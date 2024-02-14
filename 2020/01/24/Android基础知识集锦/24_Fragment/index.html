@@ -1,0 +1,199 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Fragment | Junyong Tu の 杂记</title><meta name="author" content="Junyong Tu"><meta name="copyright" content="Junyong Tu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="fragment   (碎片)—》是Android 3.0之后出现的。 Fragment 3.0之后出现的， 那么就涉及到一个问题： 如何向下兼容3.0以下的版本： 如下操作： 1. 把所有的Fragment 类与FragmentManager类改成V4包下的。 2. 把所有的继承Actvitiy 类改成继承FragmentActivity  （V4包下面）。 3. 通过getSupportFra">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fragment">
+<meta property="og:url" content="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2020/01/24/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/24_Fragment/index.html">
+<meta property="og:site_name" content="Junyong Tu の 杂记">
+<meta property="og:description" content="fragment   (碎片)—》是Android 3.0之后出现的。 Fragment 3.0之后出现的， 那么就涉及到一个问题： 如何向下兼容3.0以下的版本： 如下操作： 1. 把所有的Fragment 类与FragmentManager类改成V4包下的。 2. 把所有的继承Actvitiy 类改成继承FragmentActivity  （V4包下面）。 3. 通过getSupportFra">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4">
+<meta property="article:published_time" content="2020-01-24T04:07:08.000Z">
+<meta property="article:modified_time" content="2024-02-14T12:11:43.595Z">
+<meta property="article:author" content="Junyong Tu">
+<meta property="article:tag" content="Android基础知识集锦">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2020/01/24/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/24_Fragment/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css?v=4.12.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Fragment',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-02-14 20:11:43'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://file.ccmapp.cn/group1/M00/16/64/rApntl7CSdeAbpYqABArOjGaasg001.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Junyong Tu の 杂记"><span class="site-name">Junyong Tu の 杂记</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Fragment</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2020-01-24T04:07:08.000Z" title="发表于 2020-01-24 12:07:08">2020-01-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-02-14T12:11:43.595Z" title="更新于 2024-02-14 20:11:43">2024-02-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/">Android基础知识集锦</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Fragment"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>fragment   (碎片)—》是Android 3.0之后出现的。</p>
+<p>Fragment 3.0之后出现的， 那么就涉及到一个问题：</p>
+<p>如何向下兼容3.0以下的版本：</p>
+<p>如下操作：</p>
+<p>1. 把所有的Fragment 类与FragmentManager类改成V4包下的。</p>
+<p>2. 把所有的继承Actvitiy 类改成继承FragmentActivity  （V4包下面）。</p>
+<p>3. 通过getSupportFragmentManager（） 方法来获取FragmentManager类的实例。</p>
+<p> </p>
+<p> </p>
+<p>我们来聊一聊Fragment 的声明周期：</p>
+<p>11个关键的方法</p>
+<p>分别是：</p>
+<p>OnAttach（）  绑定Fragment 到Activity </p>
+<p>OnCreate（） 创建Fragment </p>
+<p>onCreateView()  创建Fragment 的布局。</p>
+<p>OnActivityCreated() Activity 创建完成后会回调此方法。</p>
+<p>OnStart()  可见不可交互的状态</p>
+<p>OnResume（） 可见可交互</p>
+<p>Onpause（） 部分可见，不可交互状态</p>
+<p>OnStop（）不可见状态</p>
+<p>OnDestoryView（）销毁Fragment 的View 对象</p>
+<p>OnSestory（）  销毁Fragment </p>
+<p>OnDetach（） Fragment和Activity  解绑、</p>
+<p> </p>
+<p> </p>
+<p>Fragment 是如何跟Activity 进行交互的勒？</p>
+<p>1. 在Activity 中获取Fragment 的实例。</p>
+<p>    通过getFragmentAMangger().findfragmentByTag（）或者findFragmentById（）获取相应的Fragment 的实例。</p>
+<p>2. 在Fragment 中获取Activity 的实例。</p>
+<pre><code>getActivity() 方法获取当前绑定的Activity 实例，然后进行相应的操作。
+</code></pre>
+<p> </p>
+<p> </p>
+<p>注意： 在Fragment 中可以通过getActivity 获取Context ，不过如果需要让Context </p>
+<p>在Activity被销毁后还是存在，则可以通过getActivity（）.getApplicationContext（）来获取。</p>
+<p> </p>
+<p> </p>
+<p>拓展一下：</p>
+<p>如何获取Fragment </p>
+<p>首先我们必须分别获取FragmentManager和FragmentTransaction的实例，然后创建一个</p>
+<p>Fragment 的实例，接下来调用FragmentTrancation对象的replace（）方法和Commit（）方法来完成Fragment 的切换。</p>
+<p> </p>
+<p>记住： 我这是理论知识点的过一遍， 这是针对面试使用，并不是讲解。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/">Android基础知识集锦</a></div><div class="post_share"><div class="social-share" data-image="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2020/01/23/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/23_ContentProvider/" title="ContentProvider"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">ContentProvider</div></div></a></div><div class="next-post pull-right"><a href="/2020/01/25/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/25_Intent%E5%92%8CPendingIntent/" title="Intent和PendingIntent"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Intent和PendingIntent</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2020/01/02/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/2_onNewIntent/" title="onNewIntent"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-02</div><div class="title">onNewIntent</div></div></a></div><div><a href="/2020/01/01/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/1_Activity/" title="Activity"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-01</div><div class="title">Activity</div></div></a></div><div><a href="/2020/01/03/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/3_handler/" title="handler"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-03</div><div class="title">handler</div></div></a></div><div><a href="/2020/01/18/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/18_%E5%9B%BE%E7%89%87%E5%A4%84%E7%90%86%E6%A1%86%E6%9E%B6/" title="图片处理框架"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-18</div><div class="title">图片处理框架</div></div></a></div><div><a href="/2020/01/17/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/17_AIDL/" title="AIDL"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-17</div><div class="title">AIDL</div></div></a></div><div><a href="/2020/01/16/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/16_%E4%BA%8B%E4%BB%B6%E5%88%86%E5%8F%91/" title="事件分发"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2020-01-16</div><div class="title">事件分发</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Junyong Tu</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" href="https://github.com/juncaixingchi1993"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/26_service/" title="无题">无题</a><time datetime="2024-02-14T11:37:45.559Z" title="发表于 2024-02-14 19:37:45">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/25_intent%E5%92%8CPendingIntent/" title="无题">无题</a><time datetime="2024-02-14T11:37:40.152Z" title="发表于 2024-02-14 19:37:40">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/10/gallery/" title="图库">图库</a><time datetime="2024-02-10T15:25:25.435Z" title="发表于 2024-02-10 23:25:25">2024-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/15/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC15%E7%AB%A0%20Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" title="第十五章 Android性能优化">第十五章 Android性能优化</a><time datetime="2021-01-15T14:07:08.000Z" title="发表于 2021-01-15 22:07:08">2021-01-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/14/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC14%E7%AB%A0%20JNI%E5%92%8CNDK%E7%BC%96%E7%A8%8B/" title="第十四章 JNI和NDK编程">第十四章 JNI和NDK编程</a><time datetime="2021-01-14T14:07:08.000Z" title="发表于 2021-01-14 22:07:08">2021-01-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Junyong Tu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.12.0"></script><script src="/js/main.js?v=4.12.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

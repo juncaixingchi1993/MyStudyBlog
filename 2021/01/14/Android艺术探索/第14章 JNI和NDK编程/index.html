@@ -1,0 +1,471 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第十四章 JNI和NDK编程 | Junyong Tu の 杂记</title><meta name="author" content="Junyong Tu"><meta name="copyright" content="Junyong Tu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Java JNI的本意是Java Native Interface（Java本地接口），它是为了方便Java 调用C、C++等本地代码所封装的一层接口。我们都知道，Java的优点是跨平台，但是作为优点的同时，其在和本地交互的时候就出现了短板。Java的跨平台特性导致其本地交互的能力不够强大，一些和操作系统相关的特性Java无法完成，于是Java提供了JNI专门用于和本地代码交互，这样就增强了Jav">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第十四章 JNI和NDK编程">
+<meta property="og:url" content="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/14/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC14%E7%AB%A0%20JNI%E5%92%8CNDK%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Junyong Tu の 杂记">
+<meta property="og:description" content="Java JNI的本意是Java Native Interface（Java本地接口），它是为了方便Java 调用C、C++等本地代码所封装的一层接口。我们都知道，Java的优点是跨平台，但是作为优点的同时，其在和本地交互的时候就出现了短板。Java的跨平台特性导致其本地交互的能力不够强大，一些和操作系统相关的特性Java无法完成，于是Java提供了JNI专门用于和本地代码交互，这样就增强了Jav">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4">
+<meta property="article:published_time" content="2021-01-14T14:07:08.000Z">
+<meta property="article:modified_time" content="2024-02-14T11:24:32.832Z">
+<meta property="article:author" content="Junyong Tu">
+<meta property="article:tag" content="android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/14/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC14%E7%AB%A0%20JNI%E5%92%8CNDK%E7%BC%96%E7%A8%8B/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css?v=4.12.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第十四章 JNI和NDK编程',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-02-14 19:24:32'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://img2.baidu.com/it/u=1361506290,4036378790&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=800&amp;h=500')"><nav id="nav"><span id="blog-info"><a href="/" title="Junyong Tu の 杂记"><span class="site-name">Junyong Tu の 杂记</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第十四章 JNI和NDK编程</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-01-14T14:07:08.000Z" title="发表于 2021-01-14 22:07:08">2021-01-14</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-02-14T11:24:32.832Z" title="更新于 2024-02-14 19:24:32">2024-02-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/">艺术探索</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第十四章 JNI和NDK编程"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>Java JNI的本意是Java Native Interface（Java本地接口），它是为了方便Java 调用C、C++等本地代码所封装的一层接口。我们都知道，Java的优点是跨平台，但是作为优点的同时，其在和本地交互的时候就出现了短板。Java的跨平台特性导致其本地交互的能力不够强大，一些和操作系统相关的特性Java无法完成，于是Java提供了JNI专门用于和本地代码交互，这样就增强了Java语言的本地交互能力。通过Java JNI，用户可以调用用C、C++所编写的本地代码。</p>
+<p>NDK是Android所提供的一个工具集合，通过NDK可以在Android中更加方便地通过JNI来访问本地代码，比如C或者C++。NDK还提供了交叉编译器，开发人员只需要简单地修改mk文件就可以生成特定CPU平台的动态库。使用NDK有如下好处：</p>
+<p>（1）提高代码的安全性。由于so库反编译比较困难，因此NDK提高了Android程序的安全性。</p>
+<p>（2）可以很方便地使用目前已有的C&#x2F;C++开源库。</p>
+<p>（3）便于平台间的移植。通过C&#x2F;C++实现的动态库可以很方便地在其他平台上使用。</p>
+<p>（4）提高程序在某些特定情形下的执行效率，但是并不能明显提升Android程序的性能。</p>
+<p>由于JNI和NDK比较适合在Linux环境下开发，因此本文选择Ubuntu 14.10（64位操作系统）作为开发环境，同时选择AndroidStuio作为IDE。至于Windows环境下的NDK开发，整体流程是类似的，有差别的只是和操作系统相关的特性，这里就不再单独介绍了。在Linux环境中，JNI和NDK开发所用到的动态库的格式是以.so为后缀的文件，下面统一简称为so库。另外，由于JNI和NDK主要用于底层和嵌入式开发，在Android的应用层开发中使用较少，加上它们本身更加侧重于C和C++方面的编程，因此本章只介绍JNI和NDK的基础知识，其他更加深入的知识点如果读者感兴趣的话可以查看专门介绍JNI和NDK的书籍。</p>
+<h2 id="14-1-JNI的开发流程"><a href="#14-1-JNI的开发流程" class="headerlink" title="14.1　JNI的开发流程"></a>14.1　JNI的开发流程</h2><p>JNI的开发流程有如下几步，首先需要在Java中声明native方法，接着用C或者C++实现native方法，然后就可以编译运行了。</p>
+<ol>
+<li>在Java中声明native方法</li>
+</ol>
+<p>创建一个类，这里叫做JniTest.java，代码如下所示。</p>
+<p>package com.ryg;</p>
+<p>    import java.lang.System;</p>
+<p>    public class JniTest {</p>
+<p>         static {</p>
+<p>             System.loadLibrary(“jni-test”);</p>
+<p>         }</p>
+<p>         public static </p>
+<p>void main(String args[]) {</p>
+<p>             JniTest jniTest &#x3D; new JniTest();</p>
+<p>             System.out.println(jniTest.get());</p>
+<p>             jniTest.set(“hello world”);</p>
+<p>         }</p>
+<p>         public native String get();</p>
+<p>         public native void set(String str);</p>
+<p>    }</p>
+<p>可以看到上面的代码中，声明了两个native方法：get和set(String)，这两个就是需要在JNI中实现的方法。在JniTest的头部有一个加载动态库的过程，其中jni-test是so库的标识，so库完整的名称为libjni-test.so，这是加载so库的规范。</p>
+<ol start="2">
+<li>编译Java源文件得到class文件，然后通过javah命令导出JNI的头文件</li>
+</ol>
+<p>具体的命令如下：</p>
+<p>javac com&#x2F;ryg&#x2F;JniTest.java</p>
+<p>    javah com.ryg.JniTest</p>
+<p>在当前目录下，会产生一个com_ryg_JniTest.h的头文件，它是javah命令自动生成的，内容如下所示。</p>
+<p>&#x2F;* DO NOT EDIT THIS FILE -it is machine generated *&#x2F;</p>
+<p>     #include &lt;jni.h&gt;</p>
+<p>     &#x2F;* Header for class com_ryg_JniTest *&#x2F;</p>
+<p>     #ifndef _Included_com_ryg_JniTest</p>
+<p>     #define _Included_com_ryg_JniTest</p>
+<p>     #ifdef </p>
+<p>__cplusplus</p>
+<p>    extern “C” {</p>
+<p>     #endif</p>
+<p>     &#x2F;*</p>
+<p>      * Class:     com_ryg_JniTest</p>
+<p>      * Method:    get</p>
+<p>      * Signature: ()Ljava&#x2F;lang&#x2F;String;</p>
+<p>      *&#x2F;</p>
+<p>    JNIEXPORT jstring JNICALL Java_com_ryg_JniTest_get</p>
+<p>       (JNIEnv *,jobject);</p>
+<p>     &#x2F;*</p>
+<p>      * Class:     com_ryg_JniTest</p>
+<p>      * Method:    set</p>
+<p>      * Signature: (Ljava&#x2F;lang&#x2F;String;)V</p>
+<p>      *&#x2F;</p>
+<p>    JNIEXPORT void JNICALL Java_com_ryg_JniTest_set</p>
+<p>       (JNIEnv *,jobject,jstring);</p>
+<p>     #ifdef __cplusplus</p>
+<p>    }</p>
+<p>     #endif</p>
+<p>     #endif</p>
+<p>上面的代码需要做一下说明，首先函数名的格式遵循如下规则：Java_包名_类名_方法名。比如JniTest中的set方法，到这里就变成了JNIEXPORT void JNICALL Java_com_ryg_JniTest_set(JNIEnv *,jobject,jstring)，其中com_ryg是包名，JniTest是类名，jstring是代表的是set方法的String类型的参数。关于Java和JNI的数据类型之间的对应关系会在14.3节中进行介绍，这里只需要知道Java的String对应于JNI的jstring即可。JNIEXPORT、JNICALL、JNIEnv和jobject都是JNI标准中所定义的类型或者宏，它们的含义如下：</p>
+<p>JNIEnv*：表示一个指向JNI环境的指针，可以通过它来访问JNI提供的接口方法；</p>
+<p>jobject：表示Java对象中的this；</p>
+<p>JNIEXPORT和JNICALL：它们是JNI中所定义的宏，可以在jni.h这个头文件中查找到。</p>
+<p>下面的宏定义是必需的，它指定extern “C”内部的函数采用C语言的命名风格来编译。否则当JNI采用C++来实现时，由于C和C++编译过程中对函数的命名风格不同，这将导致JNI在链接时无法根据函数名查找到具体的函数，那么JNI调用就无法完成。更多的细节实际上是有关C和C++编译时的一些问题，这里就不再展开了。</p>
+<p>#ifdef __cplusplus</p>
+<p>    extern “C” {</p>
+<p>     #endif</p>
+<ol start="3">
+<li>实现JNI方法</li>
+</ol>
+<p>JNI方法是指Java中声明的native方法，这里可以选择用C++或者C来实现，它们的实现过程是类似的，只有少量的区别，下面分别用C++和C来实现JNI方法。首先，在工程的主目录下创建一个子目录，名称随意，这里选择jni作为子目录的名称，然后将之前通过javah生成的头文件com_ryg_JniTest.h复制到jni目录下，接着创建test.cpp和test.c两个文件，它们的实现如下所示。</p>
+<p>&#x2F;&#x2F; test.cpp</p>
+<p>     #include “com_ryg_JniTest.h”</p>
+<p>     #include &lt;stdio.h&gt;</p>
+<p>    JNIEXPORT jstring JNICALL Java_com_ryg_JniTest_get(JNIEnv *env,jobject</p>
+<p>    thiz) {</p>
+<p>         printf(“invoke get in c++\n”);</p>
+<p>         return env-&gt;NewStringUTF(“Hello from JNI !”);</p>
+<p> </p>
+<p> }</p>
+<p>    JNIEXPORT void JNICALL Java_com_ryg_JniTest_set(JNIEnv *env,jobject thiz,</p>
+<p>    jstring string) {</p>
+<p>         printf(“invoke set from C++\n”);</p>
+<p>         char* str &#x3D; (char*)env-&gt;GetStringUTFChars(string,NULL);</p>
+<p>         printf(“%s\n”,str);</p>
+<p>         env-&gt;ReleaseStringUTFChars(string,str);</p>
+<p>    }</p>
+<p>    &#x2F;&#x2F; test.c</p>
+<p>     #include “com_ryg_JniTest.h”</p>
+<p>     #include &lt;stdio.h&gt;</p>
+<p>    JNIEXPORT jstring JNICALL Java_com_ryg_JniTest_get(JNIEnv *env,jobject</p>
+<p>    thiz) {</p>
+<p>         printf(“invoke get from C\n”);</p>
+<p>         return (*env)-&gt;NewStringUTF(env,”Hello from JNI !”);</p>
+<p>    }</p>
+<p>    JNIEXPORT void JNICALL Java_com_ryg_JniTest_set(JNIEnv *env,jobject thiz,</p>
+<p>    jstring string) {</p>
+<p>         printf(“invoke set from C\n”);</p>
+<p>         char* str &#x3D; (char*)(*env)-&gt;GetStringUTFChars(env,string,NULL);</p>
+<p>         printf(“%s\n”,str);</p>
+<p>         (*env)-&gt;ReleaseStringUTFChars(env,string,str);</p>
+<p>    }</p>
+<p>可以发现，test.cpp和test.c的实现很类似，但是它们对env的操作方式有所不同，因此用C++和C来实现同一个JNI方法，它们的区别主要集中在对env的操作上，其他都是类似的，如下所示。</p>
+<p>C++：env-&gt;NewStringUTF(“Hello from JNI !”</p>
+<p>);</p>
+<p>    C：  (*env)-&gt;NewStringUTF(env,”Hello from JNI !”)</p>
+<ol start="4">
+<li>编译so库并在Java中调用</li>
+</ol>
+<p>so库的编译这里采用gcc，切换到jni目录中，对于test.cpp和test.c来说，它们的编译指令如下所示。</p>
+<p>C++：gcc -shared -I &#x2F;usr&#x2F;lib&#x2F;jvm&#x2F;java-7-openjdk-amd64&#x2F;include -fPIC test.cpp -o libjni-test.so</p>
+<p>    C：  gcc -shared -I &#x2F;usr&#x2F;lib&#x2F;jvm&#x2F;java-7-openjdk-amd64&#x2F;include -fPIC test.c -o libjni-test.so</p>
+<p>上面的编译命令中，&#x2F;usr&#x2F;lib&#x2F;jvm&#x2F;java-7-openjdk-amd64是本地的jdk的安装路径，在其他环境编译时将其指向本机的jdk路径即可。而libjni-test.so则是生成的so库的名字，在Java中可以通过如下方式加载：System.loadLibrary(“jni-test”)，其中so库名字中的“lib”和“.so”是不需要明确指出的。so库编译完成后，就可以在Java程序中调用so库了，这里通过Java指令来执行Java程序，切换到主目录，执行如下指令：java -Djava.library.path&#x3D;jni com.ryg.JniTest，其中-Djava.library.path&#x3D;jni指明了so库的路径。</p>
+<p>首先，采用C++产生so库，程序运行后产生的日志如下所示。</p>
+<p>invoke get in c++</p>
+<p>    Hello from JNI !</p>
+<p>  </p>
+<p>invoke set from C++</p>
+<p>    hello world</p>
+<p>然后，采用C产生so库，程序运行后产生的日志如下所示。</p>
+<p>invoke get from C</p>
+<p>    Hello from JNI !</p>
+<p>    invoke set from C</p>
+<p>    hello world</p>
+<p>通过上面的日志可以发现，在Java中成功地调用了C&#x2F;C++的代码，这就是JNI典型的工作流程。</p>
+<h2 id="14-2-NDK的开发流程"><a href="#14-2-NDK的开发流程" class="headerlink" title="14.2　NDK的开发流程"></a>14.2　NDK的开发流程</h2><p>NDK的开发是基于JNI的，其主要由如下几个步骤。</p>
+<ol>
+<li>下载并配置NDK</li>
+</ol>
+<p>首先要从Android官网上下载NDK，下载地址为<a target="_blank" rel="noopener" href="https://developer.android.com/ndk/downloads/index.html">https://developer.android.com/ndk/downloads/index.html</a>，本章中采用的NDK的版本是android-ndk-r10d。下载完成以后，将NDK解压到一个目录，然后为NDK配置环境变量，步骤如下所示。</p>
+<p>首先打开当前用户的环境变量配置文件：</p>
+<p>vim ~&#x2F;.bashrc</p>
+<p>然后在文件后面添加如下信息：export PATH&#x3D;<del>&#x2F;Android&#x2F;android-ndk-r10d:$PATH，其中</del>&#x2F;Android&#x2F;android-ndk-r10d是本地的NDK的存放路径。</p>
+<p>添加完毕后，执行source ~&#x2F;.bashrc来立刻刷新刚刚设置的环境变量。设置完环境变量后，ndk-build命令就可以使用了，通过ndk-build命令就可以编译产生so库。</p>
+<ol start="2">
+<li>创建一个Android项目，并声明所需的native方法</li>
+</ol>
+<p>package com.ryg.JniTestApp;</p>
+<p>    import android.support.v7.app.ActionBarActivity;</p>
+<p>    import android.os.Bundle;</p>
+<p>    import android.util.Log;</p>
+<p>    import android.view.Menu;</p>
+<p>    import android.view.MenuItem;</p>
+<p>    import android.widget.TextView;</p>
+<p>    public class MainActivity extends ActionBarActivity {</p>
+<p>         static {</p>
+<p>             System.loadLibrary(“jni-test”);</p>
+<p>         }</p>
+<p>         @Override</p>
+<p>         protected void onCreate(Bundle savedInstanceState) {</p>
+<p>             super.onCreate(savedInstanceState);</p>
+<p>             setContentView(R.layout.activity_main);</p>
+<p>             TextView textView &#x3D; (TextView)findViewById(R.id.msg);</p>
+<p>             textView.setText(get());</p>
+<p>             set(“hello world from JniTestApp”);</p>
+<p>         }</p>
+<p>         public native String get();</p>
+<p>         public native void set(String str);</p>
+<p>    }</p>
+<ol start="3">
+<li>实现Android项目中所声明的native方法</li>
+</ol>
+<p>在外部创建一个名为jni的目录，然后在jni目录下创建3个文件：test.cpp、Android.mk和Application.mk，它们的实现如下所示。</p>
+<p>&#x2F;&#x2F; test.cpp</p>
+<p>     #include &lt;jni.h&gt;</p>
+<p>     #include &lt;stdio.h&gt;</p>
+<p>     #ifdef __cplusplus</p>
+<p>    extern “C” {</p>
+<p>     #endif</p>
+<p>    jstring Java_com_ryg_JniTestApp_MainActivity_get(JNIEnv *env,jobject thiz){</p>
+<p>         printf(“invoke get in c++\n”);</p>
+<p>         return env-&gt;NewStringUTF(“Hello from JNI in libjni-test.so !”);</p>
+<p>    }</p>
+<p>    void Java_com_ryg_JniTestApp_MainActivity_set(JNIEnv *env,jobject thiz,</p>
+<p>    jstring string) {</p>
+<p>         printf(“invoke set from C++\n”);</p>
+<p>         char* str &#x3D; (char*)env-&gt;GetStringUTFChars(string,NULL);</p>
+<p>         printf(“%s\n”,str);</p>
+<p>         env-&gt;ReleaseStringUTFChars(string,str);</p>
+<p>    }</p>
+<p>     #ifdef __cplusplus</p>
+<p>    }</p>
+<p>     #endif</p>
+<p>    &#x2F;&#x2F; Android.mk</p>
+<p>     #Copyright (C) 2009 The Android Open Source Project</p>
+<p>     #</p>
+<p>     #Licensed under the Apache License,Version 2.0 (the “License”);</p>
+<p>     #you may not use this file except in compliance with the License.</p>
+<p>     #You may obtain a copy of the License at</p>
+<p>     #</p>
+<p>     #     <a target="_blank" rel="noopener" href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a></p>
+<p>     #</p>
+<p>     #Unless required by applicable law or agreed to in writing,software</p>
+<p>#distributed under the License is distributed on an “AS IS” BASIS,</p>
+<p>     #WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,either express or implied.</p>
+<p>     #See the License for the specific language governing permissions and</p>
+<p>     #limitations under the License.</p>
+<p>     #</p>
+<p>    LOCAL_PATH :&#x3D; $(call my-dir)</p>
+<p>    include $(CLEAR_VARS)</p>
+<p>    LOCAL_MODULE    :&#x3D; jni-test</p>
+<p>    LOCAL_SRC_FILES :&#x3D; test.cpp</p>
+<p>    include $(BUILD_SHARED_LIBRARY)</p>
+<p>    &#x2F;&#x2F; Application.mk</p>
+<p>    APP_ABI :&#x3D; armeabi</p>
+<p>这里对Android.mk和Application.mk做一下简单的介绍。在Android.mk中，LOCAL_MODULE表示模块的名称，LOCAL_SRC_FILES表示需要参与编译的源文件。Application.mk中常用的配置项是APP_ABI，它表示CPU的架构平台的类型，目前市面上常见的架构平台有armeabi、x86和mips，其中在移动设备中占据主要地位的是armeabi，这也是大部分apk中只包含armeabi类型的so库的原因。默认情况下NDK会编译产生各个CPU平台的so库，通过APP_ABI选项即可指定so库的CPU平台的类型，比如armeabi，这样NDK就只会编译armeabi平台下的so库了，而all则表示编译所有CPU平台的so库。</p>
+<ol start="4">
+<li>切换到jni目录的父目录，然后通过ndk-build命令编译产生so库</li>
+</ol>
+<p>这个时候NDK会创建一个和jni目录平级的目录libs，libs下面存放的就是so库的目录，如图14-1所示。需要注意的是，ndk-build命令会默认指定jni目录为本地源码的目录，如果源码存放的目录名不是jni，那么ndk-build则无法成功编译。</p>
+<p>图14-1　通过NDK编译产生的so库</p>
+<p>然后在app&#x2F;src&#x2F;main中创建一个名为jniLibs的目录，将生成的so库复制到jniLibs目录中，然后通过AndroidStudio编译运行即可，运行效果如图14-2所示。这说明从Android中调用so库中的方法已经成功了。</p>
+<p>图14-2　Android中调用so库中的方法示例</p>
+<p>在上面的步骤中，需要将NDK编译的so库放置到jniLibs目录下，这个是AndroidStudio所识别的默认目录，如果想使用其他目录，可以按照如下方式修改App的build.gradle文件，其中jniLibs.srcDir选项指定了新的存放so库的目录。</p>
+<p>android {</p>
+<p>        …</p>
+<p>         sourceSets.main {</p>
+<p>             jniLibs.srcDir ‘src&#x2F;main&#x2F;jni_libs’</p>
+<p>         }</p>
+<p>    }</p>
+<p>除了手动使用ndk-build命令创建so库，还可以通过AndroidStudio来自动编译产生so库，这个操作过程要稍微复杂一些。为了能够让AndroidStudio自动编译JNI代码，首先需要在App的build.gradle的defaultConfig区域内添加NDK选项，其中moduleName指定了模块的名称，这个名称指定了打包后的so库的文件名，如下所示。</p>
+<p>android {</p>
+<p>        …</p>
+<p>        defaultConfig {</p>
+<p>                applicationId “com.ryg.JniTestApp”</p>
+<p>                minSdkVersion 8</p>
+<p>                targetSdkVersion 22</p>
+<p>                versionCode 1</p>
+<p>                versionName “1.0”</p>
+<p>                ndk {</p>
+<p>                        moduleName “jni-test”</p>
+<p>                }</p>
+<p>        }</p>
+<p>    }</p>
+<p>接着需要将JNI的代码放在app&#x2F;src&#x2F;main&#x2F;jni目录下，注意存放JNI代码的目录名必须为jni，如果不想采用jni这个名称，可以通过如下方式来指定JNI的代码路径，其中jni.srcDirs指定了JNI代码的路径：</p>
+<p>android {</p>
+<p>        …</p>
+<p>         sourceSets.main {</p>
+<p>             jni.srcDirs ‘src&#x2F;main&#x2F;jni_src’</p>
+<p>         }</p>
+<p>    }</p>
+<p>经过了上面的步骤，AndroidStudio就可以自动编译JNI代码了，但是这个时候AndroidStudio会把所有CPU平台的so库都打包到apk中，一般来说实际开发中只需要打包armeabi平台的so库即可。要解决这个问题也很简单，按照如下方式修改build.gradle的配置，然后在Build Variants面板中选择armDebug选项进行编辑就可以了。</p>
+<p>android {</p>
+<p>        …</p>
+<p>         productFlavors {</p>
+<p>             arm {</p>
+<p>                 ndk {</p>
+<p>                     abiFilter “armeabi”</p>
+<p>                 }</p>
+<p>             }</p>
+<p>             x86 {</p>
+<p>                 ndk {</p>
+<p>                     abiFilter “x86”</p>
+<p>                 }</p>
+<p>             }</p>
+<p>         }</p>
+<p>    }</p>
+<p>如图14-3所示，可以看到apk中就只有armeabi平台的so库了。</p>
+<p>图14-3　AndroidStudio打包后的apk</p>
+<h2 id="14-3-JNI的数据类型和类型签名"><a href="#14-3-JNI的数据类型和类型签名" class="headerlink" title="14.3　JNI的数据类型和类型签名"></a>14.3　JNI的数据类型和类型签名</h2><p>JNI的数据类型包含两种：基本类型和引用类型。基本类型主要有jboolean、jchar、jint等，它们和Java中的数据类型的对应关系如表14-1所示。</p>
+<p>表14-1　JNI基本数据类型的对应关系</p>
+<p>JNI中的引用类型主要有类、对象和数组，它们和Java中的引用类型的对应关系如表14-2所示。</p>
+<p>表14-2　JNI引用类型的对应关系</p>
+<p>JNI的类型签名标识了一个特定的Java类型，这个类型既可以是类和方法，也可以是数据类型。</p>
+<p>类的签名比较简单，它采用“L+包名+类名+;”的形式，只需要将其中的.替换为&#x2F;即可。比如java.lang.String，它的签名为Ljava&#x2F;lang&#x2F;String;，注意末尾的;也是签名的一部分。</p>
+<p>基本数据类型的签名采用一系列大写字母来表示，如表14-3所示。</p>
+<p>表14-3　基本数据类型的签名</p>
+<p>从表14-3可以看出，基本数据类型的签名是有规律的，一般为首字母的大写，但是boolean除外，因为B已经被byte占用了，而long的签名之所以不是L，那是因为L表示的是类的签名。</p>
+<p>对象和数组的签名稍微复杂一些。对于对象来说，它的签名就是对象所属的类的签名，比如String对象，它的签名为Ljava&#x2F;lang&#x2F;String;。对于数组来说，它的签名为[+类型签名，比如int数组，其类型为int，而int的签名为I，所以int数组的签名就是[I，同理就可以得出如下的签名对应关系：</p>
+<pre><code>char[]     [C
+</code></pre>
+<p>    float[]    [F</p>
+<p>    double[]   [D</p>
+<p>    long[]     [J</p>
+<p>    String[]   [Ljava&#x2F;lang&#x2F;String;</p>
+<p>    Object[]   [Ljava&#x2F;lang&#x2F;Object;</p>
+<p>对于多维数组来说，它的签名为n个[+类型签名，其中n表示数组的维度，比如，int[][]的签名为[[I，其他情况可以依此类推。</p>
+<p>方法的签名为（参数类型签名）+返回值类型签名，这有点不好理解。举个例子，如下方法：boolean fun1(int a,double b,int[] c)，根据签名的规则可以知道，它的参数类型</p>
+<p>的签名连在一起是ID[I，返回值类型的签名为Z，所以整个方法的签名就是(ID[I)Z。再举个例子，下面的方法：boolean fun1(int a,String b,int[] c)，它的签名是(ILjava&#x2F;lang&#x2F;String;[I)Z。为了能够更好地理解方法的签名格式，下面再给出两个示例：</p>
+<p>int fun1()       签名为 ()I</p>
+<p>    void fun1(int i)  签名为 (I)V</p>
+<h2 id="14-4-JNI调用Java方法的流程"><a href="#14-4-JNI调用Java方法的流程" class="headerlink" title="14.4　JNI调用Java方法的流程"></a>14.4　JNI调用Java方法的流程</h2><p>JNI调用Java方法的流程是先通过类名找到类，然后再根据方法名找到方法的id，最后就可以调用这个方法了。如果是调用Java中的非静态方法，那么需要构造出类的对象后才能调用它。下面的例子演示了如何在JNI中调用Java的静态方法，至于调用非静态方法只是多了一步构造对象的过程，这里就不再介绍了。</p>
+<p>首先需要在Java中定义一个静态方法供JNI调用，如下所示。</p>
+<p>public static void methodCalledByJni(String msgFromJni) {</p>
+<p>        Log.d(TAG,”methodCalledByJni,msg: “ + msgFromJni);</p>
+<p>    }</p>
+<p>然后在JNI中调用上面定义的静态方法：</p>
+<p>void callJavaMethod(JNIEnv *env,jobject thiz) {</p>
+<p>         jclass clazz &#x3D; env-&gt;FindClass(“com&#x2F;ryg&#x2F;JniTestApp&#x2F;MainActivity”);</p>
+<p>         if (clazz &#x3D;&#x3D; NULL) {</p>
+<p>             printf(“find class MainActivity error!”);</p>
+<p>             return;</p>
+<p>         }</p>
+<p>         jmethodID id &#x3D; env-&gt;GetStaticMethodID(clazz,”methodCalledByJni”,</p>
+<p>         “(Ljava&#x2F;lang&#x2F;String;)V”);</p>
+<p>         if (id &#x3D;&#x3D; NULL) {</p>
+<p>             printf(“find method methodCalledByJni error!”);</p>
+<p>         }</p>
+<p>         jstring msg &#x3D; env-&gt;NewStringUTF(“msg send by callJavaMethod in</p>
+<p>         test.cpp.”);</p>
+<p>         env-&gt;CallStaticVoidMethod(clazz,id,msg);</p>
+<p>    }</p>
+<p>从callJavaMethod的实现可以看出，程序首先根据类名com&#x2F;ryg&#x2F;JniTestApp&#x2F;MainActivity找到类，然后再根据方法名methodCalledByJni找到方法，其中(Ljava&#x2F;lang&#x2F;String;)V是methodCalledByJni方法的签名，接着再通过JNIEnv对象的CallStaticVoidMethod方法来完成最终的调用过程。</p>
+<p>最后在Java_com_ryg_JniTestApp_MainActivity_get方法中调用callJavaMethod方法，如下所示。</p>
+<p>jstring Java_com_ryg_JniTestApp_MainActivity_get(JNIEnv *env,jobject thiz){</p>
+<p>         printf(“invoke get in c++\n”);</p>
+<p>         callJavaMethod(env,thiz);</p>
+<p>         return env-&gt;NewStringUTF(“Hello from JNI in libjni-test.so !”);</p>
+<p>    }</p>
+<p>由于MainActivity会调用JNI中的Java_com_ryg_JniTestApp_MainActivity_get方法，Java_com_ryg_JniTestApp_MainActivity_get方法又会调用callJavaMethod方法，而callJavaMethod方法又会反过来调用MainActivity的methodCalledByJni方法，这样一来就完成了一次从Java调用JNI然后再从JNI中调用Java方法的过程。安装运行程序，可以看到如下日志，这说明程序已经成功地从JNI中调用了Java中的methodCalledByJni方法。</p>
+<p>D&#x2F;MainActivity: methodCalledByJni,msg: msg send by callJavaMethod in test.cpp.</p>
+<p>我们可以发现，JNI调用Java的过程和Java中方法的定义有很大关联，针对不同类型的Java方法，JNIEnv提供了不同的接口去调用，本章作为一个JNI的入门章节就不再对它们一一进行介绍了，毕竟大部分应用层的开发人员并不需要那么深入地了解JNI，如果读者感兴趣可以自行阅读相关的JNI专业书籍。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/android/">android</a></div><div class="post_share"><div class="social-share" data-image="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/01/13/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC13%E7%AB%A0%20%E7%BB%BC%E5%90%88%E6%8A%80%E6%9C%AF/" title="第十三章 综合技术"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第十三章 综合技术</div></div></a></div><div class="next-post pull-right"><a href="/2021/01/15/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC15%E7%AB%A0%20Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" title="第十五章 Android性能优化"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第十五章 Android性能优化</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/01/01/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC1%E7%AB%A0%20Activity%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%92%8C%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F/" title="第一章 Activity的生命周期和启动模式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-01</div><div class="title">第一章 Activity的生命周期和启动模式</div></div></a></div><div><a href="/2021/01/03/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC3%E7%AB%A0%20View%E7%9A%84%E4%BA%8B%E4%BB%B6%E4%BD%93%E7%B3%BB/" title="第三章　View的事件体系"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-03</div><div class="title">第三章　View的事件体系</div></div></a></div><div><a href="/2021/01/04/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC4%E7%AB%A0%20View%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" title="第四章　View的工作原理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-04</div><div class="title">第四章　View的工作原理</div></div></a></div><div><a href="/2021/01/05/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC5%E7%AB%A0%20%E7%90%86%E8%A7%A3RemoteViews/" title="第五章　理解RemoteViews"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-05</div><div class="title">第五章　理解RemoteViews</div></div></a></div><div><a href="/2021/01/06/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC6%E7%AB%A0%20Android%E7%9A%84Drawable/" title="第六章　Android的Drawable"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-06</div><div class="title">第六章　Android的Drawable</div></div></a></div><div><a href="/2021/01/07/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC7%E7%AB%A0%20Android%E5%8A%A8%E7%94%BB%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90/" title="第七章　Android动画深入分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-07</div><div class="title">第七章　Android动画深入分析</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Junyong Tu</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" href="https://github.com/juncaixingchi1993"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#14-1-JNI%E7%9A%84%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">14.1　JNI的开发流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-2-NDK%E7%9A%84%E5%BC%80%E5%8F%91%E6%B5%81%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">14.2　NDK的开发流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-3-JNI%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%92%8C%E7%B1%BB%E5%9E%8B%E7%AD%BE%E5%90%8D"><span class="toc-number">3.</span> <span class="toc-text">14.3　JNI的数据类型和类型签名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#14-4-JNI%E8%B0%83%E7%94%A8Java%E6%96%B9%E6%B3%95%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">14.4　JNI调用Java方法的流程</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/26_service/" title="无题">无题</a><time datetime="2024-02-14T11:37:45.559Z" title="发表于 2024-02-14 19:37:45">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/25_intent%E5%92%8CPendingIntent/" title="无题">无题</a><time datetime="2024-02-14T11:37:40.152Z" title="发表于 2024-02-14 19:37:40">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/10/gallery/" title="图库">图库</a><time datetime="2024-02-10T15:25:25.435Z" title="发表于 2024-02-10 23:25:25">2024-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/15/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC15%E7%AB%A0%20Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" title="第十五章 Android性能优化">第十五章 Android性能优化</a><time datetime="2021-01-15T14:07:08.000Z" title="发表于 2021-01-15 22:07:08">2021-01-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/14/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC14%E7%AB%A0%20JNI%E5%92%8CNDK%E7%BC%96%E7%A8%8B/" title="第十四章 JNI和NDK编程">第十四章 JNI和NDK编程</a><time datetime="2021-01-14T14:07:08.000Z" title="发表于 2021-01-14 22:07:08">2021-01-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Junyong Tu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.12.0"></script><script src="/js/main.js?v=4.12.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

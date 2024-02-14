@@ -1,0 +1,1487 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第九章　四大组件的工作过程 | Junyong Tu の 杂记</title><meta name="author" content="Junyong Tu"><meta name="copyright" content="Junyong Tu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本章讲述Android中的四大组件的工作过程。说到四大组件，开发者都再熟悉不过了，它们是Activity、Service、BroadcastReceiver和ContentProvider。如何使用四大组件，这不是本章关心的，毕竟这是开发者都熟悉的内容，本章按照如下的逻辑来分析Android的四大组件：首先会对四大组件的运行状态和工作方式做一个概括化的描述，接着对四大组件的工作过程进行分析，通过本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第九章　四大组件的工作过程">
+<meta property="og:url" content="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/09/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC9%E7%AB%A0%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Junyong Tu の 杂记">
+<meta property="og:description" content="本章讲述Android中的四大组件的工作过程。说到四大组件，开发者都再熟悉不过了，它们是Activity、Service、BroadcastReceiver和ContentProvider。如何使用四大组件，这不是本章关心的，毕竟这是开发者都熟悉的内容，本章按照如下的逻辑来分析Android的四大组件：首先会对四大组件的运行状态和工作方式做一个概括化的描述，接着对四大组件的工作过程进行分析，通过本">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4">
+<meta property="article:published_time" content="2021-01-09T14:07:08.000Z">
+<meta property="article:modified_time" content="2024-02-14T11:20:21.931Z">
+<meta property="article:author" content="Junyong Tu">
+<meta property="article:tag" content="android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/09/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC9%E7%AB%A0%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css?v=4.12.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第九章　四大组件的工作过程',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-02-14 19:20:21'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://img2.baidu.com/it/u=1361506290,4036378790&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=800&amp;h=500')"><nav id="nav"><span id="blog-info"><a href="/" title="Junyong Tu の 杂记"><span class="site-name">Junyong Tu の 杂记</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第九章　四大组件的工作过程</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-01-09T14:07:08.000Z" title="发表于 2021-01-09 22:07:08">2021-01-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-02-14T11:20:21.931Z" title="更新于 2024-02-14 19:20:21">2024-02-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/">艺术探索</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第九章　四大组件的工作过程"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>本章讲述Android中的四大组件的工作过程。说到四大组件，开发者都再熟悉不过了，它们是Activity、Service、BroadcastReceiver和ContentProvider。如何使用四大组件，这不是本章关心的，毕竟这是开发者都熟悉的内容，本章按照如下的逻辑来分析Android的四大组件：首先会对四大组件的运行状态和工作方式做一个概括化的描述，接着对四大组件的工作过程进行分析，通过本章的分析读者可以对四大组件有一个更深刻的认识。</p>
+<p>本章主要侧重于四大组件工作过程的分析，通过分析它们的工作过程我们可以更好地理解系统内部的运行机制。本章的意义在于加深读者对四大组件的工作方式的认识，由于四大组件的特殊性，我们有必要对它们的工作过程有一定的了解，这也有助于加深对Android整体的体系结构的认识。很多情况下，只有对Android体系结构有一定认识，在实际的开发中才能写出优秀的代码。</p>
+<h2 id="9-1-四大组件的运行状态"><a href="#9-1-四大组件的运行状态" class="headerlink" title="9.1　四大组件的运行状态"></a>9.1　四大组件的运行状态</h2><p>Android的四大组件中除了BroadcastReceiver以外，其他三种组件都必须在Android-Manifest中注册，对于BroadcastReceiver来说，它既可以在AndroidManifest中注册也可以通过代码来注册。在调用方式上，Activity、Service和BroadcastReceiver需要借助Intent，而ContentProvider则无须借助Intent。</p>
+<p>Activity是一种展示型组件，用于向用户直接地展示一个界面，并且可以接收用户的输入信息从而进行交互。Activity是最重要的一种组件，对用户来说，Activity就是一个Android应用的全部，这是因为其他三大组件对用户来说都是不可感知的。Activity的启动由Intent触发，其中Intent可以分为显式Intent和隐式Intent，显式Intent可以明确地指向一个Activity组件，隐式Intent则指向一个或多个目标Activity组件，当然也可能没有任何一个Activity组件可以处理这个隐式Intent。一个Activity组件可以具有特定的启动模式。关于Activity的启动模式在第1章中已经做了介绍，同一个Activity组件在不同的启动模式下会有不同的效果。Activity组件是可以停止的，在实际开发中可以通过Activity的finish方法来结束一个Activity组件的运行。由此来看，Activity组件的主要作用是展示一个界面并和用户交互，它扮演的是一种前台界面的角色。</p>
+<p>Service是一种计算型组件，用于在后台执行一系列计算任务。由于Service组件工作在后台，因此用户无法直接感知到它的存在。Service组件和Activity组件略有不同，Activity组件只有一种运行模式，即Activity处于启动状态，但是Service组件却有两种状态：启动状态和绑定状态。当Service组件处于启动状态时，</p>
+<p>这个时候Service内部可以做一些后台计算，并且不需要和外界有直接的交互。尽管Service组件是用于执行后台计算的，但是它本身是运行在主线程中的，因此耗时的后台计算仍然需要在单独的线程中去完成。当Service组件处于绑定状态时，这个时候Service内部同样可以进行后台计算，但是处于这种状态时外界可以很方便地和Service组件进行通信。Service组件也是可以停止的，停止一个Service组件稍显复杂，需要灵活采用stopService和unBindService这两个方法才能完全停止一个Service组件。</p>
+<p>BroadcastReceiver是一种消息型组件，用于在不同的组件乃至不同的应用之间传递消息。BroadcastReceiver同样无法被用户直接感知，因为它工作在系统内部。BroadcastReceiver也叫广播，广播的注册有两种方式：静态注册和动态注册。静态注册是指在AndroidManifest中注册广播，这种广播在应用安装时会被系统解析，此种形式的广播不需要应用启动就可以收到相应的广播。动态注册广播需要通过Context.registerReceiver()来实现，并且在不需要的时候要通过Context.unRegisterReceiver()来解除广播，此种形态的广播必须要应用启动才能注册并接收广播，因为应用不启动就无法注册广播，无法注册广播就无法收到相应的广播。在实际开发中通过Context的一系列send方法来发送广播，被发送的广播会被系统发送给</p>
+<p>感兴趣的广播接收者，发送和接收过程的匹配是通过广播接收者的<intent-filter>来描述的。可以发现，BroadcastReceiver组件可以用来实现低耦合的观察者模式，观察者和被观察者之间可以没有任何耦合。由于BroadcastReceiver的特性，它不适合用来执行耗时操作。BroadcastReceiver组件一般来说不需要停止，它也没有停止的概念。</p>
+<p>ContentProvider是一种数据共享型组件，用于向其他组件乃至其他应用共享数据。和BroadcastReceiver一样，ContentProvider同样无法被用户直接感知。对于一个ContentProvider组件来说，它的内部需要实现增删改查这四种操作，在它的内部维持着一份数据集合，这个数据集合既可以通过数据库来实现，也可以采用其他任何类型来实现，比如List和Map，ContentProvider对数据集合的具体实现并没有任何要求。需要注意的是，ContentProvider内部的insert、delete、update和query方法需要处理好线程同步，因为这几个方法是在Binder线程池中被调用的，另外ContentProvider组件也不需要手动停止。</p>
+<h2 id="9-2-Activity的工作过程"><a href="#9-2-Activity的工作过程" class="headerlink" title="9.2　Activity的工作过程"></a>9.2　Activity的工作过程</h2><p>本节讲述的内容是Activity的工作过程。为了方便日常的开发工作，系统对四大组件的工作过程进行了很大程度的封装，这使得开发者无须关注实现细节即可快速地使用四大组件</p>
+<p>。Activity作为很重要的一个组件，其内部工作过程系统当然也是做了很多的封装，这种封装使得启动一个Activity变得异常简单。在显式调用的情形下，只需要通过如下代码即可完成：</p>
+<p>Intent intent &#x3D; new Intent(this,TestActivity.class);</p>
+<p>startActivity(intent);</p>
+<p>通过上面的代码即可启动一个具体的Activity，然后新Activity就会被系统启动并展示在用户的眼前。这个过程对于Android开发者来说最普通不过了，这也是很理所应当的事，但是有没有想过系统内部到底是如何启动一个Activity的呢？比如新Activity的对象是在何时创建的？Activity的onCreate方法又是在何时被系统回调的呢？读者可能会有疑问：在日常开发中并不需要了解Activity底层到底是怎么工作的，那么了解它们又有什么意义呢？没错，在日常开发中是不需要了解系统的底层工作原理，但是如果想要在技术上有进一步的提高，那么就必须了解一些系统的工作原理，这是一个开发人员日后成长为高级工程师乃至架构师所必须具备的技术能力。从另外一个角度来说，Android作为一个优秀的基于Linux的移动操作系统，其内部一定有很多值得我们学习和借鉴的地方，因此了解系统的工作过程就是学习Android操作系统。通过对Android操作系统的学习可以提高我们对操作系统在技术实现上的理解</p>
+<p>，这对于加强开发人员的内功是很有帮助的。但是有一点，由于Android的内部实现多数都比较复杂，在研究内部实现上应该更加侧重于对整体流程的把握，而不能深入代码细节不能自拔，太深入代码细节往往会导致“只见树木不见森林”的状态。处于这种状态下，无法对整体流程建立足够的认识，取而代之的是烦琐的代码细节，但是代码细节本身并不具有太多的指导意义，因此这种学习状态是要极力避免的。鉴于这一点，本章对Activity以及其他三个组件的工作过程的分析将会侧重于整体流程的讲解，目的是为了让读者对四大组件的工作过程有一个感性的认识并能够给予上层开发一些指导意义。但凡事不是绝对的，如果开发者从事的工作是Android Rom开发，那底层代码细节还是要有所涉猎的。</p>
+<p>本节主要分析Activity的启动过程，通过本节读者可以对Activity的启动过程有一个感性的认识，至于启动模式以及任务栈等概念本节中并未涉及，读者感兴趣的话可以查看相应的代码细节即可。</p>
+<p>我们从Activity的startActivity方法开始分析，startActivity方法有好几种重载方式，但它们最终都会调用startActivityForResult方法，它的实现如下所示。</p>
+<p>public void startActivityForResult(Intent intent,int requestCode,</p>
+<p>    @Nullable Bundle options) {</p>
+<p>        if (mParent &#x3D;&#x3D; null) {</p>
+<p>                Instrumentation.ActivityResult ar &#x3D;</p>
+<p>                        mInstrumentation.execStartActivity(</p>
+<p>                                this,mMainThread.getApplicationThread(),mToken,this,</p>
+<p>        </p>
+<p>在上面的代码中，我们只需要关注mParent &#x3D;&#x3D; null这部分逻辑即可。mParent代表的是ActivityGroup，ActivityGroup最开始被用来在一个界面中嵌入多个子Activity，但是其在API 13中已经被废弃了，系统推荐采用Fragment来代替ActivityGroup，Fragment的好处就不用多说了。在上面的代码中需要注意mMainThread.getApplicationThread()这个参数，它的类型是ApplicationThread，ApplicationThread是ActivityThread的一个内部类，通过后面的分析可以发现，ApplicationThread和ActivityThread在Activity的启动过程中发挥着很重要的作用。接着看一下Instrumentation的execStartActivity方法，如下所示。</p>
+<p>public ActivityResult execStartActivity(</p>
+<p>                Context who,IBinder contextThread,IBinder token,Activity target,</p>
+<p>                Intent intent,int requestCode,Bundle options) {</p>
+<p>        IApplicationThread whoThread &#x3D; (IApplicationThread) contextThread;</p>
+<p>        if (mActivityMonitors !&#x3D; null) {</p>
+<p>                synchronized (mSync) {</p>
+<p>                        final int N &#x3D; mActivityMonitors.size();</p>
+<p>                        for (int i&#x3D;0; i&lt;N; i++) {</p>
+<p>                                final ActivityMonitor am &#x3D; mActivityMonitors.get(i);</p>
+<p>                                if (am.match(who,null,intent)) {</p>
+<p>                                        am.mHits++;</p>
+<p>                                        if (am.isBlocking()) {</p>
+<p>                                                return requestCode &#x3D;&gt; 0 ? am.getResult() : null;</p>
+<p>                                        }</p>
+<p>                                        break;</p>
+<p>                                }</p>
+<p>                        }</p>
+<p>                }</p>
+<p>        }</p>
+<p>        try {</p>
+<p>                intent.migrateExtraStreamToClipData();</p>
+<p>                intent.prepareToLeaveProcess();</p>
+<p>                int result &#x3D; ActivityManagerNative.getDefault()</p>
+<p>                        .startActivity(whoThread,who.getBasePackageName(),intent,</p>
+<p>                                        intent.resolveTypeIfNeeded(who.getContentResolver()),</p>
+<p>                                        token,target !&#x3D; null ? target.mEmbeddedID : null,</p>
+<p>                                        requestCode,0,null,options);</p>
+<p>                checkStartActivityResult(result,intent);</p>
+<p>        } catch (RemoteException e) {</p>
+<p>        }</p>
+<p>        return null;</p>
+<p>    }</p>
+<p>从上面的代码可以看出，启动Activity真正的实现由ActivityManagerNative.getDefault()的startActivity方法来完成。ActivityManagerService（下面简称为AMS）继承自ActivityManagerNative，而ActivityManagerNative继承自Binder并实现了IActivityManager这个Binder接口，因此AMS也是一个Binder，它是IActivityManager的具体实现。由于ActivityManagerNative.getDefault()其实是一个IActivityManager类型的Binder对象，因此它的具体实现是AMS。可以发现，在ActivityManagerNative中，AMS这个Binder对象采用单例模式对外提供，Singleton是一个单例的封装类，第一次调用它的get方法时它会通过create方法来初始化AMS这个Binder对象，在后续的调用中则直接返回之前创建的对象，这个过程的源码如下所示。</p>
+<p>static public IActivityManager getDefault() {</p>
+<p>        return gDefault.get();</p>
+<p>    }</p>
+<p>    private static final Singleton<IActivityManager> gDefault &#x3D; new Singleton    <IActivityManager>() {</p>
+<p>        protected IActivityManager create() {</p>
+<p>                IBinder b &#x3D; ServiceManager.getService(“activity”);</p>
+<p>                if (false) {</p>
+<p>      </p>
+<p>从上面的分析可以知道，Activity由ActivityManagerNative.getDefault()来启动，而ActivityManagerNative.getDefault()实际上是AMS，因此Activity的启动过程又转移到了AMS中，为了继续分析这个过程，只需要查看AMS的startActivity方法即可。在分析AMS的的startActivity方法之前，我们先回过头来看一下Instrumentation的execStartActivity方法，其中有一行代码：checkStartActivityResult(result,intent)，直观上看起来这个方法的作用像是在检查启动Activity的结果，它的具体实现如下所示。</p>
+<p>&#x2F;** @hide *&#x2F;</p>
+<p>    public static void checkStartActivityResult(int res,Object intent) {</p>
+<p>        if (res &#x3D;&gt; ActivityManager.START_SUCCESS) {</p>
+<p>                return;</p>
+<p>        }</p>
+<p>        switch (res) {</p>
+<p>                case ActivityManager.START_INTENT_NOT_RESOLVED:</p>
+<p>                case ActivityManager.START_CLASS_NOT_FOUND:</p>
+<p>                        if (intent instanceof Intent &amp;&amp; ((Intent)intent).getComponent() !&#x3D; null)</p>
+<p>                                throw new ActivityNotFoundException(</p>
+<p>                                                “Unable to find explicit activity class “</p>
+<p>          </p>
+<p>                                    + ((Intent)intent).getComponent().toShortString()</p>
+<p>                                                + “; have you declared this activity in your AndroidManifest.xml?”);</p>
+<p>                        throw new ActivityNotFoundException(</p>
+<p>                                        “No Activity found to handle “ + intent);</p>
+<p>                case ActivityManager.START_PERMISSION_DENIED:</p>
+<p>                        throw new SecurityException(“Not allowed to start activity “</p>
+<p>                                        + intent);</p>
+<p>                case ActivityManager.START_FORWARD_AND_REQUEST_CONFLICT:</p>
+<p>                        throw new AndroidRuntimeException(</p>
+<p>                                        “FORWARD_RESULT_FLAG used while also requesting a result”);</p>
+<p>                case ActivityManager.START_NOT_ACTIVITY:</p>
+<p>                        throw new IllegalArgumentException(</p>
+<p>                                        “PendingIntent is not an activity”);</p>
+<p>                case ActivityManager.START_NOT_VOICE_COMPATIBLE:</p>
+<p>                        throw new SecurityException(</p>
+<p>                                        “Starting under vo</p>
+<p>ice control not allowed for: “ + intent);</p>
+<p>                default:</p>
+<p>                        throw new AndroidRuntimeException(“Unknown error code “</p>
+<p>                                        + res + “ when starting “ + intent);</p>
+<p>        }</p>
+<p>    }</p>
+<p>从上面的代码可以看出，checkStartActivityResult的作用很明显，就是检查启动Activity的结果。当无法正确地启动一个Activity时，这个方法会抛出异常信息，其中最熟悉不过的就是“Unable to find explicit activity class; have you declared this activity in your AndroidManifest.xml?”这个异常了，当待启动的Activity没有在AndroidManifest中注册时，就会抛出这个异常。</p>
+<p>接着我们继续分析AMS的startActivity方法，如下所示。</p>
+<p>public final int startActivity(IApplicationThread caller,String callingPackage,</p>
+<p>                Intent intent,String resolvedType,IBinder resultTo,String resultWho,int requestCode,</p>
+<p>                int startFlags,ProfilerInfo profilerInfo,Bundle options) {</p>
+<p>        return startActivityAsUser(caller,callingPackage,intent,resolved-Type,resultTo,</p>
+<p>                resultWho,requestCode,startFlags,profilerInfo,options,</p>
+<p> UserHandle.getCallingUserId());</p>
+<p>    }</p>
+<p>    public final int startActivityAsUser(IApplicationThread caller,String callingPackage,</p>
+<p>                Intent intent,String resolvedType,IBinder resultTo,String resultWho,int requestCode,</p>
+<p>                int startFlags,ProfilerInfo profilerInfo,Bundle options,int userId) {</p>
+<p>        enforceNotIsolatedCaller(“startActivity”);</p>
+<p>        userId &#x3D; handleIncomingUser(Binder.getCallingPid(),Binder.getCalling-Uid(),userId,</p>
+<p>                        false,ALLOW_FULL_ONLY,”startActivity”,null);</p>
+<p>        &#x2F;&#x2F; TODO: Switch to user app stacks here.</p>
+<p>        return mStackSupervisor.startActivityMayWait(caller,-1,calling Package,intent,</p>
+<p>                        resolvedType,null,null,resultTo,resultWho,requestCode,startFlags,</p>
+<p>                        profilerInfo,null,null,options,userId,null,null);</p>
+<p>    }</p>
+<p>可以看出，Activity的启动过程又转移到了ActivityStackSupervisor的startActivity-MayWait方法中了，在startActivityMayWait中又调用了startActivityLocked方法，然后startActivityLocked方法又调用了startActivityUncheckedLocked方法，接着startActivityUncheckedLocked又调用了ActivityStack的resume</p>
+<p>TopActivitiesLocked方法，这个时候启动过程已经从ActivityStackSupervisor转移到了ActivityStack。</p>
+<p>ActivityStack的resumeTopActivitiesLocked方法的实现如下所示。</p>
+<p>final boolean resumeTopActivityLocked(ActivityRecord prev,Bundle options) {</p>
+<p>        if (inResumeTopActivity) {</p>
+<p>                &#x2F;&#x2F; Don’t even start recursing.</p>
+<p>                return false;</p>
+<p>        }</p>
+<p>        boolean result &#x3D; false;</p>
+<p>        try {</p>
+<p>                &#x2F;&#x2F; Protect against recursion.</p>
+<p>                inResumeTopActivity &#x3D; true;</p>
+<p>  </p>
+<p>从上面的代码可以看出，resumeTopActivityLocked调用了resumeTopActivityInnerLocked方法，resumeTopActivityInnerLocked方法又调用了ActivityStackSupervisor的startSpecificActivityLocked方法，startSpecificActivityLocked的源码如下所示。</p>
+<p>void startSpecificActivityLocked(ActivityRecord r,</p>
+<p>                boolean andResume,boolean checkConfig) {</p>
+<p>        &#x2F;&#x2F; Is this activity’s application already running?</p>
+<p>        ProcessRecord app &#x3D; mService.getProcessRecordLocked(r.processName,</p>
+<p>                        r.info.applicationInfo.uid,true);</p>
+<p>        r.task.stack.setLaunchTim</p>
+<p>e(r);</p>
+<p>        if (app !&#x3D; null &amp;&amp; app.thread !&#x3D; null) {</p>
+<p>                try {</p>
+<p>                        if ((r.info.flags&amp;ActivityInfo.FLAG_MULTIPROCESS) &#x3D;&#x3D; 0</p>
+<p>                                        || !”android”.equals(r.info.packageName)) {</p>
+<p>                                &#x2F;&#x2F; Don’t add this if it is a platform component that is marked</p>
+<p>                                &#x2F;&#x2F; to run in multiple processes,because this is actually</p>
+<p>                                &#x2F;&#x2F; part of the framework so doesn’t make sense to track as a</p>
+<p>                                &#x2F;&#x2F; separate apk in the process.</p>
+<p>                                app.addPackage(r.info.packageName,r.info.applicationInfo.versionCode,</p>
+<p>                </p>
+<p>从上面代码可以看出，startSpecificActivityLocked方法调用了realStartActivityLocked方法。为了更清晰地说明Activity的启动过程在ActivityStackSupervisor和ActivityStack之间的传递顺序，这里给出了一张流程图，如图9-1所示。</p>
+<p><img src="data:image/png;base64,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" alt="图片"></p>
+<p>图9-1　Activity的启动过程在ActivityStackSupervisor和ActivityStack之间的传递顺序</p>
+<p>在ActivityStackSupervisor的realStartActivityLocked方法中有如下一段代码：</p>
+<p>app.thread.scheduleLaunchActivity(new Intent(r.intent),r.appToken,</p>
+<p>                System.identityHashCode(r),r.info,new Configuration(mService.mConfiguration),</p>
+<p>                r.compat,r.task.voiceInteractor,app.repProcState,r.icicle,r.persistentState,</p>
+<p>                results,newIntents,!andResume,mService.isNextTransitionForward(),</p>
+<p>                profilerInfo);</p>
+<p>上面的这段代码很重要，其中app.thread的类型为IApplicationThread，IApplicationThread的声明如下：</p>
+<p>public interface IApplicationThread extends IInterface {</p>
+<p>    void schedulePauseActivity(IBinder token,boolean finished,boolean userLeaving,</p>
+<p>             int configChanges,boolean dontReport) throws RemoteException;</p>
+<p>    void scheduleStopActivity(IBinder token,boolean showWindow,</p>
+<p>             int configChanges) throws RemoteException;</p>
+<p>    void scheduleWindowVisibility(IBinder token,boolean showWindow) throws</p>
+<p>    RemoteException;</p>
+<p>    void scheduleSleeping(IBinder token,boolean sleeping) throws RemoteException;</p>
+<p>         void scheduleResumeActivity(IBinder token,int procState,boolean</p>
+<p>         isForward,Bundle resumeArgs)</p>
+<p>                 throws RemoteException;</p>
+<p>         void scheduleSendResult(IBinder token,List<ResultInfo> results) throws</p>
+<p>         RemoteException;</p>
+<p>         void scheduleLaunchActivity(Intent intent,IBinder token,int ident,</p>
+<p>                 ActivityInfo info,Configuration curConfig,CompatibilityInfo compatInfo,</p>
+<p>                 IVoiceInteractor voiceInteractor,int procState,Bundle state,</p>
+<p>                 PersistableBundle persistentState,List<ResultInfo> pendingResults,</p>
+<p>                 List<Intent> pendingNewIntents,boolean notResumed,boolean</p>
+<p>                 isForward,</p>
+<p>                 ProfilerInfo profilerInfo) throws RemoteException;</p>
+<p>         void scheduleRelaunchActivity(IBinder token,List<ResultInfo> pending-</p>
+<p>          Results,</p>
+<p>                 List<Intent> pendingNewIntents,int configChanges,</p>
+<p>                 boolean notResumed,Configuration config) throws RemoteException;</p>
+<p>         void scheduleNewIntent(List<Intent> intent,IBinder token) throws</p>
+<p>         RemoteException;</p>
+<p>         void scheduleDestroyActivity(IBinder token,boolean finished,</p>
+<p>                 int configChanges) throws RemoteException;</p>
+<p>         void scheduleReceiver(Intent intent,ActivityInfo info,Compatibility-</p>
+<p>         Info compatInfo,</p>
+<p>                 int resultCode,String data,Bundle extras,boolean sync,</p>
+<p>                 int sendingUser,int processState) throws RemoteException;</p>
+<p>         static final int BACKUP_MODE_INCREMENTAL &#x3D; 0;</p>
+<p>         static final int BACKU</p>
+<p>P_MODE_FULL &#x3D; 1;</p>
+<p>         static final int BACKUP_MODE_RESTORE &#x3D; 2;</p>
+<p>         static final int BACKUP_MODE_RESTORE_FULL &#x3D; 3;</p>
+<p>         void scheduleCreateBackupAgent(ApplicationInfo app,CompatibilityInfo</p>
+<p>         compatInfo,</p>
+<p>                 int backupMode) throws RemoteException;</p>
+<p>         void scheduleDestroyBackupAgent(ApplicationInfo app,CompatibilityInfo</p>
+<p>         compatInfo)</p>
+<p>                 throws RemoteException;</p>
+<p>         void scheduleCreateService(IBinder token,ServiceInfo info,</p>
+<p>                 CompatibilityInfo compatInfo,int processState) throws</p>
+<p>                 RemoteException;</p>
+<p>         void scheduleBindService(IBinder token,</p>
+<p>                 Intent intent,boolean rebind,int processState) throws</p>
+<p>                 RemoteException;</p>
+<p>         void scheduleUnbindService(IBinder token,</p>
+<p>                 Intent intent) throws RemoteException;</p>
+<p>         void scheduleServiceArgs(IBinder token,boolean taskRemoved,int</p>
+<p>         startId,</p>
+<p>                 int flags,Intent args) throws RemoteException;</p>
+<p>         void scheduleStopService(IBinder token) throws RemoteException;</p>
+<p>        …</p>
+<p>    }</p>
+<p>因为它继承了IInterface接口，所以它是</p>
+<p>一个Binder类型的接口。从IApplicationThread声明的接口方法可以看出，其内部包含了大量启动、停止Activity的接口，此外还包含了启动和停止服务的接口。从接口方法的命名可以猜测，IApplicationThread这个Binder接口的实现者完成了大量和Activity以及Service启动&#x2F;停止相关的功能，事实证明的确是这样的。</p>
+<p>那么IApplicationThread的实现者到底是什么呢？答案就是ActivityThread中的内部类ApplicationThread，下面来看一下ApplicationThread的定义，如下所示。</p>
+<p>private class ApplicationThread extends ApplicationThreadNative</p>
+<p>    public abstract class ApplicationThreadNative extends Binder</p>
+<p>    implements IApplicationThread</p>
+<p>可以看出，ApplicationThread继承了ApplicationThreadNative，而ApplicationThreadNative则继承了Binder并实现了IApplicationThread接口。如果读者还记得系统为AIDL文件自动生成的代码，就会发现ApplicationThreadNative的作用其实和系统为AIDL文件生成的类是一样的，这方面的知识在第2章已经做了介绍，读者可以查看第2章的相关内容。</p>
+<p>在ApplicationThreadNative的内部，还有一个ApplicationThreadProxy类，这个类的实现如下所示。相信读者有一种似曾相识的感觉</p>
+<p>，其实这个内部类也是系统为AIDL文件自动生成的代理类。种种迹象表明，ApplicationThreadNative就是IApplicationThread的实现者，由于ApplicationThreadNative被系统定义为抽象类，所以ApplicationThread就成了IApplicationThread最终的实现者。</p>
+<p>class ApplicationThreadProxy implements IApplicationThread {</p>
+<p>         private final IBinder mRemote;</p>
+<p>         public ApplicationThreadProxy(IBinder remote) {</p>
+<p>             mRemote &#x3D; remote;</p>
+<p>         }</p>
+<p>         public final IBinder asBinder() {</p>
+<p>             return mRemote;</p>
+<p>         }</p>
+<p>         public final void schedulePauseActivity(IBinder token,boolean finished,</p>
+<p>                 boolean userLeaving,int configChanges,boolean dontReport)</p>
+<p>                 throws RemoteException {</p>
+<p>             Parcel data &#x3D; Parcel.obtain();</p>
+<p>             data.writeInterfaceToken(IApplicationThread.descriptor);</p>
+<p>             data.writeStrongBinder(token);</p>
+<p>             data.writeInt(finished ? 1 : 0);</p>
+<p>             data.writeInt(userLeaving ? 1 :0);</p>
+<p>             data.writeInt(configChanges);</p>
+<p>             data.writeInt(dontReport ? 1 : 0);</p>
+<p>             mRemote.transact(SCHEDULE_PAUSE_ACTIVITY_TRANSACTION,data,null,</p>
+<p>IBinder.FLAG_ONEWAY);</p>
+<p>             data.recycle();</p>
+<p>         }</p>
+<p>         public final void scheduleStopActivity(IBinder token,boolean showWindow,</p>
+<p>                 int configChanges) throws RemoteException {</p>
+<p>             Parcel data &#x3D; Parcel.obtain();</p>
+<p>             data.writeInterfaceToken(IApplicationThread.descriptor);</p>
+<p>             data.writeStrongBinder(token);</p>
+<p>             data.writeInt(showWindow ? 1 : 0);</p>
+<p>             data.writeInt(configChanges);</p>
+<p>             mRemote.transact(SCHEDULE_STOP_ACTIVITY_TRANSACTION,data,null,</p>
+<p>                     IBinder.FLAG_ONEWAY);</p>
+<p>             data.recycle();</p>
+<p>         }</p>
+<p>        …</p>
+<p>    }</p>
+<p>绕了一大圈，Activity的启动过程最终回到了ApplicationThread中，ApplicationThread通过scheduleLaunchActivity方法来启动Activity，代码如下所示。</p>
+<p>&#x2F;&#x2F; we use token to identify this activity without having to send the</p>
+<p>    &#x2F;&#x2F; activity itself back to the activity manager. (matters more with ipc)</p>
+<p>    public final void scheduleLaunchActivity(Intent intent,IBinder token,int ident,</p>
+<p>                ActivityInfo info,Configuration curConfig,Co</p>
+<p>mpatibilityInfo compatInfo,</p>
+<p>                IVoiceInteractor voiceInteractor,int procState,Bundle state,</p>
+<p>                PersistableBundle persistentState,List<ResultInfo> pendingResults,</p>
+<p>                List<Intent> pendingNewIntents,boolean notResumed,boolean isForward,</p>
+<p>                ProfilerInfo profilerInfo) {</p>
+<p>        updateProcessState(procState,false);</p>
+<p>        ActivityClientRecord r &#x3D; new ActivityClientRecord();</p>
+<p>        r.token &#x3D; token;</p>
+<p>        r.ident &#x3D; ident;</p>
+<p>        r.intent &#x3D; intent;</p>
+<p>        r.voiceInteractor &#x3D; voiceInteractor;</p>
+<p>        r.activityInfo &#x3D; info;</p>
+<p>        r.compatInfo &#x3D; compatInfo;</p>
+<p>        r.state &#x3D; state;</p>
+<p>        r.persistentState &#x3D; persistentState;</p>
+<p>        r.pendingResults &#x3D; pendingResults;</p>
+<p>        r.pendingIntents &#x3D; pendingNewIntents;</p>
+<p>        r.startsNotResumed &#x3D; notResumed;</p>
+<p>        r.isForward &#x3D; isForward;</p>
+<p>        r.profilerInfo &#x3D; profilerInfo;</p>
+<p>        updatePendingConfiguration(curConfig);</p>
+<p>        sendMessage(H.LAUNCH_ACTIVITY,r);</p>
+<p>    }</p>
+<p>在ApplicationThread中，scheduleLaunchActivity的实现很简单，就是发送一个启动Activity的消息交由Handler处理，这个Handler有着一个很简洁的名字：H。sendMessage的作用</p>
+<p>是发送一个消息给H处理，它的实现如下所示。</p>
+<p>private void sendMessage(int what,Object obj,int arg1,int arg2,boolean        async) {</p>
+<p>        if (DEBUG_MESSAGES) Slog.v(</p>
+<p>                TAG,”SCHEDULE “ + what + “ “ + mH.codeToString(what)</p>
+<p>                + “: “ + arg1 + “ &#x2F; “ + obj);</p>
+<p>        Message msg &#x3D; Message.obtain();</p>
+<p>        msg.what &#x3D; what;</p>
+<p>        msg.obj &#x3D; obj;</p>
+<p>        msg.arg1 &#x3D; arg1;</p>
+<p>        msg.arg2 &#x3D; arg2;</p>
+<p>        if (async) {</p>
+<p>                msg.setAsynchronous(true);</p>
+<p>        }</p>
+<p>        mH.sendMessage(msg);</p>
+<p>    }</p>
+<p>接着来看一下Handler H对消息的处理，如下所示。</p>
+<p>private class H extends Handler {</p>
+<p>        public static final int LAUNCH_ACTIVITY                 &#x3D; 100;</p>
+<p>        public static final int PAUSE_ACTIVITY                          &#x3D; 101;</p>
+<p>        public static final int PAUSE_ACTIVITY_FINISHING        &#x3D; 102;</p>
+<p>        public static final int STOP_ACTIVITY_SHOW                      &#x3D; 103;</p>
+<p>        public static final int STOP_ACTIVITY_HIDE                      &#x3D; 104;</p>
+<p>        public static final int SHOW_WINDOW                             &#x3D; 105;</p>
+<p>  </p>
+<p>public static final int HIDE_WINDOW                             &#x3D; 106;</p>
+<p>        public static final int RESUME_ACTIVITY                 &#x3D; 107;</p>
+<p>        …</p>
+<p>        public void handleMessage(Message msg) {</p>
+<p>                if (DEBUG_MESSAGES) Slog.v(TAG,”&gt;&gt;&gt; handling: “ + codeToString(msg.what));</p>
+<p>                switch (msg.what) {</p>
+<p>                        case LAUNCH_ACTIVITY: {</p>
+<p>                                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER,”activityStart”);</p>
+<p>                                final ActivityClientRecord r &#x3D; (ActivityClientRecord) msg.obj;</p>
+<p>                                r.packageInfo &#x3D; getPackageInfoNoCheck(</p>
+<p>                                                r.activityInfo.applicationInfo,r.compatInfo);</p>
+<p>                                handleLaunchActivity(r,null);</p>
+<p>                                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</p>
+<p>                        } break;</p>
+<p>                        case RELAUNCH_ACTIVITY: {</p>
+<p>                                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER,”activityRestart”);</p>
+<p>                                ActivityClientRecord r &#x3D; (ActivityClientRecord)msg</p>
+<p>.obj;</p>
+<p>                                handleRelaunchActivity(r);</p>
+<p>                                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</p>
+<p>                        } break;</p>
+<p>                        case PAUSE_ACTIVITY:</p>
+<p>                                Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER,”activityPause”);</p>
+<p>                                handlePauseActivity((IBinder)msg.obj,false,(msg.arg1&amp;1) !&#x3D; 0,msg.arg2,</p>
+<p>                                                (msg.arg1&amp;2) !&#x3D; 0);</p>
+<p>                                maybeSnapshot();</p>
+<p>                                Trace.traceEnd(Trace.TRACE_TAG_ACTIVITY_MANAGER);</p>
+<p>                                break;</p>
+<p>                        …</p>
+<p>                }</p>
+<p>                if (DEBUG_MESSAGES) Slog.v(TAG,”&lt;&lt;&lt; done: “ + codeToString(msg.what));</p>
+<p>        }</p>
+<p>    }</p>
+<p>从Handler H对“LAUNCH_ACTIVITY”这个消息的处理可以知道，Activity的启动过程由ActivityThread的handleLaunchActivity方法来实现，它的源码如下所示。</p>
+<p>private void handleLaunchActivity(ActivityClientRecord r,Intent customIntent){</p>
+<p>        …</p>
+<p>        if (localLOGV) Slog.v(</p>
+<p>    </p>
+<p>     TAG,”Handling launch of “ + r);</p>
+<p>        Activity a &#x3D; performLaunchActivity(r,customIntent);</p>
+<p>        if (a !&#x3D; null) {</p>
+<p>                r.createdConfig &#x3D; new Configuration(mConfiguration);</p>
+<p>                Bundle oldState &#x3D; r.state;</p>
+<p>                handleResumeActivity(r.token,false,r.isForward,</p>
+<p>                                !r.activity.mFinished &amp;&amp; !r.startsNotResumed);</p>
+<p>                …</p>
+<p>        }</p>
+<p>        …</p>
+<p>    }</p>
+<p>从上面的源码可以看出，performLaunchActivity方法最终完成了Activity对象的创建和启动过程，并且ActivityThread通过handleResumeActivity方法来调用被启动Activity的onResume这一生命周期方法。</p>
+<p>performLaunchActivity这个方法主要完成了如下几件事。</p>
+<ol>
+<li>从ActivityClientRecord中获取待启动的Activity的组件信息</li>
+</ol>
+<p>ActivityInfo aInfo &#x3D; r.activityInfo;</p>
+<p>    if (r.packageInfo &#x3D;&#x3D; null) {</p>
+<p>        r.packageInfo &#x3D; getPackageInfo(aInfo.applicationInfo,r.compatInfo,</p>
+<p>                        Context.CONTEXT_INCLUDE_CODE);</p>
+<p>    }</p>
+<p>    ComponentName component &#x3D; r.intent.getComponent();</p>
+<p>    if (component &#x3D;&#x3D; null) {</p>
+<p>    </p>
+<p>component &#x3D; r.intent.resolveActivity(</p>
+<ol start="2">
+<li>通过Instrumentation的newActivity方法使用类加载器创建Activity对象</li>
+</ol>
+<p>Activity activity &#x3D; null;</p>
+<p>    try {</p>
+<p>        java.lang.ClassLoader cl &#x3D; r.packageInfo.getClassLoader();</p>
+<p>        activity &#x3D; mInstrumentation.newActivity(</p>
+<p>                        cl,component.getClassName(),r.intent);</p>
+<p>        StrictMode.incrementExpectedActivityCount(activity.getClass());</p>
+<p>        r.intent.setExtrasClassLoader(cl);</p>
+<p>        r.intent.prepareToEnterProcess();</p>
+<p>        if (r.state !&#x3D; null) {</p>
+<p>                r.state.setClassLoader(cl);</p>
+<p>        }</p>
+<p>    } catch (Exception e) {</p>
+<p>        if (!mInstrumentation.onException(activity,e)) {</p>
+<p>                throw new RuntimeException(</p>
+<p>                        “Unable to instantiate activity “ + component</p>
+<p>                        + “: “ + e.toString(),e);</p>
+<p>        }</p>
+<p>    }</p>
+<p>至于Instrumentation的newActivity，它的实现比较简单，就是通过类加载器来创建Activity对象：</p>
+<p>public Activity newActivity(ClassLoader cl,String className,</p>
+<p>                Intent</p>
+<p>intent)</p>
+<p>                throws InstantiationException,IllegalAccessException,</p>
+<p>                ClassNotFoundException {</p>
+<p>        return (Activity)cl.loadClass(className).newInstance();</p>
+<p>    }</p>
+<ol start="3">
+<li>通过LoadedApk的makeApplication方法来尝试创建Application对象</li>
+</ol>
+<p>public Application makeApplication(boolean forceDefaultAppClass,</p>
+<p>                Instrumentation instrumentation) {</p>
+<p>        if (mApplication !&#x3D; null) {</p>
+<p>                return mApplication;</p>
+<p>        }</p>
+<p>        Application app &#x3D; null;</p>
+<p>        String appClass &#x3D; mApplicationInfo.className;</p>
+<p>        if (forceDefaultAppClass || (appClass &#x3D;&#x3D; null)) {</p>
+<p>                appClass &#x3D; “android.app.Application”;</p>
+<p>        }</p>
+<p>        try {</p>
+<p>                java.lang.ClassLoader cl &#x3D; getClassLoader();</p>
+<p>                if (!mPackageName.equals(“android”)) {</p>
+<p>                        initializeJavaContextClassLoader();</p>
+<p>                }</p>
+<p>                ContextImpl appContext &#x3D; ContextImpl.createAppContext(mActivity-Thread,this);</p>
+<p>                app &#x3D; mActivityThread.mInstrumentation.newApplication(</p>
+<p>                                cl,appClass,appContext);</p>
+<p>appContext.setOuterContext(app);</p>
+<p>        } catch (Exception e) {</p>
+<p>                if (!mActivityThread.mInstrumentation.onException(app,e)) {</p>
+<p>                        throw new RuntimeException(</p>
+<p> </p>
+<p>从makeApplication的实现可以看出，如果Application已经被创建过了，那么就不会再重复创建了，这也意味着一个应用只有一个Application对象。Application对象的创建也是通过Instrumentation来完成的，这个过程和Activity对象的创建一样，都是通过类加载器来实现的。Application创建完毕后，系统会通过Instrumentation的callApplicationOnCreate来调用Application的onCreate方法。</p>
+<ol start="4">
+<li>创建ContextImpl对象并通过Activity的attach方法来完成一些重要数据的初始化</li>
+</ol>
+<p>Context appContext &#x3D; createBaseContextForActivity(r,activity);</p>
+<p>    CharSequence title &#x3D; r.activityInfo.loadLabel(appContext.getPackage-      Manager());</p>
+<p>    Configuration config &#x3D; new Configuration(mCompatConfiguration);</p>
+<p>    if (DEBUG_CONFIGURATION) Slog.v(TAG,”Launching activity “</p>
+<p>                + r.activityInfo.name + “ with config “ + config);</p>
+<p>    activity.attach(appContext,this,getInstrumentation(),r.token,</p>
+<p>                r.ident,app,r.intent,r.activityInfo,title,r.parent,</p>
+<p> </p>
+<p>r.embeddedID,r.lastNonConfigurationInstances,config,</p>
+<p>                r.voiceInteractor);</p>
+<p>ContextImpl是一个很重要的数据结构，它是Context的具体实现，Context中的大部分逻辑都是由ContextImpl来完成的。ContextImpl是通过Activity的attach方法来和Activity建立关联的，除此以外，在attach方法中Activity还会完成Window的创建并建立自己和Window的关联，这样当Window接收到外部输入事件后就可以将事件传递给Activity。</p>
+<ol start="5">
+<li>调用Activity的onCreate方法</li>
+</ol>
+<p>mInstrumentation.callActivityOnCreate(activity,r.state)，由于Activity的onCreate已经被调用，这也意味着Activity已经完成了整个启动过程。</p>
+<h2 id="9-3-Service的工作过程"><a href="#9-3-Service的工作过程" class="headerlink" title="9.3　Service的工作过程"></a>9.3　Service的工作过程</h2><p>在9.2节中介绍了Activity的工作过程，本节将介绍Service的工作过程，通过本节的分析，读者将会对Service的一些工作原理有更进一步的认识，比如Service的启动过程和绑定过程。在分析Service的工作过程之前，先看一下如何使用一个Service。Service分为两种工作状态，一种是启动状态，主要用于执行后台计算；另一种是绑定状态，主要用于其他组件和Service的交互。需要注意的是，Service的这两</p>
+<p>种状态是可以共存的，即Service既可以处于启动状态也可以同时处于绑定状态。通过Context的startService方法即可启动一个Service，如下所示。</p>
+<p>Intent intentService &#x3D; new Intent(this,MyService.class);</p>
+<p>    startService(intentService);</p>
+<p>通过Context的bindService方法即可以绑定的方式启动一个Service，如下所示。</p>
+<p>Intent intentService &#x3D; new Intent(this,MyService.class);</p>
+<p>    bindService(intentService,mServiceConnection,BIND_AUTO_CREATE);</p>
+<h3 id="9-3-1-Service的启动过程"><a href="#9-3-1-Service的启动过程" class="headerlink" title="9.3.1　Service的启动过程"></a>9.3.1　Service的启动过程</h3><p>Service的启动过程从ContextWrapper的startActivity开始，如下所示。</p>
+<p>public ComponentName startService(Intent service) {</p>
+<p>        return mBase.startService(service);</p>
+<p>    }</p>
+<p>上面代码的mBase的类型是ContextImpl，在9.2节中我们知道，Activity被创建时会通过attach方法将一个ContextImpl对象关联起来，这个ContextImpl对象就是上述代码中的mBase。从ContextWrapper的实现可以看出，其大部分操作都是通过mBase来实现的，在设计模式中这是一种典型的桥接模式。下面继续看ContextImpl的startActivity的实现，如下所示。</p>
+<p>public ComponentName startService(Intent service) {</p>
+<p>        warnIfCallingFromSystemProcess();</p>
+<p>        return startServiceCommon(service,mUser);</p>
+<p>    }</p>
+<p>    private ComponentName startServiceCommon(Intent service,UserHandle user) {</p>
+<p>        try {</p>
+<p>                validateServiceIntent(service);</p>
+<p>                service.prepareToLeaveProcess();</p>
+<p>                ComponentName cn &#x3D; ActivityManagerNative.getDefault().startService(</p>
+<p>                        mMainThread.getApplicationThread(),service,</p>
+<p>                        service.resolveTypeIfNeeded(getContentResolver()),user.get-Identifier());</p>
+<p>                if (cn !&#x3D; null) {</p>
+<p>                        if (cn.getPackageName().equals(“!”)) {</p>
+<p>                      throw new SecurityException(</p>
+<p>       “Not allowed to start service “ + service</p>
+<p>                                                + “ without permission “ + cn.getClassName());</p>
+<p>                        } else if (cn.getPackageName().equals(“!!”)) {</p>
+<p>                                throw new SecurityException(</p>
+<p>                                                “Unable to start service “ + service</p>
+<p>                                                + “: “ + cn.getClassName());</p>
+<p>                        }</p>
+<p>                }</p>
+<p>                return cn;</p>
+<p>        } catch (RemoteException e) {</p>
+<p>                return null;</p>
+<p>        }</p>
+<p>    }</p>
+<p>在ContextImpl中，startService方法会调用startServiceCommon方法，而startService-Common方法又会通过ActivityManagerNative.getDefault()这个对象来启动一个服务。对于ActivityManagerNative.getDefault()这个对象，我们应该有点印象，在9.2节中进行了详细的分析，它实际上就是AMS（ActivityManagerService），这里就不再重复说明了。需要注意的是，在上述代码中通过AMS来启动服务的行为是一个远程过程调用。AMS的startService方法的实现如下所示。</p>
+<p>public ComponentName startService(IApplicationThread caller,Intent service,</p>
+<p>                String resolvedType,int userId) {</p>
+<p>        enforceNotIsolatedCaller(“startService”);</p>
+<p>        &#x2F;&#x2F; Refuse possible leaked file descriptors</p>
+<p>        if (service !&#x3D; null &amp;&amp; service.hasFileDescriptors() &#x3D;&#x3D; true) {</p>
+<p>                throw new IllegalArgumentException(“File descriptors passed in Intent”);</p>
+<p>        }</p>
+<p>        if (DEBUG_SERVICE)</p>
+<p>                Slog.v(TAG,”startService: “ + service + “ type&#x3D;” + resolvedT</p>
+<p>ype);</p>
+<p>        synchronized(this) {</p>
+<p>                final int callingPid &#x3D; Binder.getCallingPid();</p>
+<p>                final int callingUid &#x3D; Binder.getCallingUid();</p>
+<p>                final long origId &#x3D; Binder.clearCallingIdentity();</p>
+<p>                ComponentName res &#x3D; mServices.startServiceLocked(caller,service,</p>
+<p>                                resolvedType,callingPid,callingUid,userId);</p>
+<p>                Binder.restoreCallingIdentity(origId);</p>
+<p>                return res;</p>
+<p>        }</p>
+<p>    }</p>
+<p>在上面的代码中，AMS会通过mServices这个对象来完成Service后续的启动过程，mServices对象的类型是ActiveServices，ActiveServices是一个辅助AMS进行Service管理的类，包括Service的启动、绑定和停止等。在ActiveServices的startServiceLocked方法的尾部会调用startServiceInnerLocked方法，startServiceInnerLocked的实现如下所示。</p>
+<p>ComponentName startServiceInnerLocked(ServiceMap smap,Intent service,</p>
+<p>                ServiceRecord r,boolean callerFg,boolean addToStarting) {</p>
+<p>        ProcessStats.ServiceState stracker &#x3D; r.getTracker();</p>
+<p>        if (stracker !&#x3D; null) {</p>
+<p>                stracker.setStarted(true,mAm.mProcessStats.getMemFactorLocked(),r.lastActivity);</p>
+<p>        }</p>
+<p>        r.callStart &#x3D; false;</p>
+<p>        synchronized (r.stats.getBatteryStats()) {</p>
+<p>                r.stats.startRunningLocked();</p>
+<p>        }</p>
+<p>        String error &#x3D; bringUpServiceLocked(r,service.getFlags(),callerFg,false);</p>
+<p>        if (error !&#x3D; null) {</p>
+<p>                return new ComponentName(“!!”,error);</p>
+<p>        }</p>
+<p>        if (r.startRequested &amp;&amp; addToStarting) {</p>
+<p>                boolean first &#x3D; smap.mStartingBackground.size() &#x3D;&#x3D; 0;</p>
+<p>                smap.mStartingBackground.add(r);</p>
+<p>                r.startingBgTimeout &#x3D; SystemClock.uptimeMillis() + BG_START_TIMEOUT;</p>
+<p>                if (DEBUG_DELAYED_SERVICE) {</p>
+<p>                        RuntimeException here &#x3D; new RuntimeException(“here”);</p>
+<p>             </p>
+<p>在上述代码中，ServiceRecord描述的是一个Service记录，ServiceRecord一直贯穿着整个Service的启动过程。startServiceInnerLocked方法并没有完成具体的启动工作，而是把后续的工作交给了bringUpServiceLocked方法来处理，在bringUpServiceLocked方法中又调用了realStartServiceLocked方法。从名字上来看，这个方法应该是真正地启动一个Service，它的实现如下所示。</p>
+<p>private final void realStartServiceLocked</p>
+<p>(ServiceRecord r,</p>
+<p>                ProcessRecord app,boolean execInFg) throws RemoteException {</p>
+<p>        …</p>
+<p>        boolean created &#x3D; false;</p>
+<p>        try {</p>
+<p>                String nameTerm;</p>
+<p>                int lastPeriod &#x3D; r.shortName.lastIndexOf(‘.’);</p>
+<p>                nameTerm &#x3D; lastPeriod &#x3D;&gt; 0 ? r.shortName.substring(lastPeriod) : r.shortName;</p>
+<p>                if (LOG_SERVICE_START_STOP) {</p>
+<p>                        EventLogTags.writeAmCreateService(</p>
+<p>                                        r.userId,System.identityHashCode(r),nameTerm,r.app.uid,r.app.pid);</p>
+<p>                }</p>
+<p>                synchronized (r.stats.getBatteryStats()) {</p>
+<p>                        r.stats.startLaunchedLocked();</p>
+<p>                }</p>
+<p>                mAm.ensurePackageDexOpt(r.serviceInfo.packageName);</p>
+<p>                app.forceProcessStateUpTo(ActivityManager.PROCESS_STATE_SERVICE);</p>
+<p>                app.thread.scheduleCreateService(r,r.serviceInfo,</p>
+<p>                                mAm.compatibilityInfoForPackageLocked(r.serviceInfo.applicationInfo),</p>
+<p>                                app.repProcState);</p>
+<p>                r.postNotification();</p>
+<p>                created &#x3D; true;</p>
+<p>        } catch (DeadObje</p>
+<p>ctException e) {</p>
+<p>                Slog.w(TAG,”Application dead when creating service “ + r);</p>
+<p>                mAm.appDiedLocked(app);</p>
+<p>        } finally {</p>
+<p>                if (!created) {</p>
+<p>                        app.services.remove(r);</p>
+<p>                        r.app &#x3D; null;</p>
+<p>                        scheduleServiceRestartLocked(r,false);</p>
+<p>                        return;</p>
+<p>                }</p>
+<p>        }</p>
+<p>        requestServiceBindingsLocked(r,execInFg);</p>
+<p>        updateServiceClientActivitiesLocked(app,null,true);</p>
+<p>        &#x2F;&#x2F; If the service is in the started state,and there are no</p>
+<p>        &#x2F;&#x2F; pending arguments,then fake up one so its onStartCommand() will</p>
+<p>        &#x2F;&#x2F; be called.</p>
+<p>        if (r.startRequested &amp;&amp; r.callStart &amp;&amp; r.pendingStarts.size() &#x3D;&#x3D; 0) {</p>
+<p>                r.pendingStarts.add(new ServiceRecord.StartItem(r,false,r.make-NextStartId(),</p>
+<p>                                null,null));</p>
+<p>        }</p>
+<p>        sendServiceArgsLocked(r,execInFg,true);</p>
+<p>        …</p>
+<p>    }</p>
+<p>在realStartServiceLocked方法中，首先通过app.thread的scheduleCreateService方法来创建Service对象并调用其onCreate，接着再通过sendServiceArgsLocked方法来调用Serv</p>
+<p>ice的其他方法，比如onStartCommand，这两个过程均是进程间通信。app.thread对象是IApplicationThread类型，它实际上是一个Binder，它的具体实现是ApplicationThread和ApplicationThreadNative，在9.2节已经对这个问题做了说明。由于ApplicationThread继承了ApplicationThreadNative，因此只需要看ApplicationThread对Service启动过程的处理即可，这对应着它的scheduleCreateService方法，如下所示。</p>
+<p>public final void scheduleCreateService(IBinder token,</p>
+<p>                ServiceInfo info,CompatibilityInfo compatInfo,int processState) {</p>
+<p>        updateProcessState(processState,false);</p>
+<p>        CreateServiceData s &#x3D; new CreateServiceData();</p>
+<p>        s.token &#x3D; token;</p>
+<p>        s.info &#x3D; info;</p>
+<p>        s.compatInfo &#x3D; compatInfo;</p>
+<p>        sendMessage(H.CREATE_SERVICE,s);</p>
+<p>    }</p>
+<p>很显然，这个过程和Activity的启动过程是类似的，都是通过发送消息给Handler H来完成的。H会接收这个CREATE_SERVICE消息并通过ActivityThread的handleCreateService方法来完成Service的最终启动，handleCreateService的源码如下所示。</p>
+<p>private void handleCreateService(CreateServiceData data) {</p>
+<p>        &#x2F;&#x2F; If we are get</p>
+<p>ting ready to gc after going to the background,well</p>
+<p>        &#x2F;&#x2F; we are back active so skip it.</p>
+<p>        unscheduleGcIdler();</p>
+<p>        LoadedApk packageInfo &#x3D; getPackageInfoNoCheck(</p>
+<p>                        data.info.applicationInfo,data.compatInfo);</p>
+<p>        Service service &#x3D; null;</p>
+<p>        try {</p>
+<p>                java.lang.ClassLoader cl &#x3D; packageInfo.getClassLoader();</p>
+<p>                service &#x3D; (Service) cl.loadClass(data.info.name).newInstance();</p>
+<p>        } catch (Exception e) {</p>
+<p>                if (!mInstrumentation.onException(service,e)) {</p>
+<p>                        throw new RuntimeException(</p>
+<p>                                “Unable to instantiate service “ + data.info.name</p>
+<p>                                + “: “ + e.toString(),e);</p>
+<p>                }</p>
+<p>        }</p>
+<p>        try {</p>
+<p>                if (localLOGV) Slog.v(TAG,”Creating service “ + data.info.name);</p>
+<p>                ContextImpl context &#x3D; ContextImpl.createAppContext(this,packageInfo);</p>
+<p>                context.setOuterContext(service);</p>
+<p>                Application app &#x3D; packageInfo.makeApplication(false,mInstrumen-tation);</p>
+<p>                service.attach(context,this,data.info.name,data.token,app,</p>
+<p>    </p>
+<p> ActivityManagerNative.getDefault());</p>
+<p>                service.onCreate();</p>
+<p>                mServices.put(data.token,service);</p>
+<p>                try {</p>
+<p>                        ActivityManagerNative.getDefault().serviceDoneExecuting(</p>
+<p>                                        data.token,0,0,0);</p>
+<p>                } catch (RemoteException e) {</p>
+<p>                        &#x2F;&#x2F; nothing to do.</p>
+<p>                }</p>
+<p>        } catch (Exception e) {</p>
+<p>                if (!mInstrumentation.onException(service,e)) {</p>
+<p>                        throw new RuntimeException(</p>
+<p>                                “Unable to create service “ + data.info.name</p>
+<p>                                + “: “ + e.toString(),e);</p>
+<p>                }</p>
+<p>        }</p>
+<p>    }</p>
+<p>handleCreateService主要完成了如下几件事。</p>
+<p>首先通过类加载器创建Service的实例。</p>
+<p>然后创建Application对象并调用其onCreate，当然Application的创建过程只会有一次。</p>
+<p>接着创建ConTextImpl对象并通过Service的attach方法建立二者之间的关系，这个过程和Activity实际上是类似的，毕竟Service和Activity都是一个Context。</p>
+<p>最后调用Service的onCreate方法并将Service对象存储到ActivityThread中的一个列表中。这个列表的定义如下所示。</p>
+<p>final ArrayMap&lt;IBinder,Service&gt; mServices &#x3D; new ArrayMap&lt;IBinder,Service&gt;()</p>
+<p>由于Service的onCreate方法被执行了，这也意味着Service已经启动了。除此之外，ActivityThread中还会通过handleServiceArgs方法调用Service的onStartCommand方法，如下所示。</p>
+<p>private void handleServiceArgs(ServiceArgsData data) {</p>
+<p>        Service s &#x3D; mServices.get(data.token);</p>
+<p>        if (s !&#x3D; null) {</p>
+<p>                try {</p>
+<p>                        if (data.args !&#x3D; null) {</p>
+<p>                                data.args.setExtrasClassLoader(s.getClassLoader());</p>
+<p>                                data.args.prepareToEnterProcess();</p>
+<p>                        }</p>
+<p>                        int res;</p>
+<p>                        if (!data.taskRemoved) {</p>
+<p>                                res &#x3D; s.onStartCommand(data.args,data.flags,data.startId);</p>
+<p>                        } else {</p>
+<p>                                s.onTaskRemoved(data.args);</p>
+<p>                                res &#x3D; Service.START_TASK_REMOVED_COMP</p>
+<p>最后调用Service的onCreate方法并将Service对象存储到ActivityThread中的一个列表中。这个列表的定义如下所示。</p>
+<p>final ArrayMap&lt;IBinder,Service&gt; mServices &#x3D; new ArrayMap&lt;IBinder,Service&gt;()</p>
+<p>由于Service的onCreate方法被执行了，这也意味着Service已经启动了。除此之外，ActivityThread中还会通过handleServiceArgs方法调用Service的onStartCommand方法，如下所示。</p>
+<p>private void handleServiceArgs(ServiceArgsData data) {</p>
+<p>        Service s &#x3D; mServices.get(data.token);</p>
+<p>        if (s !&#x3D; null) {</p>
+<p>                try {</p>
+<p>                        if (data.args !&#x3D; null) {</p>
+<p>                                data.args.setExtrasClassLoader(s.getClassLoader());</p>
+<p>                                data.args.prepareToEnterProcess();</p>
+<p>                        }</p>
+<p>                        int res;</p>
+<p>                        if (!data.taskRemoved) {</p>
+<p>                                res &#x3D; s.onStartCommand(data.args,data.flags,data.startId);</p>
+<p>                        } else {</p>
+<p>                                s.onTaskRemoved(data.args);</p>
+<p>                                res &#x3D; Service.START_TASK_REMOVED_COMPLETE;</p>
+<p>                        }</p>
+<p>                        QueuedWork.waitToFinish();</p>
+<p>                        try {</p>
+<p>                                ActivityManagerNative.getDefault().serviceDoneExecuting(</p>
+<p>                                                data.token,1,data.startId,res);</p>
+<p>                        } catch (RemoteException e) {</p>
+<p>                                &#x2F;&#x2F; nothing to do.</p>
+<p>                        }</p>
+<p>                        ensureJitEnabled();</p>
+<p>                } catch (Exception e) {</p>
+<p>                        if (!mInstrumentation.onException(s,e)) {</p>
+<p>                                throw new RuntimeException(</p>
+<p>       “Unable to start service “ + s</p>
+<p>                                                + “ with “ + data.args + “: “ + e.toString(),e);</p>
+<p>                        }</p>
+<p>                }</p>
+<p>        }</p>
+<p>    }</p>
+<p>到这里，Service的启动过程已经分析完了，下面分析Service的绑定过程。</p>
+<h3 id="9-3-2-Service的绑定过程"><a href="#9-3-2-Service的绑定过程" class="headerlink" title="9.3.2　Service的绑定过程"></a>9.3.2　Service的绑定过程</h3><p>和Service的启动过程一样，Service的绑定过程也是从ContextWrapper开始的，如下所示。</p>
+<p>public boolean bindService(Intent service,ServiceConnection conn, int flags) {</p>
+<p>        return mBase.bindService(service,conn,flags);</p>
+<p>    }</p>
+<p>这个过程和Service的启动过程是类似的，mBase同样是ContextImpl类型的对象。ContextImpl的bindService方法最终会调用自己的bindServiceCommon方法，如下所示。</p>
+<p>private boolean bindServiceCommon(Intent service,ServiceConnection conn,int flags,</p>
+<p>                UserHandle user) {</p>
+<p>        IServiceConnection sd;</p>
+<p>        if (conn &#x3D;&#x3D; null) {</p>
+<p>                throw new IllegalArgumentException(“connection is null”);</p>
+<p>        }</p>
+<p>        if (mPackageInfo !&#x3D; null) {</p>
+<p>                sd &#x3D; mPackageInfo.getServiceDispatcher(conn,getOuterContext(),</p>
+<p>                                mMainThread.getHandler(),flags);</p>
+<p>        } else {</p>
+<p>                throw new RuntimeException(“Not supported in system context”);</p>
+<p>        }</p>
+<p>        validateServiceIntent(service);</p>
+<p>        try {</p>
+<p>                IBinder token &#x3D; getActivityToken();</p>
+<p>                if (token &#x3D;&#x3D; null &amp;&amp; (flags&amp;BIND_AUTO_CREATE) &#x3D;&#x3D; 0 &amp;&amp; mPackageInfo !&#x3D;null</p>
+<p>                                &amp;&amp; mPackageInfo.getApplicationInfo().targetSdkVersion</p>
+<p> </p>
+<p>   &lt; android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {</p>
+<p>                        flags |&#x3D; BIND_WAIVE_PRIORITY;</p>
+<p>                }</p>
+<p>                service.prepareToLeaveProcess();</p>
+<p>         </p>
+<p>bindServiceCommon方法主要完成如下两件事情。</p>
+<p>首先将客户端的ServiceConnection对象转化为ServiceDispatcher.InnerConnection对象。之所以不能直接使用ServiceConnection对象，这是因为服务的绑定有可能是跨进程的，因此ServiceConnection对象必须借助于Binder才能让远程服务端回调自己的方法，而ServiceDispatcher的内部类InnerConnection刚好充当了Binder这个角色。那么ServiceDispatcher的作用是什么呢？其实ServiceDispatcher起着连接ServiceConnection和InnerConnection的作用。这个过程由LoadedApk的getServiceDispatcher方法来完成，它的实现如下：</p>
+<p>public final IServiceConnection getServiceDispatcher(ServiceConnection c,</p>
+<p>                Context context,Handler handler,int flags) {</p>
+<p>        synchronized (mServices) {</p>
+<p>                LoadedApk.ServiceDispatcher sd &#x3D; null;</p>
+<p>                ArrayMap&lt;serviceConnection,LoadedApk.ServiceDispatcher&gt; map &#x3D; mServices.get(context);</p>
+<p>    </p>
+<p> if (map !&#x3D; null) {</p>
+<p>                        sd &#x3D; map.get(c);</p>
+<p>                }</p>
+<p>                if (sd &#x3D;&#x3D; null) {</p>
+<p>                        sd &#x3D; new ServiceDispatcher(c,context,handler,flags);</p>
+<p>                        if (map &#x3D;&#x3D; null) {</p>
+<p>                                map &#x3D; new ArrayMap&lt;serviceConnection,LoadedApk.Service-Dispatcher&gt;();</p>
+<p>                                mServices.put(context,map);</p>
+<p>                        }</p>
+<p>                        map.put(c,sd);</p>
+<p>                } else {</p>
+<p>                        sd.validate(context,handler);</p>
+<p>                }</p>
+<p>                return sd.getIServiceConnection();</p>
+<p>        }</p>
+<p>    }</p>
+<p>在上面的代码中，mServices是一个ArrayMap，它存储了一个应用当前活动的ServiceConnection和ServiceDispatcher的映射关系，它的定义如下所示。</p>
+<p>private final ArrayMap&lt;Context,ArrayMap&lt;serviceConnection,LoadedApk.ServiceDispatcher&gt;&gt; mServices &#x3D; new ArrayMap&lt;Context,ArrayMap &lt;serviceConnection,LoadedApk.ServiceDispatcher&gt;&gt;();</p>
+<p>系统首先会查找是否存在相同的ServiceConnection，如果不存在就重新创建一个Servi</p>
+<p>ceDispatcher对象并将其存储在mServices中，其中映射关系的key是ServiceConnection，value是ServiceDispatcher，在ServiceDispatcher的内部又保存了ServiceConnection和InnerConnection对象。当Service和客户端建立连接后，系统会通过InnerConnection来调用ServiceConnection中的onServiceConnected方法，这个过程有可能是跨进程的。当ServiceDispatcher创建好了以后，getServiceDispatcher会返回其保存的InnerConnection对象。</p>
+<p>接着bindServiceCommon方法会通过AMS来完成Service的具体的绑定过程，这对应于AMS的bindService方法，如下所示。</p>
+<p>public int bindService(IApplicationThread caller,IBinder token,</p>
+<p>                Intent service,String resolvedType,</p>
+<p>                IServiceConnection connection,int flags,int userId) {</p>
+<p>        enforceNotIsolatedCaller(“bindService”);</p>
+<p>        &#x2F;&#x2F; Refuse possible leaked file descriptors</p>
+<p>        if (service !&#x3D; null &amp;&amp; service.hasFileDescriptors() &#x3D;&#x3D; true) {</p>
+<p>                throw new IllegalArgumentException(“File descriptors passed in Intent”);</p>
+<p>        }</p>
+<p>        synchronized(this) {</p>
+<p>                return mServices.bindServiceLocked(caller,token,service,resolvedType,</p>
+<p> </p>
+<p>   connection,flags,userId);</p>
+<p>        }</p>
+<p>    }</p>
+<p>接下来，AMS会调用ActiveServices的bindServiceLocked方法，bindServiceLocked再调用bringUpServiceLocked，bringUpServiceLocked又会调用realStartServiceLocked方法，realStartServiceLocked方法的执行逻辑和9.3.1节中的逻辑类似，最终都是通过ApplicationThread来完成Service实例的创建并执行其onCreate方法，这里不再重复讲解了。和启动Service不同的是，Service的绑定过程会调用app.thread的scheduleBindService方法，这个过程的实现在ActiveServices的requestServiceBindingLocked方法中，如下所示。</p>
+<p>private final boolean requestServiceBindingLocked(ServiceRecord r,</p>
+<p>                IntentBindRecord i,boolean execInFg,boolean rebind) {</p>
+<p>        if (r.app &#x3D;&#x3D; null || r.app.thread &#x3D;&#x3D; null) {</p>
+<p>                &#x2F;&#x2F; If service is not currently running,can’t yet bind.</p>
+<p>                return false;</p>
+<p>        }</p>
+<p>        if ((!i.requested || rebind) &amp;&amp; i.apps.size() &gt; 0) {</p>
+<p>                try {</p>
+<p>                        bumpServiceExecutingLocked(r,execInFg,”bind”);</p>
+<p>                        r.app.forceProcessStateUpTo(ActivityManager.PROCESS_STATE_SERVICE);</p>
+<p>                        r.app.thread.</p>
+<p>scheduleBindService(r,i.intent.getIntent(),rebind,</p>
+<p>                                        r.app.repProcState);</p>
+<p>                        if (!rebind) {</p>
+<p>                                i.requested &#x3D; true;</p>
+<p>                        }</p>
+<p>                        i.hasBound &#x3D; true;</p>
+<p>                        i.doRebind &#x3D; false;</p>
+<p>                } catch (RemoteException e) {</p>
+<p>                        if (DEBUG_SERVICE) Slog.v(TAG,”Crashed while binding “ + r);</p>
+<p>    </p>
+<p>在上述代码中，app.thread这个对象多次出现过，对于它我们应该再熟悉不过了，它实际上就是ApplicationThread。ApplicationThread的一系列以schedule开头的方法，其内部都是通过Handler H来中转的，对于scheduleBindService方法来说也是如此，它的实现如下所示。</p>
+<p>public final void scheduleBindService(IBinder token,Intent intent,</p>
+<p>                boolean rebind,int processState) {</p>
+<p>        updateProcessState(processState,false);</p>
+<p>        BindServiceData s &#x3D; new BindServiceData();</p>
+<p>        s.token &#x3D; token;</p>
+<p>        s.intent &#x3D; intent;</p>
+<p>        s.rebind &#x3D; rebind;</p>
+<p>        if (DEBUG_SERVICE)</p>
+<p>                Slog.v(TAG,”scheduleBindService token&#x3D;” + token + “ intent&#x3D;” + intent + “ uid&#x3D;</p>
+<p>“</p>
+<p>                                + Binder.getCallingUid() + “ pid&#x3D;” + Binder.getCallingPid());</p>
+<p>        sendMessage(H.BIND_SERVICE,s);</p>
+<p>    }</p>
+<p>在H内部，接收到BIND_SERVICE这类消息时，会交给ActivityThread的handleBind-Service方法来处理。在handleBindService中，首先根据Service的token取出Service对象，然后调用Service的onBind方法，Service的onBind方法会返回一个Binder对象给客户端使用，这个过程我们在Service的开发过程中应该都比较熟悉了。原则上来说，Service的onBind方法被调用以后，Service就处于绑定状态了，但是onBind方法是Service的方法，这个时候客户端并不知道已经成功连接Service了，所以还必须调用客户端的ServiceConnection中的onServiceConnected，这个过程是由ActivityManagerNative.getDefault()的publishService方法来完成的，而前面多次提到，ActivityManagerNative.getDefault()就是AMS。handleBindService的实现过程如下所示。</p>
+<p>private void handleBindService(BindServiceData data) {</p>
+<p>        Service s &#x3D; mServices.get(data.token);</p>
+<p>        if (DEBUG_SERVICE)</p>
+<p>                Slog.v(TAG,”handleBindService s&#x3D;” + s + “ rebind&#x3D;” + data.rebind);</p>
+<p>        if (s !&#x3D; null) {</p>
+<p>                try {</p>
+<p>                        data.inten</p>
+<p>t.setExtrasClassLoader(s.getClassLoader());</p>
+<p>                        data.intent.prepareToEnterProcess();</p>
+<p>                        try {</p>
+<p>                                if (!data.rebind) {</p>
+<p>                                        IBinder binder &#x3D; s.onBind(data.intent);</p>
+<p>                                        ActivityManagerNative.getDefault().publishService(</p>
+<p>                 </p>
+<p>Service有一个特性，当多次绑定同一个Service时，Service的onBind方法只会执行一次，除非Service被终止了。当Service的onBind执行以后，系统还需要告知客户端已经成功连接Service了。根据上面的分析，这个过程由AMS的publishService方法来实现，它的源码如下所示。</p>
+<p>public void publishService(IBinder token,Intent intent,IBinder service) {</p>
+<p>        &#x2F;&#x2F; Refuse possible leaked file descriptors</p>
+<p>        if (intent !&#x3D; null &amp;&amp; intent.hasFileDescriptors() &#x3D;&#x3D; true) {</p>
+<p>                throw new IllegalArgumentException(“File descriptors passed in                          Intent”);</p>
+<p>        }</p>
+<p>        synchronized(this) {</p>
+<p>                if (!(token instanceof ServiceRecord)) {</p>
+<p>                        throw new IllegalArgumentException(“Invalid service token”);</p>
+<p> </p>
+<p>  }</p>
+<p>                mServices.publishServiceLocked((ServiceRecord)token,intent,service);</p>
+<p>        }</p>
+<p>    }</p>
+<p>从上面代码可以看出，AMS的publishService方法将具体的工作交给了ActiveServices类型的mServices对象来处理。ActiveServices的publishServiceLocked方法看起来很复杂，但其实核心代码就只有一句话：c.conn.connected(r.name,service)，其中c的类型是ConnectionRecord，c.conn的类型是ServiceDispatcher.InnerConnection，service就是Service的onBind方法返回的Binder对象。为了分析具体的逻辑，下面看一下ServiceDispatcher. InnerConnection的定义，如下所示。</p>
+<p>private static class InnerConnection extends IServiceConnection.Stub {</p>
+<p>        final WeakReference&lt;LoadedApk.ServiceDispatcher&gt; mDispatcher;</p>
+<p>        InnerConnection(LoadedApk.ServiceDispatcher sd) {</p>
+<p>                mDispatcher &#x3D; new WeakReference&lt;LoadedApk.ServiceDispatcher&gt;(sd);</p>
+<p>        }</p>
+<p>        public void connected(ComponentName name,IBinder service) throws RemoteException {</p>
+<p>                LoadedApk.ServiceDispatcher sd &#x3D; mDispatcher.get();</p>
+<p>                if (sd !&#x3D; null) {</p>
+<p>                        sd.connected(name,service);</p>
+<p>                }</p>
+<p>        }</p>
+<p>    }</p>
+<p>从InnerConnection的定义可以看出，它的connected方法又调用了ServiceDispatcher的connected方法，ServiceDispatcher的connected方法的实现如下所示。</p>
+<p>public void connected(ComponentName name,IBinder service) {</p>
+<p>        if (mActivityThread !&#x3D; null) {</p>
+<p>                mActivityThread.post(new RunConnection(name,service,0));</p>
+<p>        } else {</p>
+<p>                doConnected(name,service);</p>
+<p>        }</p>
+<p>    }</p>
+<p>对于Service的绑定过程来说，ServiceDispatcher的mActivityThread是一个Handler，其实它就是ActivityThread中的H，从前面ServiceDispatcher的创建过程来说，mActivityThread不会为null，这样一来，RunConnection就可以经由H的post方法从而运行在主线程中，因此，客户端ServiceConnection中的方法是在主线程被回调的。RunConnection的定义如下所示。</p>
+<p>private final class RunConnection implements Runnable {</p>
+<p>        RunConnection(ComponentName name,IBinder service,int command) {</p>
+<p>                mName &#x3D; name;</p>
+<p>                mService &#x3D; service;</p>
+<p>                mCommand &#x3D; command;</p>
+<p>        }</p>
+<p>        public void run() {</p>
+<p>                if (mCommand &#x3D;&#x3D; 0) {</p>
+<p>                        doConn</p>
+<p>ected(mName,mService);</p>
+<p>                } else if (mCommand &#x3D;&#x3D; 1) {</p>
+<p>                        doDeath(mName,mService);</p>
+<p>                }</p>
+<p>        }</p>
+<p>        final ComponentName mName;</p>
+<p>        final IBinder mService;</p>
+<p>        final int mCommand;</p>
+<p>    }</p>
+<p>很显然，RunConnection的run方法也是简单调用了ServiceDispatcher的doConnected方法，由于ServiceDispatcher内部保存了客户端的ServiceConnection对象，因此它可以很方便地调用ServiceConnection对象的onServiceConnected方法，如下所示。</p>
+<p>&#x2F;&#x2F; If there is a new service,it is now connected.</p>
+<p>    if (service !&#x3D; null) {</p>
+<p>        mConnection.onServiceConnected(name,service);</p>
+<p>    }</p>
+<p>客户端的onServiceConnected方法执行后，Service的绑定过程也就分析完成了，至于Service的停止过程和解除绑定的过程，系统的执行过程是类似的，读者可以自行分析源码，这里就不再分析了。</p>
+<h2 id="9-4-BroadcastReceiver的工作过程"><a href="#9-4-BroadcastReceiver的工作过程" class="headerlink" title="9.4　BroadcastReceiver的工作过程"></a>9.4　BroadcastReceiver的工作过程</h2><p>本节将介绍BroadcastReceiver的工作过程，主要包含两方面的内容，一个是广播的注册过程，另一个是广播的发送和接收过程。这里</p>
+<p>先简单回顾一下广播的使用方法，首先要定义广播接收者，只需要继承BroadcastReceiver并重写onReceive方法即可，下面是一个典型的广播接收者的实现：</p>
+<p>public class MyReceiver extends BroadcastReceiver {</p>
+<p>         @Override</p>
+<p>         public void onReceive(Context context,Intent intent) {</p>
+<p>             &#x2F;&#x2F; onReceive函数不能做耗时的事情，参考值：10s以内</p>
+<p>             Log.d(“scott”,”on receive action&#x3D;” + intent.getAction());</p>
+<p>             String action &#x3D; intent.getAction();</p>
+<p>             &#x2F;&#x2F; do some works</p>
+<p>         }</p>
+<p>    }</p>
+<p>定义好了广播接收者，接着还需要注册广播接收者，注册分为两种方式，既可以在AndroidManifest文件中静态注册，也可以通过代码动态注册。</p>
+<p>静态注册的示例如下：</p>
+<receiver android:name=".MyReceiver" >
+
+<p>        <intent-filter></p>
+<p>                <action android:name="com.ryg.receiver.LAUNCH" /></p>
+<p>        </intent-filter></p>
+<p>    </receiver></p>
+<p>通过代码来动态注册广播也是很简单的，如下所示。需要注意的是，动态注册的广播需要在合适的时机进行解注册，解注册采用unre</p>
+<p>gisterReceiver方法。</p>
+<p>IntentFilter filter &#x3D; new IntentFilter();</p>
+<p>    filter.addAction(“com.ryg.receiver.LAUNCH”);</p>
+<p>    registerReceiver(new MyReceiver(),filter);</p>
+<p>前面两步都完成了以后，就可以通过send方法来发送广播了，如下所示。</p>
+<p>Intent intent &#x3D; new Intent();</p>
+<p>    intent.setAction(“com.ryg.receiver.LAUNCH”);</p>
+<p>    sendBroadcast(intent);</p>
+<p>上面简单回顾了广播的使用方法，下面就开始分析广播的工作过程，首先分析广播的注册过程，接着再分析广播的发送和接收过程。</p>
+<h3 id="9-4-1-广播的注册过程"><a href="#9-4-1-广播的注册过程" class="headerlink" title="9.4.1　广播的注册过程"></a>9.4.1　广播的注册过程</h3><p>广播的注册分为静态注册和动态注册，其中静态注册的广播在应用安装时由系统自动完成注册，具体来说是由PMS（PackageManagerService）来完成整个注册过程的，除了广播以外，其他三大组件也都是在应用安装时由PMS解析并注册的。这里只分析广播的动态注册的过程，动态注册的过程是从ContextWrapper的registerReceiver方法开始的，和Activity以及Service一样。ContextWrapper并没有做实际的工作，而是将注册过程直接交给了ContextImpl来完成，如下所示。</p>
+<p>public Intent registerReceiver(</p>
+<p>        Br</p>
+<p>oadcastReceiver receiver,IntentFilter filter) {</p>
+<p>        return mBase.registerReceiver(receiver,filter);</p>
+<p>    }</p>
+<p>ContextImpl的registerReceiver方法调用了自己的registerReceiverInternal方法，它的实现如下所示。</p>
+<p>private Intent registerReceiverInternal(BroadcastReceiver receiver,int userId,</p>
+<p>                IntentFilter filter,String broadcastPermission,</p>
+<p>                Handler scheduler,Context context) {</p>
+<p>        IIntentReceiver rd &#x3D; null;</p>
+<p>        if (receiver !&#x3D; null) {</p>
+<p>                if (mPackageInfo !&#x3D; null &amp;&amp; context !&#x3D; null) {</p>
+<p>        </p>
+<p>在上面的代码中，系统首先从mPackageInfo获取IIntentReceiver对象，然后再采用跨进程的方式向AMS发送广播注册的请求。之所以采用IIntentReceiver而不是直接采用BroadcastReceiver，这是因为上述注册过程是一个进程间通信的过程，而BroadcastReceiver作为Android的一个组件是不能直接跨进程传递的，所以需要通过IIntentReceiver来中转一下。毫无疑问，IIntentReceiver必须是一个Binder接口，它的具体实现是LoadedApk.Receiver-Dispatcher.InnerReceiver，ReceiverDispatcher的内部同时保存了BroadcastReceiver和InnerReceiver，这样当接收到广播时，Receive</p>
+<p>rDispatcher可以很方便地调用BroadcastReceiver的onReceive方法，具体会在9.4.2节中说明。可以发现，BroadcastReceiver的这个过程和Service的实现原理类似，Service也有一个叫ServiceDispatcher的类，并且其内部类InnerConnection也是一个Binder接口，作用同样也是为了进程间通信，这一点在9.3.2节中已经描述过了，这里不再重复说明。</p>
+<p>关于ActivityManagerNative.getDefault()，这里就不用再做说明了，它就是AMS，在前面的章节中已经多次提到它。下面看一下ReceiverDispatcher的getIIntentReceiver的实现，如下所示。很显然，getReceiverDispatcher方法重新创建了一个ReceiverDispatcher对象并将其保存的InnerReceiver对象作为返回值返回，其中InnerReceiver对象和BroadcastReceiver都是在ReceiverDispatcher的构造方法中被保存起来的。</p>
+<p>public IIntentReceiver getReceiverDispatcher(BroadcastReceiver r,</p>
+<p>                Context context,Handler handler,</p>
+<p>                Instrumentation instrumentation,boolean registered) {</p>
+<p>        synchronized (mReceivers) {</p>
+<p>                LoadedApk.ReceiverDispatcher rd &#x3D; null;</p>
+<p>                ArrayMap&lt;BroadcastReceiver,LoadedApk.ReceiverDispatcher&gt; map &#x3D; null;</p>
+<p>                if (registered) {</p>
+<p>             </p>
+<p>map &#x3D; mReceivers.get(context);</p>
+<p>                        if (map !&#x3D; null) {</p>
+<p>                                rd &#x3D; map.get(r);</p>
+<p>                        }</p>
+<p>                }</p>
+<p>                if (rd &#x3D;&#x3D; null) {</p>
+<p>                        rd &#x3D; new ReceiverDispatcher(r,context,handler,</p>
+<p>                             instrumentation,registered);</p>
+<p>                        if (registered) {</p>
+<p>                                if (map &#x3D;&#x3D; null) {</p>
+<p>                                        map &#x3D; new ArrayMap&lt;BroadcastReceiver,LoadedApk.ReceiverDispatcher&gt;();</p>
+<p>                                        mReceivers.put(context,map);</p>
+<p>           </p>
+<p>由于注册广播的真正实现过程是在AMS中，因此我们需要看一下AMS的具体实现。AMS的registerReceiver方法看起来很长，其实关键点就只有下面一部分，最终会把远程的InnerReceiver对象以及IntentFilter对象存储起来，这样整个广播的注册过程就完成了，代码如下所示。</p>
+<p>public Intent registerReceiver(IApplicationThread caller,String callerPackage,</p>
+<p>        IIntentReceiver receiver,IntentFilter filter,String permission,int           userId) {</p>
+<p>        …</p>
+<p>        mRegisteredRec</p>
+<p>eivers.put(receiver.asBinder(),rl);</p>
+<p>        BroadcastFilter bf &#x3D; new BroadcastFilter(filter,rl,callerPackage,</p>
+<p>                        permission,callingUid,userId);</p>
+<p>        rl.add(bf);</p>
+<p>        if (!bf.debugCheck()) {</p>
+<p>                Slog.w(TAG,”&#x3D;&#x3D;&gt; For Dynamic broadast”);</p>
+<p>        }</p>
+<p>        mReceiverResolver.addFilter(bf);</p>
+<p>        …</p>
+<p>    }</p>
+<h3 id="9-4-2-广播的发送和接收过程"><a href="#9-4-2-广播的发送和接收过程" class="headerlink" title="9.4.2　广播的发送和接收过程"></a>9.4.2　广播的发送和接收过程</h3><p>上面分析了广播的注册过程，可以发现注册过程的逻辑还是比较简单的，下面来分析广播的发送和接收过程。当通过send方法来发送广播时，AMS会查找出匹配的广播接收者并将广播发送给它们处理。广播的发送有几种类型：普通广播、有序广播和粘性广播，有序广播和粘性广播与普通广播相比具有不同的特性，但是它们的发送&#x2F;接收过程的流程是类似的，因此这里只分析普通广播的实现。</p>
+<p>广播的发送和接收，其本质是一个过程的两个阶段。这里从广播的发送可以说起，广播的发送仍然开始于ContextWrapper的sendBroadcast方法，之所以不是Context，那是因为Context的sendBroadcast是一个抽象方法。和广播的注册过程一样，ContextWrapper的sendBroadcast方法仍然什么都不做，只是把事情交给ContextImpl去处理，ContextImpl的sendBroadca</p>
+<p>st方法的源码如下所示。</p>
+<p>public void sendBroadcast(Intent intent) {</p>
+<p>        warnIfCallingFromSystemProcess();</p>
+<p>        String resolvedType &#x3D; intent.resolveTypeIfNeeded(getContentResolver());</p>
+<p>        try {</p>
+<p>                intent.prepareToLeaveProcess();</p>
+<p>                ActivityManagerNative.getDefault().broadcastIntent(</p>
+<p>                        mMainThread.getApplicationThread(),intent,resolvedType,null,</p>
+<p>                        Activity.RESULT_OK,null,null,null,AppOpsManager.OP_NONE,false,false,</p>
+<p>                        getUserId());</p>
+<p>        } catch (RemoteException e) {</p>
+<p>        }</p>
+<p>    }</p>
+<p>从上面的代码来看，ContextImpl也是几乎什么事都没干，它直接向AMS发起了一个异步请求用于发送广播。因此，下面直接看AMS对广播发送过程的处理，AMS的broadcastIntent方法的源码如下所示。</p>
+<p>public final int broadcastIntent(IApplicationThread caller,</p>
+<p>                Intent intent,String resolvedType,IIntentReceiver resultTo,</p>
+<p>                int resultCode,String resultData,Bundle map,</p>
+<p>                String requiredPermission,int appOp,boolean serialized,boolean sticky,int use</p>
+<p>rId) {</p>
+<p>        enforceNotIsolatedCaller(“broadcastIntent”);</p>
+<p>        synchronized(this) {</p>
+<p>                intent &#x3D; verifyBroadcastLocked(intent);</p>
+<p>                final ProcessRecord callerApp &#x3D; getRecordForAppLocked(caller);</p>
+<p>                final int callingPid &#x3D; Binder.getCallingPid();</p>
+<p>                final int callingUid &#x3D; Binder.getCallingUid();</p>
+<p>                final long origId &#x3D; Binder.clearCallingIdentity();</p>
+<p>                int res &#x3D; broadcastIntentLocked(callerApp,</p>
+<p>                                callerApp !&#x3D; null ? callerApp.info.packageName : null,</p>
+<p>                                intent,resolvedType,resultTo,</p>
+<p>                                resultCode,resultData,map,requiredPermission,appOp,serialized,sticky,</p>
+<p>                                callingPid,callingUid,userId);</p>
+<p>                Binder.restoreCallingIdentity(origId);</p>
+<p>                return res;</p>
+<p>        }</p>
+<p>    }</p>
+<p>从上面代码来看，broadcastIntent调用了broadcastIntentLocked方法，AMS的broadcastIntentLocked方法有436行代码，看起来比较复杂。在代码最开始有如下一行：</p>
+<p>&#x2F;&#x2F; By default broadcasts do not go to sto</p>
+<p>pped apps.</p>
+<p>    intent.addFlags(Intent.FLAG_EXCLUDE_STOPPED_PACKAGES);</p>
+<p>这表示在Android 5.0中，默认情况下广播不会发送给已经停止的应用，其实不仅仅是Android 5.0，从Android 3.1开始广播已经具有这种特性了。这是因为系统在Android 3.1中为Intent添加了两个标记位，分别是FLAG_INCLUDE_STOPPED_PACKAGES和FLAG_EXCLUDE_STOPPED_PACKAGES，用来控制广播是否要对处于停止状态的应用起作用，它们的含义如下所示。</p>
+<p>FLAG_INCLUDE_STOPPED_PACKAGES</p>
+<p>表示包含已经停止的应用，这个时候广播会发送给已经停止的应用。</p>
+<p>FLAG_EXCLUDE_STOPPED_PACKAGES</p>
+<p>表示不包含已经停止的应用，这个时候广播不会发送给已经停止的应用。</p>
+<p>从Android 3.1开始，系统为所有广播默认添加了FLAG_EXCLUDE_STOPPED_PACKAGES标志，这样做是为了防止广播无意间或者在不必要的时候调起已经停止运行的应用。如果的确需要调起未启动的应用，那么只需要为广播的Intent添加FLAG_INCLUDE_STOPPED_PACKAGES标记即可。当FLAG_EXCLUDE_STOPPED_PACKAGES和FLAG_INCLUDE_STOPPED_PACKAGES两种标记位共存时，以FLAG_INCLUDE_STOPPED_PACKAGES为准。这里需要补充一下，一个应用处于停止状态分为</p>
+<p>两种情形：第一种是应用安装后未运行，第二种是应用被手动或者其他应用强停了。Android 3.1中广播的这个特性同样会影响开机广播，从Android 3.1开始，处于停止状态的应用同样无法接收到开机广播，而在Android 3.1之前，处于停止状态的应用是可以收到开机广播的。</p>
+<p>在broadcastIntentLocked的内部，会根据intent-filter查找出匹配的广播接收者并经过一系列的条件过滤，最终会将满足条件的广播接收者添加到BroadcastQueue中，接着BroadcastQueue就会将广播发送给相应的广播接收者，这个过程的源码如下所示。</p>
+<p>if ((receivers !&#x3D; null &amp;&amp; receivers.size() &gt; 0)</p>
+<p>                || resultTo !&#x3D; null) {</p>
+<p>        BroadcastQueue queue &#x3D; broadcastQueueForIntent(intent);</p>
+<p>        BroadcastRecord r &#x3D; new BroadcastRecord(queue,intent,callerApp,</p>
+<p>                        callerPackage,callingPid,callingUid,resolvedType,</p>
+<p>                        requiredPermission,appOp,receivers,resultTo,resultCode,</p>
+<p>                        resultData,map,ordered,sticky,false,userId);</p>
+<p>        if (DEBUG_BROADCAST) Slog.v(</p>
+<p>                        TAG,”Enqueueing ordered broadcast “ + r</p>
+<p>     + “: prev had “ + queue.mOrderedBroadcasts.size());</p>
+<p>        if (DEBUG_BROADCAST) {</p>
+<p>                int seq &#x3D; r.intent.getIntExtra(“seq”,-1);</p>
+<p>                Slog.i(TAG,”Enqueueing broadcast “ + r.intent.getAction() + “ seq&#x3D;” + seq);</p>
+<p>        }</p>
+<p>        boolean replaced &#x3D; replacePending &amp;&amp; queue.replaceOrderedBroadcast-Locked(r);</p>
+<p>        if (!replaced) {</p>
+<p>                queue.enqueueOrderedBroadcastLocked(r);</p>
+<p>                queue.scheduleBroadcastsLocked();</p>
+<p>        }</p>
+<p>    }</p>
+<p>下面看一下BroadcastQueue中广播的发送过程的实现，如下所示。</p>
+<p>public void scheduleBroadcastsLocked() {</p>
+<p>        if (DEBUG_BROADCAST) Slog.v(TAG,”Schedule broadcasts [“</p>
+<p>                        + mQueueName + “]: current&#x3D;”</p>
+<p>                        + mBroadcastsScheduled);</p>
+<p>        if (mBroadcastsScheduled) {</p>
+<p>                return;</p>
+<p>        }</p>
+<p>        mHandler.sendMessage(mHandler.obtainMessage(BROADCAST_INTENT_MSG,this));</p>
+<p>        mBroadcastsScheduled &#x3D; true;</p>
+<p>    }</p>
+<p>BroadcastQueue的scheduleBroadcastsLocked方法并没有立即发送广播，而是发送了一个BROADCAST_INTENT_MSG类型的消息，BroadcastQueue收到消息后会调用process-NextBroadcast方法，BroadcastQueue的processNextBroad</p>
+<p>cast方法对普通广播的处理如下所示。</p>
+<p>&#x2F;&#x2F; First,deliver any non-serialized broadcasts right away.</p>
+<p>    while (mParallelBroadcasts.size() &gt; 0) {</p>
+<p>        r &#x3D; mParallelBroadcasts.remove(0);</p>
+<p>        r.dispatchTime &#x3D; SystemClock.uptimeMillis();</p>
+<p>        r.dispatchClockTime &#x3D; System.currentTimeMillis();</p>
+<p>        final int N &#x3D; r.receivers.size();</p>
+<p>        if (DEBUG_BROADCAST_LIGHT) Slog.v(TAG,”Processing parallel broadcast [“</p>
+<p>                    + mQueueName + “] “ + r);</p>
+<p>        for (int i&#x3D;0; i&lt;N; i++) {</p>
+<p>                Object target &#x3D; r.receivers.get(i);</p>
+<p>                if (DEBUG_BROADCAST)  Slog.v(TAG,</p>
+<p>                        “Delivering non-ordered on[“+mQueueName + “] to registered “</p>
+<p>                        + target + “: “ + r);</p>
+<p>                deliverToRegisteredReceiverLocked(r,(BroadcastFilter)target,false);</p>
+<p>        }</p>
+<p>        addBroadcastToHistoryLocked(r);</p>
+<p>        if (DEBUG_BROADCAST_LIGHT) Slog.v(TAG,”Done with parallel broadcast [“</p>
+<p>                        + mQueueName + “] “ + r);</p>
+<p>    }</p>
+<p>可以看到，无序广播存储在mParallelBroadcasts中，系统会遍历mParallelBroadcasts并将其中的广播发送给它们所有的接收者，具体的发送过程是通过deliverToRegistered-Recei</p>
+<p>verLocked方法来实现的。deliverToRegisteredReceiverLocked方法负责将一个广播发送给一个特定的接收者，它内部调用了performReceiveLocked方法来完成具体的发送过程：</p>
+<p>performReceiveLocked(filter.receiverList.app,filter.receiverList.receiver,</p>
+<p>        new Intent(r.intent),r.resultCode,r.resultData,</p>
+<p>        r.resultExtras,r.ordered,r.initialSticky,r.userId);</p>
+<p>performReceiveLocked方法的实现如下所示。由于接收广播会调起应用程序，因此app.thread不为null，根据前面的分析我们知道这里的app.thread仍然指ApplicationThread。</p>
+<p>private static void performReceiveLocked(ProcessRecord app,IIntentReceiver</p>
+<p>    receiver,</p>
+<p>                Intent intent,int resultCode,String data,Bundle extras,</p>
+<p>                boolean ordered,boolean sticky,int sendingUser) throws Remote-Exception {</p>
+<p>        &#x2F;&#x2F; Send the intent to the receiver asynchronously using one-way binder calls.</p>
+<p>        if (app !&#x3D; null) {</p>
+<p>                if (app.thread !&#x3D; null) {</p>
+<p>                        &#x2F;&#x2F; If we have an app thread,do the call through that so it is</p>
+<p>                        &#x2F;&#x2F; correctly ordered with other one-way calls.</p>
+<p>                    </p>
+<p>app.thread.scheduleRegisteredReceiver(receiver,intent,resultCode,</p>
+<p>                        data,extras,ordered,sticky,sendingUser,app.repProcState);</p>
+<p>                } else {</p>
+<p>                        &#x2F;&#x2F; Application has died. Receiver doesn’t exist.</p>
+<p>                        throw new RemoteException(“app.thread must not be null”);</p>
+<p>                }</p>
+<p>        } else {</p>
+<p>                receiver.performReceive(intent,resultCode,data,extras,ordered,</p>
+<p>      </p>
+<p>ApplicationThread的scheduleRegisteredReceiver的实现比较简单，它通过InnerReceiver来实现广播的接收，如下所示。</p>
+<p>public void scheduleRegisteredReceiver(IIntentReceiver receiver,Intent</p>
+<p>    intent,</p>
+<p>                int resultCode,String dataStr,Bundle extras,boolean ordered,</p>
+<p>                boolean sticky,int sendingUser,int processState) throws RemoteException {</p>
+<p>        updateProcessState(processState,false);</p>
+<p>        receiver.performReceive(intent,resultCode,dataStr,extras,ordered,sticky,sendingUser);</p>
+<p>    }</p>
+<p>InnerReceiver的performReceive方法会调用LoadedApk.ReceiverDispatcher的perform-Receive方法，LoadedApk.ReceiverDispatcher的performReceive方法的实现如下所示。</p>
+<p>public void performReceive(Intent intent,int resultCode,String data,</p>
+<p>                Bundle extras,boolean ordered,boolean sticky,int sendingUser) {</p>
+<p>        if (ActivityThread.DEBUG_BROADCAST) {</p>
+<p>                int seq &#x3D; intent.getIntExtra(“seq”,-1);</p>
+<p>                Slog.i(ActivityThread.TAG,”Enqueueing broadcast “ + intent.getAction() + “ seq&#x3D;” + seq + “ to “ + mReceiver);</p>
+<p>        }</p>
+<p>        Args args &#x3D; new Args(intent,resultCode,data,extras,ordered,</p>
+<p>                        sticky,sendingUser);</p>
+<p>        if (!mActivityThread.post(args)) {</p>
+<p>                if (mRegistered &amp;&amp; ordered) {</p>
+<p>                        IActivityManager mgr &#x3D; ActivityManagerNative.getDefault();</p>
+<p>                        if (ActivityThread.DEBUG_BROADCAST) Slog.i(ActivityThread.TAG,</p>
+<p>                                        “Finishing sync broadcast to “ + mReceiver);</p>
+<p>                        args.sendFinished(mgr);</p>
+<p>                }</p>
+<p>        }</p>
+<p>    }</p>
+<p>在上面的代码中，会创建一个Args对象并通过mActivityThread的post方法来执行Args中的逻辑，而Args实现了Runnable接口。mActivityThread是一个Handler，它其实就是ActivityThread中的mH，mH的类型是ActivityThread的</p>
+<p>内部类H，关于H这个类前面已经介绍过了，这里就不再多说了。在Args的run方法中有如下几行代码：</p>
+<p>final BroadcastReceiver receiver &#x3D; mReceiver;</p>
+<p>    receiver.setPendingResult(this);</p>
+<p>    receiver.onReceive(mContext,intent);</p>
+<p>很显然，这个时候BroadcastReceiver的onReceive方法被执行了，也就是说应用已经接收到广播了，同时onReceive方法是在广播接收者的主线程中被调用的。到这里，整个广播的注册、发送和接收过程已经分析完了，读者应该对广播的整个工作过程有了一定的理解。</p>
+<h2 id="9-5-ContentProvider的工作过程"><a href="#9-5-ContentProvider的工作过程" class="headerlink" title="9.5　ContentProvider的工作过程"></a>9.5　ContentProvider的工作过程</h2><p>ContentProvider的使用方法在第2章已经做了介绍，这里再简单说明一下。ContentProvider是一种内容共享型组件，它通过Binder向其他组件乃至其他应用提供数据。当ContentProvider所在的进程启动时，ContentProvider会同时启动并被发布到AMS中。需要注意的是，这个时候ContentProvider的onCreate要先于Application的onCreate而执行，这在四大组件中是一个少有的现象。</p>
+<p>当一个应用启动时，入口方法为ActivityThread的main方法，main方法是一个静态方法，在main方法中会创建ActivityThread的实例</p>
+<p>并创建主线程的消息队列，然后在ActivityThread的attach方法中会远程调用AMS的attachApplication方法并将ApplicationThread对象提供给AMS。ApplicationThread是一个Binder对象，它的Binder接口是IApplicationThread，它主要用于ActivityThread和AMS之间的通信，这一点在前面多次提到。在AMS的attachApplication方法中，会调用ApplicationThread的bindApplication方法，注意这个过程同样是跨进程完成的，bindApplication的逻辑会经过ActivityThread中的mH Handler切换到ActivityThread中去执行，具体的方法是handleBindApplication。在handleBindApplication方法中，ActivityThread会创建Application对象并加载ContentProvider。需要注意的是，ActivityThread会先加载ContentProvider，然后再调用Application的onCreate方法，整个流程可以参看图9-2。</p>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAf0AAAE5CAAAAAC/3qb2AAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAACYktHRAD/h4/MvwAAAAd0SU1FB+gCCw8MOWPuZxcAAAABb3JOVAHPoneaAABIg0lEQVR42u29eZQk51Uneu/9IiLXyqytq6r3Ra3eu9VqLZYsyW5byLYQBtvYGPBgAwaGYZntwYM3Zw4wDG8YzoGDeRyGZww8YLANNrZkY0teZMmSWqu1tJZuqfd9qa4198yI77v3/RGZtXVWZGZVZnWWOn/nSNGZFRnxxXfju9/dLwp0cN2CrvUAOriG6FD/ekaH+tczOtS/ntGh/vUMn/odwf/6RGftX8/oUP96Rof61zM61L+e0aH+9YyFU5/nfOzoDcsPjVGfR1lEBERELhR8TVHggisgx4sAaRYvlR1lgNzEtX6wDupAY9Qf+9tLbNyS0ey63xwxRrMpGf7GCLvuP4wKP5zhK9976q/HDD/xL9f6wTqoA1YjJ8sT34/90uhENrHReyM0hmdKsP7cZN/GpM681TWugR66ce/LR0ceW/9R90sXfgGv9aN1UBMNrX3v8d9/XL7/F498ZuLQZ793Qv/tXz3+0j9/72/Hvzf21N8/eplEPvAcP7mf73vYe2Vr37V+sA7qQAPUF7kwYo9fHIv/Jqa/fN+/2wAntnz8H+/8P/TJE7lHP/mpPhDYf+Ts+BbanD725Xs7K385oG7qC4v5zoonbvySGQz3susUAKHfzqqCAyLadhEA1tIXdicQf/Ev9E3X+rk6qAf17/tMePz/XDP5Cx/xpC90/8vOsDUQj/7Q6wVn06rIXS+ddglY7vzf/wP6uu757M/a/df6wTqoA+r3AACgDkaNyD03QmRo96ru5OqNmu9buWJL1+Zscf+a3m1bJ7vfvcYRGNy4TyU3DW7dFe1de62frIPaQAEAkDqozwCkCQVFEAQBBVAERUQhIwAAMvrfAxnqbPzLAPVTfx4IczFCHZPxssTiiUb4Rho7K31ZYvHUZxo+bK71Y3SwIDSDYd/2Zp47wWHLEU3g/DTUexQ7vH85YtHURwB12wmv4+Bdjlg09QVBVpsr9VgMOmg3NGHtC9INr/Bir9PBNUATpD4E2HFh7Fo/SAcLQFOMNBjd/Gpn8S9DNIX6QvuOpa/1k3TQOJpDfe5ee8h0xP5lh6ZQn4DufDXTof6yQ5M4v/StOEsd6i83NMk1h3T7Wx25b9mhOTI/Cqx2L3fW/nJDk9Y+IWx9vuPpWW5oWlAGbr803rH2LjM0jfoU3dIx9y43NI36wrcfSUmH+S8rNI/zY2LTa6ZD/GWFJlIf3vF6/lo/TgcNoXmcX6Sv57x0Fv9yQvOoj4R3HzIdsX85oXkyPyGuSQ93xP7lhOYmYex4ocP5lxOaS/29pyc7Ot8yQlOpT+EdrxnuSH7LBk2lPspdB1Odqr/LB02lPlNs8xuLSQntYGnR5LWP97xUwI7cv1zQXOoj9gyc7+j8ywZNT7t/70vcof5yQdOpP5S70pH6lguaX3Jj1/OdbP7lguZTf+/pSeFOdPeyQNOpL+GbX+js/MsETac+yjsOZYA6Wt9ywIxqjc1i1pGtB+9W2ELW3+EsC0BVG9w09c2EJc3gBIJ7vrQtwi2q4CaCkIR2fQOkfQ2dTFXmbJr63ut9VhMWrABx9zNbWLXmIYzi9O0NlZVfUgi0q8yDjEHUh4EdzSCZAODAt7dLiyhkFD+dS7brChMoZtv01eTuKpx9eqwizYnHRob+7JWhFu37BCKuYJuSX3D4Ute1HkRV4OXbqwxsmvoETSm7JkAg+57+SIv2fQYC1bZ1YQmKG1de60FUhWTTsas5+/Q0YnMKKyMA4N7Tky16CgLw0u258AEAAdv0vUSVrsKNWzJYce44IC0K8UEI9bUp329ruIkqk9YS6hPeeijbmuqdIuClsRM+1CjEKlQxwM2UUJuWhSfo7Hjl7laJZtzGWnUbg5dq7QPwPS8UW+TpEScmrbQkvk1hoktHfUpuPN6SCyNgcRLb1aTSvhArXYPzNw+MeM/D21vxZgmIk1xUM5FWoz3ZEupoFXK0ZO0jIva4oyjQdMFfAFDa1MrfzqhOh9ZwfgSgWx9vRV4HAXr5dnXytDEk7Fbh/C0zTuCOCxMgTS/nICChREfqaxike5aK8/tXvuNpnBhpwYXdVIf4DUMwtVS2PgAAMDveOPXwyebTCVF1Nv6GUZ0Lt4z6cvlQ5s++Gm0B51cR6Cz+RkEmVGXFtM4bPfG1I8Vwd7PfLgQopXvbWOFrU4iV4SAfX51XqfvMXT+3JxLqrp9MAlLP5QXDPR07f+PQ8SqkbmjtCyNbUPLqISnKxl/44nFVqJtOGALFUjO6CIW9zr7fMLBqbu0s6tdkqEZBzs1kVD0tu42CD7x1qe7h6WjciWFtz5CgLi7NhL2tIKpUhfM3FtmlTGYk07/GqmvpocBWhjpDBcVkTkdWJOxaO5EAhBJCrQoZfvtCJ2px/uCFJyjmwsUbbqA6Z14QmOqVzwRjQ5njPT3JGucjQHE80ZH6GoZKDwStfQy2nwoZNJdGb3XqFLlQEIWwXt0MQUlyz1ulcFhqSaJWqCl5By0BNt+z0SSIvRgPLzLipdGb7HqN974A38BcCLC91TrpBr9djEJOuzrS2hjI9mL0fRTIHb8LGFqYoce08dVzGwKHRADFdCewr2FU1/frpj6THN1qM9fXe6lMnmkq1UMvAcGtzw/Fgk/FSB9K4OWmFcLKafMd65u4xfy4bVBV6quf84ObGuD6QjVlIi/Ck64II494IlxXJScEgsjQpVqn6iAbgggIM4gwsIgICzCLCIswi/9PFmZhYWYR/3P5OPMzlD9fdWTDyzFBGb3FeHmEL6wkEJB68IXnmCe+eJ6hZPiZrLAxWM/PQIAHRkuBDyHA7vzUF0HIA3tcYu2xZva00WLYaM2eGDFai8cs2mjxNGijDWuPjTaGtWajjTHG06yN1uxp8Vhr8DR4rD3QWjzWBsRbhmIHVpvW+vd9uHBzveF0/Ge33hl67Ctr1x3Jda+j0pURE99Qp96PMVOIBNxGBMPd88v8iCAja1yvS7MqhsSLaLSKNrphLXZROSXHiFOCSNE2hlydzIcZyfXiRRtApBQxRMJUtGwm0XYRI0bEC5dMQot4jud1aYGSDQV7+TF/nViUl0e4bvM6JnsP7n3mI6b0leLwHz2y+qXvr8v8QaLO21gT6WTQoEjy411BWy8OYSQMMQCbMSQRBEvAERtAAcTEAYkBRIFAoihdKAgqKjEUBA6Lg4LAjiAxiYkj2EwhEweICIWMFYWIkC1o8vGmU6fVsKvp+/VzfmzEI3T/V06qBNHH3/f68HjmyorflVy9v0THCR4HOJFgmW/CMKOIAKGvfyMCigj6R0BERBFAQBAQqXZkYCEE/wgAUv4swCKCeoGZSiJ+0OMSYK7hlkOL8fIQY92B1ILv/tyDHzyLxz8XyTAAdVvxeoP7UdAJPBWZlAS4eZjs5iQkzjsAAOMuTPIXhKULSps9Pha7yjn1a3xAbrjOkctq52Of/w8TkdHE9tedgXC3a7rrrQzArFM9Qc8kWMz0BRj7EEJMLY33Z7QiC4srJQFYosZVaM2eA7JzVW7cgNQXT4eY6tL38T/gA6vDN0V6Wf3BwE/fkED1QFc9PxNAyA31B+0wTBLpkwD3AUo+IqqFOrkglnR8YQklQvpctGUjm4nS2tn8UaA/mPMHp8cJbH6pv94A/bshfjesBXg3ANwK3QA76pobJuZJCgwfQBEvGyT1CUSFuJUBACiKFpajKCTm0K7WjWwGXh9wZo0RMdtdy9YXQFpkxxnrNS1lqsjonVlrB75gQkHGFkGEfKh+7WQhYLAWyL4FBQc2tm5kM3AytWL2CjDFmhpf0NpH2vpGOGxaWYkPUZ+mrmiQQVFIQl08L2f3xXKrldZYJgjk/ME+KliqKqaIZiarF921KH2fqbvn/KbGiN8gEcQdvXhLLHBIKFCcmN+/LwAQJW5p0C+Dshf2eqHIUuWfGtazGD1aqcFAzo/B7y0B7HxhOBkmrEgIyADga8cAKAiAjDPnBY1lCJkEQLB8JCh/9k+ZOluEWE+e2hkK1WLbTizA1gcgOaelWpUggjfvHwPlIsGGfN6LAc2JwUETXVxsDwDvPZTui4QQUYQExFdeBQUFAJmAEQSZBAUEUBSKMAoDCkwdQRhQUAAFUCr/AoZSbnJsczJCwQsXWQQC9f36Q0oWCOHlUIUcZ01D9ZduFvVrcSWkm86djPfaaLEoRhFi/xYoQEYJK0NolIjS/oeiQyBkiLRiIEPAlaNlQHk2s6WJPNsAeZy5bO+wo0SBSx8B3TwG6vuO//q1DAJqMXUNl2bti/CsAlJoFRaj7wMAoODaVScvU6qrKLFsGPPxAoZzES7F8sopRD0dyTlWIVaScC4sbrQkJ1b0iQ4XySpGNDtFG9yoK07BgVKsSFYhYrxowVKFqGdCxXDP2u5IhGoUu2SUSA8H6vulSIvNPeBKvO29/DibBYpZnJcHAMAGpK2um7U0RbNhKMSKGM5F2I0ULDsf1V40F6JCrMTRdBSK8QK8tX69uNG8ZeVjngnnHSzGixDKhaXYVVBWLmrceM5RubhrwgXbhqhVsw4jAbiZBATp+zZTKwVrQVB1RJ7PM7ilCvuTOQEwQvlasT11PZLYoSgwWmEFcTuGFLGY7RhSxGa2IkRRx4gKWRBzIhLq6UJjRxCjFosVRYxbEbAiCowdQRW1xNhhoqjFbHUh1hNTLlDD24TiRbiV/JWM0GJouFR2/tljJMFaa7++HB0CBAVsCdhiAVtCii1gW0ixLWIzITsiNlvANonFCsQSAlYAlihgW8BmBWwLUfkXvhQBta00QmJHONCSK4ILM8PXByYpMbR76SCcy/k5XOWsBWRxIlPZmFZ+vabz7yozUo7qgymnQDkST0hmnj/9QfyPtdcFAZRS3fMTXwDiiEb5MyCzyrwICEKZZ8/8NwD4vrer+LmU1dpZjy8L0/fLm1oA2xCEigxdCM8NTQQohlj5fwUAAK4I9VWHIjIn4cXKLlbq8+/F4C8uLOcATB99VWz6CFD5e3k54tSynPnl1P/qAKPYiaB4fhSj/BkiCxlIpOLwZQCD5OsLjGIIoZI2KCJkkAzN2RoFrg5JFALWjc4aAIif13TVYzKSiGAuArkuZERDAvL9/WEymJ5cbTEhsDIEpefvOLcy5p8BRQmNYh+SCGliqqIC42yND020iqIyax6XQbgagogXLDsxaBQRYZeFSyiVeArSZyCtxf83gCCnqBILYYqFQjF/Xq4KkXCv8NzgQ15gEqk+O+ZdHd4qQqXxEVN8PDX5dFHnhrPojY7yX14YdZEf+8ww5EvDLuYKl0vFz6WevOgOZ0xxbMw7dsScfB1Kl1NcKI6WkKus/9nfCOhaa7/pWnLzi/WikC5hYDKPAjIEAN6B/aFTR/eHCJgABGTyr377wDsGhAlYUC5sdA88AIwIIOK9mi92xR/6zQT6MRiAIEIgMvrtT1z9VEjlnary/8q/kLXnwYxlNP34IubB6N710blzzMTnDl25tfvrQ/z1rSsOnui77+JT8XcVn5G9O0pPuU//+GNd53bc/IPMle1bPdNHhw8OvfPSwfy7ntUDXaZ48ER0/9lzY6v3h64irfBszo/kNYPzX2MwSThZS+ozgoKS+YN3qK88tmFrKpvrGhzPu736pdxwuusCriyOy7rUX/9G5ByOjodW85WiSp5768T+1T84EV8jk4WVcAUGeSw/2JO6nBqbNBVVRMTfvbko3b6UYsr7OJdfATQXUhkA4DIrnnr5BQQ49Z3Hbn7PXDMhglwpnHv5NzQAiL5s/fFNDyWctBmL/N0fvc4/8aUPf379/j/+3Ff0+/7895G/ws/f6WUvOA+5wvLaceuLP/WQffq7n/7ju+gqro40x9Zn4sEyf6uqajcXAsVUgL6PgGCIEUS4ZIbPP3B42wsHwupnv3FFBvejjOZf+l7yPWeOnfyV0dff2jMy8WA6+0nnTwcnPvWxl57+2XOpRzL3Rx+K/+jpN/mOnifO7vjYv1xMekdT7BuXgUWARcgYjACUBRcB8PdPQhSUK/ERAKCyvItQ0bNIUErgXbi44uonSoJ3bFXPZq93Q74rdXniuT9eBeqjyd+Cxwa80wVz7z2/M6lvvffvzgqYK2f/O3DyMl/cZ4ZEvrf5HSOvxrd/8BsMNLf5scxVnym3mFyeNoINgQnciAIsiGKZl8K7vvHAidf/5HdeevKe/f9+O8iT+7704/syPbe/9u1PrdhjHt996Hc+98h9X/3WF17fioDo7D/15J4n/t/o33689PVf2hp+8Nbv/MkLR1f2ACGh8pUoJEDyVDcCIvodLab9VUxwuHcFlAP4ZhwBUDQc3rLjvatfnbPEhM0/d/U6QOd79cXL//jBOPZd0P0hRXbh5D2XN75kLp1cE8WxM/HeEFjhrlNO/At745YaGUMcHDlzYWUhDCG42rwlcwuhCC3a1tcGQHFCEpgYziAinpiseI/GXzh+Slb0hjO0oTefF0Tz5qaY88X4SNYh0nxoTXj9UQrdsNOIEYHklsgZGthxZvJMZPfBw8Xc5WjP+pOrzZQ8hAKAgFKiKKAfnyszBgbEZc8a+souVkQEQQH0Nv/YGmWu9pDj1tPOO2nTd36k77u3bRy+q/unnrY/uidMWwp3fIJu+768cuXTSXkT3n/DbnvXlsTXeh+4cWT9ptUvvTQA7/3/vu59+IW42m5dndmGiLOMJ8JLW7WpNUCBYrqnorNXVPTyZ2MMu2ZClTzX84qSyOCvUfRFuPRydMcjh/TuwQQlY/cdHIm+/CunI8iv7kzc9ejLr/+Q1Y0RA3aYKEGhqJOQwb03xTf86breUzuiBw/ZgoBY8WcCAjBgyA9wnzIRlNm/TE04Cfs0gMqvhJwHAMGbGxdJbH1kIsrqZ7I9v+h1/ycdig5toZ7/mMCf7vo40ub+Zz5w8wpI3P6+Xuvnk5+OwkQo8TOphIRXObbE/l0+nLhX8yecq42PIrOj28ipxvnV70F5eGbs6i1psTi4uek9ihAvrw0hAoBw2YQkWrvFQjaTGhm+fPHUqaPnLo+kXY72J7f33hTvd1NHk7fd+nA082OrcbfZ9Y5XxncMnd95w4bU8C25B8ZOb3gvwi3S3W9iawzsVs7q+C5KHrrcv/dMYtvexKGVm9bwHImI0TNR30gxZb3wNwBEGAvFKuOcbVotn6IvrZ5DJgAVc0Jgx1QoSuGogxSLYgQhjA4KhNxda4m9zZsUhjGsVCyMVty2MRqybXBiIbBDEKqiqp8Zis26v1weil29XU6bi9yj25su9f3d+5veowjhwLYVJAggjOhpXdKe67m6kCt4GAnFe6OpRNgBFLDCAiQiXz/17xX+3x/aAYxkEAUFwSgBJAY0ZBSCAIogAvixBuVwBWEkXcVGJq7VA9WVTnkrORA4/OLLtzX4wL6/ulELwxM39c92lb80tOrqiP5Wcv4yP26uQVxAeygIYNxSSecymVRRIslkcihkh2wUJRi12LeZGhJB5PfcjYI/1y1AKCSMggLk26vFoFjg25BQxI9aqkSsoPFjVebs1GgQrUU4EhpcYuxz9UbdCnM5P3C+CiVaRn0mKEzmUwT9TQuuRxZCAadLjFss5VOpCc9KrLghGgnPugEJCDEAawJDADFk5H5hKRMZUBCQkQEBDCCQCAoTMgoylYV3ABRkZJwbQowAXOpa6Evd8K+IlZ9c1ujvcPba111VhP6WUR8Bx/7pVFGv/QlpVldWJgERTp8ZyIxNTKiegW3xuT3mENA35gMA+2GHFXgN3ctHNQsIk1jOAtc+CjZsVMEF+atljvVGVGZwCfV9RD2YPnVs1Y9I01rUEZPO57NXSqe8nhv6Y1b1FSFEzNa0kW3RmHMJZFiyyNxFDHquaiHOYmt1NgImiz7wsv3AFtW02nriprKXLih9w8awIgGsHt2JXC5M2azEgzm3YGRNC+8Fu0QG1TkuPpixIGZgdke2oFFjY0+MKLRnoPt9ljQYYnv1TcTPR86lr5zwVu/vOZDoAqgoXNUuIM11V1299tFu21bb05Mwu8oO1srilEC9AqXoNbqIefdOlW103FeHH4oQernUmTPJW1faJOEeDsjRFiBobTaHoC7G53c0BOZCLhkQaRbXYq+rJucPKodEp1k1OHzZl7zQ6BPz2J1zdyMETo9dOj/0gV4gEfYKiUAu5NrcynQzQVbW/IpsEGeXJna8rGuoM/5do05vDaAZv73RcjXeDm60koLI49mraosVr7w5fPOPhgB8qZmDtyDV0rA+ACa90DvUVYO+OZjDybHqXlX32gcLVaOc3y7rXg0AQbLJmb8RZSZPvbb9XX6XDwaEUDxYArGYpL6qgguCEIgOMGIFrX0E1vnpZIPqEXkzc9wEAcGdrrJa+xdl8BwvD+hoTeoH1sNp/G3Hxl91AatrJosSyo28WvxwokxORIHCeDLwqsaoVhYUBREVnm+qaiQjMKC5UD5TALkc2ihlMguKH/mKAsgkgExMeCWznqZ+MTWt5TpDIDj1CxRE39MkLpnZ1TuszNDVA2o3H5+gLsVmfjF+8tiNN9kzI2JUXAIju0i4hc2mQABYL3RnQWeX6xrHVahtI5an0HMMKM8SY2ssH6n8Rws8R4PtFie2hlxSniVseUReSM/+heMRuQ6z7V8WlGfJNrJmLVeU8KJ7c7RuTqdGOTtbg4df5g9GrOnIFUYhgED/vhEyLVTIhIzAAvV9QVghwrYmMBYDGUJtcTkHsnI0SHr6j0I6ZzYqRtIWi5r6RTknUiuo/EKUmbosGAtotr6PNfT9mmNv2YzOHKYKMwEIMQK4555bdY81MzSdBN1cf+DUG6yzmPDCQAZFLUzfF2UUIwk4wJYQsiMQEgWiBCxRApVjSAj9oxKxiSKeDTO/rPwCJMQE/mUI2QG2pv44O+GE7PyiqC911dpdLATdbBwAkJExf+r5O3bArN1UEKK9wdZD20hr66KhyccXxluEytsyoJQzSCrNqOY5CpAxBOUQErn6jHIC/PQ/p9JjZr+gXs3eHDUH38IpnR5RCAGAFdD48ZP3r5KrRCk3Ew/kuyVqaR1tAW2FlrJSN5acxa87Ufkqa6aFUp9g9X8HgoGBFQCJN/YD78dsoLnJqCi1Kma1OMfOkIYl7AMt4NqLf6DqJsjGqF9/ezUBmDYNNsAzUEwRAAT0uWdXvpuI5zryEJxIcFSno8m0Ut9XEqjvNx3oJgUW+0Bch74f/NhSNwNCQ4DT5lYm0PX25qJQHwBQ7uyzt+ymKpKqSH40WN/X2mqpmV9ERVrZwHg2ULiwcvEvM9oTg1fbXVvD+Y2Vc1SJyoFkQhczW+odJaAtYsYuvfK+VWCqORYw1BPcuMmCJjv55txfQBcjS9cXSiAbl0UXI2HqrcL8W8H53Xw3v7q55zTdAAWOQ9GLPfXU/wjbdf0WWYzKnnsj+ZMOK5Sq0r0bXDpDCy3YGlPPHFhaWQt27zd+O5TJ7sWLGcjVilzO9vAGj6OuwASB3JGzu1d97YGdj3UNZo+n9nU9J7vh/AvhmyP1PIGAmSycO7Z/AwKDwFUlnFDELUJtfb91xEEmT82377dA1UTOdjWB83O6Snh1A/p+vfe5dAAf+b/GzyYu5a4cP3H45du+9MMvypETT//Wtvp6+qReGV7xk+FpNXbOn1GifcGBgiFtFi0kBcPLxZasdgeTgUY969Uuo7uXIrILueuO9D+uXXvzlkPxDRTPPHHlZ97rPbjv5xL5un4uMJF97+qAqksCpVRwRG0JpJVeHkF2IjC/p6HJ7x2KG2rCJVFlzVLo+/idl++2RI2uh4mJv1xbUJHUBduOoMN17ZUMG3b0S7Bj2KmhbpGnWmiYQkbPLJ3GJ2q0ORkxalFrH+sLRhaViF7ZhRtfWLnq0fV9TDs/9PDYrvha6o7XVUeNwBWx5j9TCBynhr7vqlayZVYtZS1XTQhf2tSEywiHqnzbfC+P/uD26EfkQ6e71/cnbzk96A6uyq3jbXiLI/UtFycSZFdAxvx4d+BIXN3K5gwABpwF9uZYCAQu7W/CZdBKLVbfr2vtk2wmo3gL0xaUnQZwjSBGIU5cz+8FvXws6ASEUHewvm8zt1ImQ8ZiPrx0+r4e727CVUR3WVfPSdOfgpiJwaCggKBBBEEWxVhf/UwEZQUb8UFcDBTpNWIrm3SzYru1VcBn32683o73gUD0gvX9mqhT30dGYxtEJiFNgmRIGAzWpYUJYo3eHKLdYJFLDLTSGY0+Z1kqqQ9f3dKMWyFWy2RriaVXFPtBakyAwCjV7DbzjBK8bGDOP0qkO1jfV8wtVsbd3AK7Mi0A+o1/2wzq8yJ7c8DSRHaJHQte+1BMJwJXHrc2zU7IhKPQyr1lFs4k67KR1gJa2WVQtUlQuzVOoVAtSy+2tisTLaG+r5+4l0wz3jSxF2frW5KKbsRgAjd1AkvV0PcLCyymWec0BLq6mztHos4X1zUlC1akGqXrv/LSSLksKhYkshFQYTJY4tattfIjiBNeGn2fyX1i/6LKwU+P2spUaSPXwHu1JGtfwMsFrn2QcE+w3Ui1NgAVhQr5peH7ZE6bnbopbYVFJ6xa/v3AhlKwFOtfRDk1hqELPYEuA4PQlJ1yHjCxHQoYQBPnCHMHPshWc65IpeCoTqkha/tdy8sF5Mv5RIJYqVKHlYp2UqkyX5G9EITY/4wzfi4oIDTbJ+43eguknTAHi1ysqaW2Pr8h5bw5vE27D4P3Snc/NKn4BVbrI9ZAF2Yxmvy6R5VaXJUSSADT0zEVgT39GZA8YpkqbDidklh+i2beRtxiMmAYQhBJBEt92OJujMJuId7y4B4UkLOHfoobzoOtDta18/cDhxO/YgmgUSBkCIwSUZYHTOLnFRETsBJGW8N0WhIjMAkisRjltxlgxYhaiZCtwRCwMoRaSTkDKZqoYesrpoIbemNrczkEORxdQBGtBsEoFw+8L9ksAYZUtgoTqZutCGwkVTRSBLcIJQNFKXm2bZsCFF0pgS5K0YMieKVQ2JEiuiXJa1NC14WC6JIKh6QoridFrQvielA0umjZtuTELUJJSxHcEpSYS9aWcNAwEEBFgufeIKO0DsjkLaT+V6PAscf3bWxaxSuwYoux9aF0KS+J0i8I0IPQC+KEoeAhTG/x2AuIMSxokB6BXkCQHpA+YCtCXlEAUPrKzQ96kK0IFbweBKEewD4BgF4AiCgT7OVBomDOb3vQynh+Rm618oMCAuPPb9rVRPmlqnGygbg+joRIACvtNxkBICoC5VLVgoLIiAxhQPYlAmTye7YC2JY/BvErK6AIgUQiUyUmBMs9m8CqZenNBCfy6dZ2vWMUJ9RaS6+AQOoZekcz9xcer1JCtv6HwHK5f8JyjqCvAiJiuQ1z2b5KCH7xcr89ExIAIAqXaYsEAALsVyEUwHKJByw3pKqVM4IY7g4eNUlLSYNM+WxLs4QBBEae0/c1U7QQU03qa2CesJxJWunDhgJ+A8UZ7dQQgEUqfbmgfBQBIGKaWXjSTzKd+fNyvWis9dA6V6PTdUsVPgACJ9LKkHEAMOeeDt1vN/MdRio1pS9PRUvzS40ATHVkK/8ZK53Yps8ngUqB+6kq9/6bQTM65uGsn817e6nVvo1lcc0ya81j5eVv1fUZiud/sGsXLYExecE+vqCKeXPPkKt/gNN/qY/qlUsROLFgqQ/QtFIhExFT7GqZvi8gE6cP3bKj2Zc3i5L52wUixclgi4BVWkC1qAYGgGTFWvh6FSZfy7x/RdPdlFZmcEnz91sCRLG7auj7YKwWymQo7JVii79OdejUmdMb3hVu/sbytujLA0DCNSy9jK3U99EXbZq+9pkEOXv5MNy9ohWXrzohy476Am6uP1DfZ0BuZSYXgF0rm2ghQMHcxPGLu3eoOhMfGoPKL4PIrppAiPTU0OcNNVgWvLEBsMrGIs1PGJFM/tJbaz4YoxYsfADQi67a1B5w04lgmYi4pfH8ZJxo0/V9nc6cnhj6QFIht0agpEKVL+umPrdyPU0DUYKL7IpQjZ5ILMQtXfsk3Bx9H6Uc5lBKj58c23xfDMrNCFox7Grjrd/LQ611nE5PSGCVEqGaVZsAmxURMQ9YuwvvzTHrQsiKlZfLjB3XO/aHyoNuzSybyOJk/iw0qbtSIMRNBs6rSH4yuGqTJdLK+vwgFG2Wfx/RTXv65Ln4zWusFr+zVmYx+fvER7tV622PwsfeG3QbRAkngzm/EWht1SbJF5ui75fy7KbOpeLrb4koQdOUfL35ZyW6GKlPyN3ktHJ45dvgpVI4kMeQcYM5Pwm0tD4/1JQ85gUKggiiiCnmvIlzMB7bclfIZpDWJwctKq5viYDMuoZ/3y1iDX2/pcHHAuJYCxT6WEiQTClXKl0cyfT2d+23HWmlcWIaVFiUvr80XUUQSoXgLE6I1tD3Rbd2GbGVzSxQ3yedK7rKuzw86my4q8cWFDDU0kojU9DJxUV1LsEQARidSI1TihNdwd3DrJZGXjEZJ74AfZ+LRVeKV0Y8Sfbf2mOhIBAKCLBaisVv56p8WXdnFllIn5XGIcxe8MyKVSOPyjA03D2soSEi1tL3K0KnH+3EpuiW2J0YnXAja28asmiqv4rv+l4K4qOqtqjq78i2RG0kkXWQyCYkVo2qTUawlUlnCGxKNajPCEKABly35GrJT46mvPCqzatCiivdeJYYLNVE9nbL4QWxY0HFGVAwP9kduFOGi81q+1wVjBSK12hgBSXP1Z4CyU2MpYsqObh30AFDAkwAtGS5/7PGNNZ/9ZcNrP0laiDrZqOBa5/DNaQ+3dqKagicy0eqNYwFELfI5GngXDqV05btJHrXJx1Av3s8KxHBVlqh5we5taS+4AwZmA6WE7zq4asyM5QFaEYUaFVAAJ1P1OgZ2yp9X/y9WtlWuSgVIIggi9GecT0RyRxnlXMVdfdv7u6devZyL5ZyFPO1ID6IcpsS1QkAwGoOWasTg2cr5oJcM2AXgKwgbR4BjQ6uySWArajdIoIoiAhaIsQCYLQnWmsDrEu5XCFfYKKu0tp1iRgAMpJZ+t09AE2I6S1fQKs5rzCjmZkMjFNfz+FyZs5bczVnQHBz8YARMEmkN3hfZ0PNtvSW2xxpARYwZqzUzyylXN7NF1yNaHcl+hKJJBLIm12DwEACxNQiX+3CnmDxXZkqeLNv9WwiHl/72t4QCOoRob58fsjP1oZzsQEzHolOn3dKrRxdg+IXPNNER7dMJwSXTxE7KgESNQEWJmKBPERZBhaOqWwDEGYWFmE2LAIixmPx2IiGibNGUEVjiUQiEgasBOOgICpBYlYidZcpWxKgvciozuksm7+/6aOOoKscw9ohKdFXfu73/2pIc2TiL9bCuwpvflwMhIzwk9v681/a+h7wmGwwBu1vpT/x6KfEC5Pnhqxjvf1/+weqJGHUbMJYCfU3LkgmMzjDmCoznNNMYIUBUXB67y9XCRDfjg6GpzJtBK4u4IRSaYjm/wQq6ZksLCCGxc8xEdGeZ7RmbTwGREIrEna6QnY4ZK+b7WiaGh4KMgggcEXXbxuYat0xFrT2+cjTazefuGLvnjjH4Z2jx/pKXCgNXzQbM9/5zNED9yXlJSu7O/5sfGSHOX7g6Du9Q9reTsdKskXS8YH8W97qgRMjQ6sf3HP3Zsi+WViz8WUrs22w3D+OWaeHXxv5OQUzJfepiWRgIkbG6R7TMvM0ZNAaNE33ugMW/x8sfgqZgIARQeOnnAmIMcawMWzEaBbDCICIKuTYTtyxbCdkVTqDCYIAe25LCwS0BGIvzr8/DTwY/dJnnht+5vdf+u7tL/3uv14ZmhDgf72kN96FKh8589D7/+sDh9+/5X/de+hu860f/dZo/vfuPfmhDf/ztvO3IV56MPmFfRff8Z3c2f86OTzxp5/82hn7a7/73+8Yf+sXyyIB4sgrz527bWxW3OysgV+0N8wh+ZQhSgQAxicqLgkur2gjIlz+wMLgf+vfDRDRtshyHLIsS1m2ZampKhN+Ipr/KrG/mlGQrOgStuRqDtDKNkvm5/d/6ldp99C3T2S2/Op/O/Xkn/X9EVD+0Y+pZ+8qPn9lYDKLo//2lafe+NBPGki9vq/3O3dc+bWHvv3p/K+88NnboZR68M5PZcw7Ct/oWb9z/WXzP5+J/uTFsY9Zf1Gp/47FJ18ZxfxhmN78lciMXUCGMQWz+nsjgEwJmEIjeSiHdyAQISokBGUTkQJFiogIlVI0o8SIKBahcuEHZEHwN21BABTfzIUAiCCCIF4hhq0NH2o6ZJG1OwSmaEBhqyv75/cakThFVWzcEwHqKsR/3I7fH/vD1cgRp0ti3mgWXo0cThzYyxPjSYLUeJdCQfBG6LkH7wOGyaxCmkw7NoXDvvIMABz98Z1PnOx933xrC/mZrasCQmsETqYE6w/u8fPI2N+7BaYkzmnpD2cLGIIE9rJb+6CapvENdeNKjtO6WJ8LK1be+bTjqPU9txndHVn3tHVzz1rcIKGBfQ9+93Lo3CffWfjDy9nHLn9MJh4984nzJrbuo4883qsHi1tw9ZtD2+DXvh7bs2qdbQ+JL6qJgvC793x31JvH5oOAUqMGNwrU3zmwcSCTWl7r3keVcn1l6UUQwH1za+Cv5YVbKq/KqUjf6c2nRgfiLq++kDTHepzBo1sKR8z6lYfTzq78lRvf2JOdXPdaYW18bCBqLg3/+v8T33L0937L3nnZ7Tl/47HJG/pfjkTWF98YGt4nL+LOxGvb4OIGU3aZf2/nAJmR3nmoL8Q/uDkaoO8LHE9BK+OPhcDb2D8P95G34itadudFjfqFG1Zd/c42RP3KpIvSJEDCqLRiFBJRuux3E0EE0mAZLJuG5crf/LaSS1/7JRIlTAZAMQmBJlEaCIGVVsh+t1FRT+7uUjhvOguCPLltrWAQ559saaVWFFGb4/NEYrUt9eHlnhuv5vOzvqkRJz21npDJz74HJkFAKX8DUNZ9mYCxorHh4H8BgZW/7G+vlQp9DORX5hNApulSgOx65WCCqhAEJwqBBmNpZRYfAAiwN49tu43VwEVGdC+Rf6KGkcS3wwT695mArdZt/ILc4oKALRl11RlrpFLrkrj3wYrUUKZK2f5AC7oFppXhMiJIQRnWbfpaqNxiZf4lIb/OR4P+jBzuDnbgGm5tvUZhLsRanC7U/EHreHDVphqhOwj19VVaLFQo8M+CXq5WZE1Lo5AE0ArNMwJcmmTHhcDKL7Ir01JAhKWGfx8oODAOW5twigaRq8S3tDnsxdv5lyKg35QSQSNAdqLBkV0GWsqWDYnrwtK1Y2wOkOPLoHKLoBUNoh0JlVLdgQo9tda7SoC1KgW3I2Sib3FVm5YmplcXA6U+AKer1sJraeCkABh36frxNQveIjO4lyiTC4M7kSCLF8zYWVrrgEOzDO38XFUJboT6bsNh8guiQihQ6hP0isF5VApNS19UJrUUhQyaC1psVGd0WGxm21Xk2UZsT6Fna1TaEu0f2dieIs/R7JRs1HYpoyEe0SEPrZLDbHuE2jZiu5YYR6NybTaOR1OXcx0Dluvmgjg/E4eStVq3tDaHF9krdS07zl9L36/11OvNJLkZldWYwmJOZUUymC+oLJosZV3KKC9LWQ+zqpS10wyp/LFnTz7zxvlxO1/CSXLzKqslQ6USZVinqeCpNLgZK6cpjaWsyjJksJDH/I21enGWUjWIi9Oxei0Ao9hL1JGtiRAruxh9n1XXOi+m3XjSUd0xV6LdYeiL9mO4J8ylaI/l9MRcL9pj273xPhONhXXu0sRdu4bfOnuDs9FyuiPGRLtttSLqSjgZZjfeazldMc/rStpWMuZyrDuEPTFXor2hwH4UCEih4JmX1qackRHjLTt9H0213ap+zs8UiaIdkQRAEm2ALoBE+RiCBEACImFMACQgyhTJXji8+sNRXLv68jOT21dgUhyALkBHLIAEQATiKEm0otA1fbkkOgIJDqyvLshWSGpJfa2cRyFmA8tt8Ys4i+rMguUmG9M9uKbq9OOMz2gI5MroGfe9KwCQcdUDb728ck1fFLgSJFmu8y9+2OaMy/hZE8EiHTGV0j2B8fxE0ko7Pxqk8LLT99HKBdfuqMEvpeLlq0TMTh+nYuAEAIhTY2/QbSss9sOgQzdtOXFg4/q+EPDc8+e5XI1E8nACApUC4NaaelnpYrw642+xi2ExqCr1zcribErLz8Lo8Yu3brZNmYMzSWTXmhee2r4u0ZTlIqCLtfR9amVcnyDb9uIvs8RgqtbafCb1m0EdL336zQ0fjlbaMYEgAHHPfRd+cH5Xd2zxVhIUNLrG5oDSyrY5ZJpfo7f1INSL9e8HAxn15MgZ80DS33j93lvAyIC0duCN59at7I8uNihGSEJdNda+aWkSlSEx3vKz9C4ynr8WyEB6+NXQrUOVAPip2jUIAhC5ecehA5vX9zi4uIUpUphIBE69YEv3XkEOLUd9P10ji3NRrzNKafTYpds2KYTqGhtFb930zJmdqxK0mA7ZgmDHgsepWhrQDcTEpeiy0/e5WtBMU/Z9FAA3dfqtdR8JyzzlOoRRpPf+My+c3Z2MNnyDWYMkq1blFmmll0fKVaSXFfFBxGqJf58JkXl85IR6oE+MmtGVeyYQGAho85o3n10/uCIiJAsrRE8ipUxvsL4PzeteW20eGcFZdvo+NC+LcyYQgTl3+Q25p09xRdKreiIIIDt7trz6+I51vTbyAosbUKRbAuP5ETW0sF4fCnI+vswYP4BXs2rTQh5ISEpjRy7dsc6qaz9nFb59x1Nn9/QnFS2wxIaX6wrm/Jpa2peHOBRZdvH8qIo11v7C3uZS6twbN37MIeF6ypcSIyTvP/780JaB0IJuyMSGgiu3+KU0BcvNYssKSDlhe85xhuEapouRzTjC9E5fzug2Si8/hQ8tbnJXJiZAPXHlmP3DfYACddWu9cslbNv08vMbh1aERVSpQbsZYagrWGcMhTzCUoi141roOn7UQTEEXqhkqYKDXrjoHyMFpYohMaGSQs9hsDwSUYzIyARMKMIKtcUk2gbPZkTXJjeiyYXllr/PULtqUyMvNJcmVnHm0mG4N6Ya+7WQ2Lfd/NQbe9b0W+bY9sYkKIH8WDKwXN9A14RJXulRVwYnVfelfhgbGLeTF4b05OBwtOv86kJ24EJP5MLadG7d6e7QxVU5d/B8D44NpjF5pcfN902EouM9GUmOxa1075gTH+mRbN9wPDzSX3J7LnXbYwMpFVSrsz2ZgshIb/Dab8wzxgcPfWL42Pm7NtGCrDfh/ZlHj+8bUp//taGGbivoJCAwpjcejXEkaVF3qBecuIO9TjfacQdWOF2WiofYOLEQxqMJCW2OSCLiohOKcF+4m6x4xONQ0qJkuBecpKX6Qj0mmnDQc7o5nHTEOAm0uyPd4kBQ+Yi2hI7UWPuNGUgv/VP2hvOb/42aN4Q2OOVCU+LDZ797Y+i1L/1SqIHlgr6+H9y1KyIYRVFoCcYALLAEYgA2RAXiAgBxkDiEBeOANkQE42A5EAWIgwKIAVgYAYgBKrQ0xYAstLWKATFaRsUgUqNYZDtCpNoeX71Sax3dIHMPH6Ov/cd1IvM9sIgVEFotQkJrP/Xlh/D7u99dx+ix8m4yFVPdwZuu8u1P5Lc8mwooKHeKFxS/9gcKgSAIlY849T+aPlqM6B+p/JkC9M0lKWK/IBDVre/rbG2R5tiLKyB/rjugQA5yN3EuQPcScIdjXfzI9jqMf9wtZSkco33Btj703xXfIDf9Hk8fK4IGTp074zj3S7rq2J4bew2I7q4S2lWV+qkTPTWZm/sxBuRLON9CENKX9gsdSQZchws7djHiaLj26M/fTX5OvkgpHW9E32ppIY/lg1qxPdPQg9sCo339GBxti5C25qM+01gpzN5NAZdh8ixWTHWQ5+LECp+LYPXuUjOu6gLakkmUw80m7PgM1f26RfWIqer6PtaxgYklQGLNdx6SIDAFOlsJbKH6ytkiT9HP6QqI/WNIPzXo7rKe/AAhKwHzg+5bBQgYoJ6X7G0L1NEqjz/fCq/DaocYpKmzoM7W9rTXUbIdAABUcmrpF8bnz+AWlCP/+bXPHvZe4zPn3sqaC4dPXNGXjk6akbOn2lQeWyJY6frj+ZtQpgVFRYWaFWihc6HywMBJwrzkRybpfd8RMcfdP183fP/Ov+Oxdee/nt/0wDcvDa5bgmaS7Quuf+03o0aPiEjzQqxktvA2L+MnoZFHXlWF73nfvun+H7x46VfD8sXzd/zr2IG1D7RbsvrSoqrwO8++v3i6CYIpxE2zfGFWWStERi/bNy/nR0bovr3vn34Dwd4CB48MRtbot8wTG2zcOri8DPPNhmqkF+fiiYbGjtfTiaU+6FS0ou8HdWVCkGhPMTRAvdijIPqOfzh4avuPXL6za2WilR36lgGqV2meh/M3gfEz6kLz4itVrOKaFTcTwFAY1/zo8+mfj/986Kfj8T1b3/nGe9e/P/7sEfmh63zpo8o3ENtTfX4ra1mmxC6vaEN4vktgg66DAEzlZyCgml95F+LEr4MA/ir8Aspt8CEBwE8qwB9ebmGYTQcFfycz7fzViXZhzG9awsLpAoiIXHrk8A+qGnNRhMLN60vEhUp9dLADvCyIRFT+DwiISBEqQqTlF4nXVIgJNaDvVwU/8lJx8uKE8S5N8uNvublLF/XFzx76qqn6qjB5ueb1mFWJ8k1YCpNBV/W7qsywzSP6pvnrmviAVqamvi/Th2oUpZHeU4+FnA8ffnHPjhdT686+mvogMVVPnUESO9pgyEAATDbq34UknGhrHt6m0qWJ1ZT6sIx5rsAoB7+w86ELn08oKxS1s6uOfJ9h/l4IPGWQrzYjgQLhVX9Dyx8dCBivnYnfrsBq3pF5qjRX1/eFSbbesQduO92b7B6wCudHRwWYqy9wJnCjKAKAwlS5JHqWn2lTboyGfhczFNcRRP908HtoEyMIlms5YGiqWYopLiwV4PqGXS2Lc15bX1XOr8ix0ZZbbntYRy8O/+/4apvClq2qi32sIn5HVPbFSGEE4ZPDwAAMjO5lFkBmYBQwL+Yu5Jj9tA+tMX0ZGICp8mqZ7FR2fyhRl1ewg5lASFbx71fvMDEPV5atQ6tu4a2xFw9/AHYcTb3v+MotybvW3VQ1b48ZvAL6IVjGK2hTYPGyBh9+WZfEcw3y639zGUqmwKJ1QXufPf/901Ioicm7ZvycPvNd4XwejMlrFgBQcX+5E2AxvdyC6dsADBMNVG2qPr/3W3IzPOB83Niwb5e1s2ij+k/2rfOcLGSVOzpkT2VCfWdvHDx9PrGrlDqX33isMLTWfOvlHR8+Erq4Yf3p3NiatW5htRo91L01e9zdefjERxK95tx5tSt3Odu7DQSAvalxWcFFvDuoBtLV1nlV6iOWI6LmLuqQgCVhcIAJFWCEAKK++dgPdpvVZVvILkcKXP6ju5/cP/zGzx+4/OJn4OTlzZPfWDH8O1fO/NK3fvTv7XUP/eFXT2/+6n8B+PatqeFVvedefPE+59LlK9/Y9Q8b3synv3LHS5/pAQCeLj2halRt6qAK2FSzyc0zj1KOfpyLSmsUFD9fptKbF/2KNSI03dYWvTz5Xxv+tBn69FF149ajl+GbeN9X+9ZezD3ZEz2XTW39xZcvTq795ZE3BcauPPwznxhcub77xe2btxZHHtM/86Gn8qFfDLsiIlZFYREopuvvttdBGWjl6pX6RECATf2qqxgWAEjPTG9DtmO+eCYcstGJqAt/VSLBm0eGExH6icgLQ2/0HDTeaDiEZpyiAAChzIT3TxcEIJcWUDw6keBQyK8srnNl6YIgnOis/cbh1araNAMCk8NucvXUD7wZjEMyCXMyLAPT3yB4R7ZbAI/d70yVdEMm4zq+7uCslKEuGuCwuSHct+Pi8/c95/Xne3858to3+aBzzyC88cSaHWtCK9e874n+fZaVTHSNHIytuefId89+4NwgDpAAgLIrld3AFK/1TC5HKLfKWla/BwB+rORwX+XLvNdrvnHg5MUt7hWwTG5c28fO9NmZcduayKVDuUc2Zn/VHDSr8hO2Hvacoli5/L/shmH4X/eZMR1K8XjoihthdWIwAufWA4BzY//GDfH1G7f03Ldhzbpb7G3xrp6Brf3cs/rFPTsfiDw7sO9HkhtXb950kxq4cbt9195VsZ6N27esCe/c1bu9e3W/AoAzqxxBACDBM33J9o3THbUXVZuiZcBL0Z466/MzyIXv/uZAwX3hxMB7M89l7PuevTzQ9/jE2ru/2DNxB355V+zNv37rr1c9777r3InQ3aOhm15e68jrB3a57qEjyXc9FTp/15NrP2CzHfHLg0pss2wF3MhbBSUGso32KFarhe3Nd+7ca7m7k7cR3ggbAW8H6es3JPsAeszmLQwrVsBGEADQhS4Sf2i1qjZ1UAWiY/V6eZDpza7NyYEXnrrn2ZdPf373s8cSsZ7vH1j7uct/YHV/pTfaq/jyhe1H/n7NkQfvLH1z4p9z30t9c+TL23Pu2b9YcfjpR7+55V9CUQ/QzZEvKgojIgoICAoDCTEJgkL+yb3A6ofvVigACCKIaFDI7//EiAIkLCJixX3TAQoWJzr6fsNAO1tT6qvI68SKR8ZzT25cv+cor739Lt3tOC/lngt7+Q99sLDCDqv8dzKf4JX3jq9cs3dkz/Az0X6eTG17T+zwxddyGm7bv+PFsySinMpWTSzM4KsKfk49Axg0YBEKWsSMKAhIzICITIgCgIax0gOSS1wZnBW71lO5DCFcLaZ1BufHmWb+3a8+ER7Yc/HA2N7ICoxFwmNv3vL6ig1rNhD1YuK57dt/xVaH+2nThaeHdwzufWy/vbJ7y4ururfe1tt3x8G4Wb/zmR+xydcZAcpRouzbfAHZ/4SMfuFfEAQRYAEBZD8WVIQYK3okALDhShk4UlJXqYBrgtZWi1sEqhpkZ0h9V6akvqzpie2Z5KE77dKe22OrB7sG13jRdypnYOO6Ldi3ckVh08YbiaMbV67pyqy8194avzO08sbNqf6tu9dC94bVm7sn6d5NTGeGQnJ+fdU5mn2cdcBKkl0lnQ4AAE4PRdm3P+G5/njbCn0warWp1Hcx0R3Yg/uNGytfXsneAIDlPGkh8IuuEgsZxcSiBIgRwCjfJMhkbA2WIQMKgMuFTszTt4XwwD3NGf1jOwbLzj5+eU+yfWulvhXqv9ZDqI4Xb1h9tZtnHmsPEfoeVhAljCSIrIk0GWQSZGQEAfKboDAxsRImJBJhYkQEQdTZ5tU3sRKVqE7Mp1rbY/ttCakjtqcC5LKhFwVYkBFECFhISJCJiZERGP2XB4FEhID9XHlfvBMGKyZN6+Kms5HyY0A42b6Mv33h1d+NcSq0S6br8s8oqi/Tx8pXMOsrECBko5sWzg9olf1OrFhf65lchiCqNmvzxfMves0yi3jN64SOdkUoZK+wNH0h31ZgdBuq1LrYTC4BinHT4vlNNlYeFUa6r/cA3QUATVf9Ed2LX1xIyPlmZIOWxxn3r4SCpVRn5TcMsTNVwjpbltgqImA3sU2CLov8JGr59UW59kCovw9vM/L4gNBm1SzlzJQqjmNlRVo3SW9bCIbrpT56OQKYUcas8qF89GOt/YDsGceZZ4oQu5k+gXz57DmXuKoa7nz9DcuXtqa2LSmMJ6/3nLwFAEf7anVkK89pyDtna0RtG1CeJWbqqIk8S9h2FbmOBsuzQNsaLNdhtjShthiU/6U4bigm0HPRDZUIjQJRGoEtBuURsGWIPCXlI4MyCrRiUIzAxKCYhImRjMVGGbIy/ooXYLvrWs/kvGhxU5hFgOqP7Ulsc9FDNEqQPAJWBpRWwJZG0haLYkC2jG8NVAZQUMTSqIzFxvIUGcuwU1qNgtvcvOWBch0RpQm8kAHlEWjHIHkWG8cgaovZNgReyIVQyRE3VCKnFDJeqGT5zZ1L9qqy2VAEgaV5doTrBQK1O7BXXlzHAUFkYlGGQIiBDIEoA2QUA1WhPiiDaBSD0gSsjIKYIQQJOYxA2gIhg2AsATIkrBhJK2HLIGnFQIzIKIhxBMb49JEVs9IKUMpeKnSLbZ2N3Z6LX2rW559uo4UigKAYkRUACYEoAGICsYQQEIGYfH8cE/htrxWwEiSxRBSTIbaMH7FBwLYBNCRgGxRDjJZBZMugZUjYMgR+/z4SRobZR4OWsblSBBWJo71tvfbbk/pYszfHtBFFyi1zfR/gTJuv76KfMv3O+U/Ab7cqCAQkVKmvi4z+pfxmvAiMIMDoF/Jlv5zuVJPeuUdGPzQAAQAYSpNxbOO1354jEztTpXrJcouQQ0FUdRSR7mAOqnZgX27UB2Q70q7stZ1hGqnV2a4QwGKqs/IbhzNZdwZ3O4OceGflNwxscR/eJQKxNK8K4HUEZd4Oa59JF9rVoNbGECxUMfcsN+ojSrinpR3W357AUk/dtTrbFwLgZdtVqW5jiJ2t8u1yoz4JtrTH8tsV1dttLLeZZBTLkebFC14vEBN5G+j7IJCfXG5tUNsAaKWC4/mXiyQdSrTztt+ms4h11Opsf4jvI2rPKW5jiLwd7PwkWMp1qjY1DLQLgVLflN9sqiP9vJeadvnCtOt37nXm98NJueFz5Xj1tee/O5OEktL+tTpnDnDOI8nc44wzpuYugLlddbmZXvj55k4gGRjVaTyvHJupp2M0pZw0j/7IKpF/Uu6KNR2XKTB11DjziFL5LULlc/mPAIB6ekzT95wVKVr5S/l2ypQyybb18LIYXZ7+qeHPXQ7VBl+ZIF0+mvJ35WRKRH+l0Iw0/OnLmXI8BsLsuS5HZ/hHTvcERnUWRwi0oxGZhG2PkJUR21NgbA8t1xa2XEWezWwxAisRMoRGMZBRwpanQNssyiBqxyMyBNrxiLTFbHsKtWXEdi0wNgMaJawY0ZCIMoTaNmK5FhjLIHmWiGIgz2a2PQXa0WCVj7YLqn0DuyQ0IcYy/owog0r700T+UaG2DKK2xZSPTIaQyaDShKwMKk8BkyHybANKK9SKxfaUsGJQhgTQkB8MZxRqP/6KxfJQacViaaTK5YzFgIaALYOUreYcma7ewHqS3Jyd0ZJWxZJKi8mogktp8bJWTmOaijkrzZhShYJKi0mrXInS6GVUVkNKFfMqbSRr5QsqBSbjZEs0SV7OzmjOUClvZYxJq2KJMuJlVdbDSSpl7bTBSVXI22kwaZUrqTTqjMq6mCE3p9IGMlahQGmRtJ0tYRp01s54amz1gNWutTuElM7nrJzGtCrlVZYhQ8WcyorJWdkSpcnLWWkP06qUt1IGMlahqFLCGStfojR6OSvrQZpKeTvDkrIKJZVCL2PnPEiTl1dZLRkq5lWWOaPyRUqjzllZl1LKzdpphrRdLFhpYZ9uoLNWVkuaSgWVYYENVRT+6eoNBgoCpC1h2yMwlojlERiL0Y/i1uWj5y9U21OgbY1KKzG2R0orYaUVakeL5Sk0ti5fTiNqy4/pZYvFchUY26ByLTGOR+UlTqgtA5ZWYiyDSlvMyhB5NovyFHmOBtIWaMejWLuWa2RiyCnPZmNrQj11NGJpAuNosTxLjOOhmnpo24DyFMwOm7eZLU+hdjxU3sxpqnBfTeWJrlyuQho/4B61bYD01D2YbR0Lqt3RwfWHNl1EHSwJOtS/nnF1bI8ITmkrvuYCfjSNr3f4qKhmUC6/19k6plFJNQdBf3ba1zB99b5vyrkSgqAVAKBWwCikPAvASCGsUMo5nuWK7JSJY1snWCwpBIVRgASMxSSMrtO2PumrxzV2ya+TWtBwYlJQ4EhGF4SA6fzp46fGv3NFmLhcqx/9UjpP5bljeJ+CgHsiR8Wjo8Slk8XSqaOj13pE82Ja3y/DfP7xd9qFMa1e96Jfw0HLFP5pBfxgVdHB9MOvfGnc+0Kiz6FMlmmiZEN6Qhx3hD/7rkj7216XDAKvf2bF+jO/7u3D1z6z6/znx0qb23Vy5ubxyeXXUye3vXB81Z7HNiV6ci/cdeFCn379X244uXvFo/fTm59y/v7FkV3v+DZv7H4pdPPQc+e6Pnz0wPp8x+syDWHzrZXfuCd79OBE8nEr+0bo/Yl2Jf4czm+Enxi647H0P+yy7e4V8ccO/83YNy4/fK6vq/f0g1ce7xqIrEiCu/Kz+T8PeX+SO/FFLnV/9uxDSZPCztKfhoy89tHzE9S3/eDpi3vh3WNfHmnbxTGL+kLiHYipp06e3vfu3q6esOmjgy/tM9QX633gxRdvcQQA1Lve4wB9cOP3M5545ljq0pn33rfiWj9FO0HguegZdQTg3c8+cmsM1/52/18WrvWY5sMs6iPQpcKmga6z3acusjWcQnj/F3oGUKnCpTXw6Lv8mslECgAie/ft/+Rb37w5EVp14UT+Wj9FO8HAi+/mO55huuHoU+9EuZy7tWoT1LbAHH1fRt/9Y8zZH/7S6p9Y8dTqDf23ffOe6OauqP3sj9394BoFGwA2J9UmtUPFPvT9RN+Kvje29Nz6ze6Vbex1W3JYxeRPhCb+NLYn/q6Rdcdizx0xe9uzbDfM1fdZChCTgrFSkbg30WWsyGhSpWP2OHZ/88Ivk8l2QTqkconxHnRTknQmTSgikzYmqGrg0HUJ5nyUKR3LdJd0vGDxBCXD7arvz6K+MAMRCwKQAIMSLje0F3567TpiUYDGd7AhA2I5osCojsl4CloZEGIAxWKxEFaKWbchZq99jUDConwzniZEFiUiRMLAqtykEYCJ2DfzluNwqJNeUwGDIb+ejVC5o/gyoT5jOSIJ/KJ8Zdu+H9kFVKnBMm3aFyCBcmGWa/0obQLxQ9NIpia3bYnf8e9f12jb17KDJUCH+tczOtS/ntGh/vWMDvWvZ/z/PbX86/XX1RYAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjQtMDItMTFUMTU6MTI6NTcrMDA6MDDFW8SjAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDI0LTAyLTExVDE1OjEyOjU3KzAwOjAwtAZ8HwAAACh0RVh0ZGF0ZTp0aW1lc3RhbXAAMjAyNC0wMi0xMVQxNToxMjo1NyswMDowMOMTXcAAAAAASUVORK5CYII=" alt="图片"></p>
+<p>图9-2　ContentProvider的启动过程</p>
+<p>这就是ContentProvider的启动过程，ContentProvider启动后，外界就可以通过它所提供的增删改查这四个接口来操作ContentProvider中的数据源，即insert、delete、update和query四个方法。这四个方法都是通过Binder来调用的，外界无法直接访问ContentProvider，它只能通过AMS根据Uri来获取对应的ContentProvider的Binder接口IConentProvider，然后再通过IConentProvider来访问ContentProvider中的数据源。</p>
+<p>一般来说，ContentProvider都应该是单实例的。ContentProvider到底是不是单实例，这是由它的android:multiprocess属性来决定的，当android:multiprocess为false时，ContentProvider是单实例，这也是默认值；当android:multiprocess为true时，ContentProvider为多实例，这个时候在每个调用者的进程中都存在一个ContentProvider对象。由于在实际的开发中，并未发现多实例的ContentProvider的具体使用场景，官方文档中的解释是这样可以避免进程间通信的开销，但是这在实际开发中仍然缺少使用价值。因此，我们可以简单认为ContentProvider都是单实例的。下面分析单实例的ContentProvider的启动过程。</p>
+<p>访问ContentProvider需要通过ContentResolver，ContentResolver是一个抽象类，通过C</p>
+<p>ontext的getContentResolver方法获取的实际上是ApplicationContentResolver对象，ApplicationContentResolver类继承了ContentResolver并实现了ContentResolver中的抽象方法。当ContentProvider所在的进程未启动时，第一次访问它时就会触发ContentProvider的创建，当然这也伴随着ContentProvider所在进程的启动。通过ContentProvider的四个方法的任何一个都可以触发ContentProvider的启动过程，这里选择query方法。</p>
+<p>ContentProvider的query方法中，首先会获取IContentProvider对象，不管是通过acquireUnstableProvider方法还是直接通过acquireProvider方法，它们的本质都是一样的，最终都是通过acquireProvider方法来获取ContentProvider。下面是ApplicationContent-Resolver的acquireProvider方法的具体实现：</p>
+<p>protected IContentProvider acquireProvider(Context context,String auth) {</p>
+<p>        return mMainThread.acquireProvider(context,</p>
+<p>                        ContentProvider.getAuthorityWithoutUserId(auth),</p>
+<p>                        resolveUserIdFromAuthority(auth),true);</p>
+<p>    }</p>
+<p>ApplicationContentResolver的acquireProvider方法并没有处理任何逻辑，它直接调用了ActivityThread的acquireProvider方法，Ac</p>
+<p>tivityThread的acquireProvider方法的源码如下所示。</p>
+<p>public final IContentProvider acquireProvider(</p>
+<p>                Context c,String auth,int userId,boolean stable) {</p>
+<p>        final IContentProvider provider &#x3D; acquireExistingProvider(c,auth,userId,stable);</p>
+<p>        if (provider !&#x3D; null) {</p>
+<p>                return provider;</p>
+<p>        }</p>
+<p>        &#x2F;&#x2F; There is a possible race here. Another thread may try to acquire</p>
+<p>        &#x2F;&#x2F; the same provider at the same time. When this happens,we want to ensure</p>
+<p>        &#x2F;&#x2F; that the first one wins.</p>
+<p>        &#x2F;&#x2F; Note that we cannot hold the lock while acquiring and installing the</p>
+<p>        &#x2F;&#x2F; provider since it might take a long time to run and it could also potentially</p>
+<p>        &#x2F;&#x2F; be re-entrant in the case where the provider is in the same process.</p>
+<p>        IActivityManager.ContentProviderHolder holder &#x3D; null;</p>
+<p>        try {</p>
+<p>                holder &#x3D; ActivityManagerNative.getDefault().getContentProvider(</p>
+<p>                                getApplicationThread(),auth,userId,stable);</p>
+<p>        } catch (RemoteException ex) {</p>
+<p>        }</p>
+<p>        if (holder &#x3D;&#x3D; null) {</p>
+<p>                Slog.e(TAG,”Failed to find </p>
+<p>provider info for “ + auth);</p>
+<p>                return null;</p>
+<p>        }</p>
+<p>        &#x2F;&#x2F; Install provider will increment the reference count for us,and break</p>
+<p>        &#x2F;&#x2F; any ties in the race.</p>
+<p>        holder &#x3D; installProvider(c,holder,holder.info,</p>
+<p>                        true &#x2F;<em>noisy</em>&#x2F;,holder.noReleaseNeeded,stable);</p>
+<p>        return holder.provider;</p>
+<p>    }</p>
+<p>上面的代码首先会从ActivityThread中查找是否已经存在目标ContentProvider了，如果存在就直接返回。ActivityThread中通过mProviderMap来存储已经启动的ContentProvider对象，mProviderMap的声明如下所示。</p>
+<p>final ArrayMap&lt;providerKey,ProviderClientRecord&gt; mProviderMap</p>
+<p>        &#x3D; new ArrayMap&lt;providerKey,ProviderClientRecord&gt;();</p>
+<p>如果目前ContentProvider没有启动，那么就发送一个进程间请求给AMS让其启动目标ContentProvider，最后再通过installProvider方法来修改引用计数。那么AMS是如何启动ContentProvider的呢？我们知道，ContentProvider被启动时会伴随着进程的启动，在AMS中，首先会启动ContentProvider所在的进程，然后再启动ContentProvider。启动进程是由AMS的startProcessLocked方法来完成的，其内部主要是通过Process的start方法来完成一个新进程的启动，新进程启动后其入口方法为ActivityThr</p>
+<p>ead的main方法，如下所示。</p>
+<p>public static void main(String[] args) {</p>
+<p>        SamplingProfilerIntegration.start();</p>
+<p>        &#x2F;&#x2F; CloseGuard defaults to true and can be quite spammy. We</p>
+<p>        &#x2F;&#x2F; disable it here,but selectively enable it later (via</p>
+<p>        &#x2F;&#x2F; StrictMode) on debug builds,but using DropBox,not logs.</p>
+<p>        CloseGuard.setEnabled(false);</p>
+<p>        Environment.initForCurrentUser();</p>
+<p>        &#x2F;&#x2F; Set the reporter for event logging in libcore</p>
+<p>        EventLogger.setReporter(new EventLoggingReporter());</p>
+<p>        Security.addProvider(new AndroidKeyStoreProvider());</p>
+<p>        &#x2F;&#x2F; Make sure TrustedCertificateStore looks in the right place for CA                certificates</p>
+<p>        final File configDir &#x3D; Environment.getUserConfigDirectory(User-Handle.myUserId());</p>
+<p>        TrustedCertificateStore.setDefaultUserDirectory(configDir);</p>
+<p>        Process.setArgV0(“<pre-initialized>“);</p>
+<p>        Looper.prepareMainLooper();</p>
+<p>        ActivityThread thread &#x3D; new ActivityThread();</p>
+<p>        thread.attach(false);</p>
+<p>        if (sMainThreadHandler &#x3D;&#x3D; null) {</p>
+<p>                sMainThreadHandler &#x3D; thread.getHandler();</p>
+<p>        }</p>
+<p>        AsyncTask.init();</p>
+<p>        if</p>
+<p>(false) {</p>
+<p>                Looper.myLooper().setMessageLogging(new</p>
+<p>                                LogPrinter(Log.DEBUG,”ActivityThread”));</p>
+<p>        }</p>
+<p>        Looper.loop();</p>
+<p>        throw new RuntimeException(“Main thread loop unexpectedly exited”);</p>
+<p>    }</p>
+<p>可以看到，ActivityThread的main方法是一个静态方法，在它内部首先会创建Activity-Thread的实例并调用attach方法来进行一系列初始化，接着就开始进行消息循环了。ActivityThread的attach方法会将ApplicationThread对象通过AMS的attachApplication方法跨进程传递给AMS，最终AMS会完成ContentProvider的创建过程，源码如下所示。</p>
+<p>try {</p>
+<p>        mgr.attachApplication(mAppThread);</p>
+<p>    } catch (RemoteException ex) {</p>
+<p>        &#x2F;&#x2F; Ignore</p>
+<p>    }</p>
+<p>AMS的attachApplication方法调用了attachApplicationLocked方法，attachApplication-Locked中又调用了ApplicationThread的bindApplication，注意这个过程也是进程间调用，如下所示。</p>
+<p>thread.bindApplication(processName,appInfo,providers,app.instrumen-   tationClass,</p>
+<p>                profilerInfo,app.instrumentationArguments,app.instrumentation-Watc</p>
+<p>her,</p>
+<p>                app.instrumentationUiAutomationConnection,testMode,enableOpen-GlTrace,</p>
+<p>                isRestrictedBackupMode || !normalMode,app.persistent,</p>
+<p>                new Configuration(mConfiguration),app.compat,getCommonServices-Locked(),</p>
+<p>                mCoreSettingsObserver.getCoreSettingsLocked());</p>
+<p>ActivityThread的bindApplication会发送一个BIND_APPLICATION类型的消息给mH，mH是一个Handler，它收到消息后会调用ActivityThread的handleBindApplication方法，bindApplication发送消息的过程如下所示。</p>
+<pre><code>AppBindData data = new AppBindData();
+</code></pre>
+<p>    data.processName &#x3D; processName;</p>
+<p>    data.appInfo &#x3D; appInfo;</p>
+<p>    data.providers &#x3D; providers;</p>
+<p>    data.instrumentationName &#x3D; instrumentationName;</p>
+<p>    data.instrumentationArgs &#x3D; instrumentationArgs;</p>
+<p>    data.instrumentationWatcher &#x3D; instrumentationWatcher;</p>
+<p>    data.instrumentationUiAutomationConnection &#x3D; instrumentationUiConnection;</p>
+<p>    data.debugMode &#x3D; debugMode;</p>
+<p>    data.enableOpenGlTrace &#x3D; enableOpenGlTrace;</p>
+<p>    data.restrictedBackupMode &#x3D; isRestrictedBackupMode;</p>
+<p>    data.persistent &#x3D; persistent;</p>
+<p>    data.config &#x3D; config;</p>
+<p>    data.compatInfo &#x3D; compatInfo;</p>
+<p>    data.initProfilerInfo &#x3D; profilerInfo;</p>
+<p>    sendMessage(H.BIND_APPLICATION,data);</p>
+<p>ActivityThread的handleBindApplication则完成了Application的创建以及Content-Provider的创建，可以分为如下四个步骤。</p>
+<ol>
+<li>创建ContextImpl和Instrumentation</li>
+</ol>
+<p>ContextImpl instrContext &#x3D; ContextImpl.createAppContext(this,pi);</p>
+<p>    try {</p>
+<p>        java.lang.ClassLoader cl &#x3D; instrContext.getClassLoader();</p>
+<p>        mInstrumentation &#x3D; (Instrumentation)</p>
+<p>                cl.loadClass(data.instrumentationName.getClassName()).newInstance();</p>
+<p>    } catch (Exception e) {</p>
+<p>        throw new RuntimeException(</p>
+<p>                “Unable to instantiate instrumentation “</p>
+<p>                + data.instrumentationName + “: “ + e.toString(),e);</p>
+<p>    }</p>
+<p>    mInstrumentation.init(this,instrContext,appContext,</p>
+<p>           new ComponentName(ii.packageName,ii.name),data.instrumentation-Watcher,</p>
+<p>           data.instrumentationUiAutomationConnection);</p>
+<ol start="2">
+<li>创建Application对象</li>
+</ol>
+<p>Application app &#x3D; data.info.makeApplication(data.restrictedBackupMode,null);</p>
+<p>    mI</p>
+<p>nitialApplication &#x3D; app;</p>
+<ol start="3">
+<li>启动当前进程的ContentProvider并调用其onCreate方法</li>
+</ol>
+<p>List<providerInfo> providers &#x3D; data.providers;</p>
+<p>    if (providers !&#x3D; null) {</p>
+<p>        installContentProviders(app,providers);</p>
+<p>        &#x2F;&#x2F; For process that contains content providers,we want to</p>
+<p>        &#x2F;&#x2F; ensure that the JIT is enabled “at some point”.</p>
+<p>        mH.sendEmptyMessageDelayed(H.ENABLE_JIT,10*1000);</p>
+<p>    }</p>
+<p>installContentProviders完成了ContentProvider的启动工作，它的实现如下所示。首先会遍历当前进程的ProviderInfo的列表并一一调用调用installProvider方法来启动它们，接着将已经启动的ContentProvider发布到AMS中，AMS会把它们存储在ProviderMap中，这样一来外部调用者就可以直接从AMS中获取ContentProvider了。</p>
+<p>private void installContentProviders(</p>
+<p>                Context context,List<providerInfo> providers) {</p>
+<p>        final ArrayList&lt;IActivityManager.ContentProviderHolder&gt; results &#x3D;</p>
+<p>                new ArrayList&lt;IActivityManager.ContentProviderHolder&gt;();</p>
+<p>        for (ProviderInfo cpi : providers) {</p>
+<p>                if (DEBUG_PROVIDER) {</p>
+<p>  </p>
+<p>下面看一下ContentProvider对象的创建过程，在installProvider方法中有下面一段代码，其通过类加载器完成了ContentProvider对象的创建：</p>
+<p>final java.lang.ClassLoader cl &#x3D; c.getClassLoader();</p>
+<p>    localProvider &#x3D; (ContentProvider)cl.</p>
+<p>        loadClass(info.name).newInstance();</p>
+<p>    provider &#x3D; localProvider.getIContentProvider();</p>
+<p>    if (provider &#x3D;&#x3D; null) {</p>
+<p>        Slog.e(TAG,”Failed to instantiate class “ +</p>
+<p>                  info.name + “ from sourceDir “ +</p>
+<p>                  info.applicationInfo.sourceDir);</p>
+<p>        return null;</p>
+<p>    }</p>
+<p>    if (DEBUG_PROVIDER) Slog.v(</p>
+<p>        TAG,”Instantiating local provider “ + info.name);</p>
+<p>    &#x2F;&#x2F; XXX Need to create the correct context for this provider.</p>
+<p>    localProvider.attachInfo(c,info);</p>
+<p>在上述代码中，除了完成ContentProvider对象的创建，还会通过ContentProvider的attachInfo方法来调用它的onCreate方法，如下所示。</p>
+<p>private void attachInfo(Context context,ProviderInfo info,boolean testing) {</p>
+<p>        …</p>
+<p>        if (mContext &#x3D;&#x3D; null) {</p>
+<p>                mContext &#x3D; context;</p>
+<p>  if (context !&#x3D; null) {</p>
+<p>                        mTransport.mAppOpsManager &#x3D; (AppOpsManager) context.getSystem-Service(</p>
+<p>                                        Context.APP_OPS_SERVICE);</p>
+<p>                }</p>
+<p>                mMyUid &#x3D; Process.myUid();</p>
+<p>                …</p>
+<p>                ContentProvider.this.onCreate();</p>
+<p>        }</p>
+<p>    }</p>
+<p>到此为止，ContentProvider已经被创建并且其onCreate方法也已经被调用，这意味着ContentProvider已经启动完成了。</p>
+<ol start="4">
+<li>调用Application的onCreate方法</li>
+</ol>
+<p>try {</p>
+<p>        mInstrumentation.callApplicationOnCreate(app);</p>
+<p>    } catch (Exception e) {</p>
+<p>        if (!mInstrumentation.onException(app,e)) {</p>
+<p>                throw new RuntimeException(</p>
+<p>                        “Unable to create application “ + app.getClass().getName()</p>
+<p>                        + “: “ + e.toString(),e);</p>
+<p>        }</p>
+<p>    }</p>
+<p>经过上面的四个步骤，ContentProvider已经成功启动，并且其所在进程的Application也已经启动，这意味着ContentProvider所在的进程已经完成了整个的启动过程，然后其他应用就可以通过AMS来访问这个ContentProvider了。拿到了ContentProvider以后，就可以通过它所提供的接口方法来访问它了。需要注意的是，这里的ContentProvider并不是原始的ContentProvider，而是ContentProvider的Binder类型的对象IContentProvider，IContentProvider的具体实现是ContentProviderNative和ContentProvider.Transport，其中ContentProvider.Transport继承了ContentProviderNative。这里仍然选择query方法，首先其他应用会通过AMS获取到ContentProvider的Binder对象即IContentProvider，而IContentProvider的实现者实际上是ContentProvider.Transport。因此其他应用调用IContentProvider的query方法时最终会以进程间通信的方式调用到ContentProvider.Transport的query方法，它的实现如下所示。</p>
+<p>public Cursor query(String callingPkg,Uri uri,String[] projection,</p>
+<p>                String selection,String[] selectionArgs,String sortOrder,</p>
+<p>                ICancellationSignal cancellationSignal) {</p>
+<p>        validateIncomingUri(uri);</p>
+<p>        uri &#x3D; getUriWithoutUserId(uri);</p>
+<p>        if (enforceReadPermission(callingPkg,uri) !&#x3D; AppOpsManager.MODE_ALLOWED) {</p>
+<p>                return rejectQuery(uri,projection,selection,selectionArgs,sortOrder,</p>
+<p>                                CancellationSignal.fromTransport(cancellationSignal));</p>
+<p>        }</p>
+<p>        final String original &#x3D; setCallingPackage(callingPkg);</p>
+<p>        try {</p>
+<p>                return ContentProvider.this.query(</p>
+<p>                                uri,projection,selection,selectionArgs,sortOrder,</p>
+<p>                                CancellationSignal.fromTransport(cancellationSignal));</p>
+<p>        } finally {</p>
+<p>                setCallingPackage(original);</p>
+<p>        }</p>
+<p>    }</p>
+<p>很显然，ContentProvider.Transport的query方法调用了ContentProvider的query方法，query方法的执行结果再通过Binder返回给调用者，这样一来整个调用过程就完成了。除了query方法，insert、delete和update方法也是类似的，这里就不再分析了。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/android/">android</a></div><div class="post_share"><div class="social-share" data-image="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/01/08/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC8%E7%AB%A0%20%E7%90%86%E8%A7%A3Window%E5%92%8CWindowManager/" title="第八章　理解Windows和WindowManager"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第八章　理解Windows和WindowManager</div></div></a></div><div class="next-post pull-right"><a href="/2021/01/10/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC10%E7%AB%A0%20Android%E7%9A%84%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6/" title="第十章　Android的消息机制"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第十章　Android的消息机制</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/01/01/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC1%E7%AB%A0%20Activity%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%92%8C%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F/" title="第一章 Activity的生命周期和启动模式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-01</div><div class="title">第一章 Activity的生命周期和启动模式</div></div></a></div><div><a href="/2021/01/03/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC3%E7%AB%A0%20View%E7%9A%84%E4%BA%8B%E4%BB%B6%E4%BD%93%E7%B3%BB/" title="第三章　View的事件体系"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-03</div><div class="title">第三章　View的事件体系</div></div></a></div><div><a href="/2021/01/04/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC4%E7%AB%A0%20View%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" title="第四章　View的工作原理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-04</div><div class="title">第四章　View的工作原理</div></div></a></div><div><a href="/2021/01/05/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC5%E7%AB%A0%20%E7%90%86%E8%A7%A3RemoteViews/" title="第五章　理解RemoteViews"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-05</div><div class="title">第五章　理解RemoteViews</div></div></a></div><div><a href="/2021/01/06/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC6%E7%AB%A0%20Android%E7%9A%84Drawable/" title="第六章　Android的Drawable"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-06</div><div class="title">第六章　Android的Drawable</div></div></a></div><div><a href="/2021/01/07/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC7%E7%AB%A0%20Android%E5%8A%A8%E7%94%BB%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90/" title="第七章　Android动画深入分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-07</div><div class="title">第七章　Android动画深入分析</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Junyong Tu</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" href="https://github.com/juncaixingchi1993"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#9-1-%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E7%9A%84%E8%BF%90%E8%A1%8C%E7%8A%B6%E6%80%81"><span class="toc-number">1.</span> <span class="toc-text">9.1　四大组件的运行状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-2-Activity%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">9.2　Activity的工作过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-3-Service%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">9.3　Service的工作过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-1-Service%E7%9A%84%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B"><span class="toc-number">3.1.</span> <span class="toc-text">9.3.1　Service的启动过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-3-2-Service%E7%9A%84%E7%BB%91%E5%AE%9A%E8%BF%87%E7%A8%8B"><span class="toc-number">3.2.</span> <span class="toc-text">9.3.2　Service的绑定过程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-4-BroadcastReceiver%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">9.4　BroadcastReceiver的工作过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-4-1-%E5%B9%BF%E6%92%AD%E7%9A%84%E6%B3%A8%E5%86%8C%E8%BF%87%E7%A8%8B"><span class="toc-number">4.1.</span> <span class="toc-text">9.4.1　广播的注册过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#9-4-2-%E5%B9%BF%E6%92%AD%E7%9A%84%E5%8F%91%E9%80%81%E5%92%8C%E6%8E%A5%E6%94%B6%E8%BF%87%E7%A8%8B"><span class="toc-number">4.2.</span> <span class="toc-text">9.4.2　广播的发送和接收过程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#9-5-ContentProvider%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="toc-number">5.</span> <span class="toc-text">9.5　ContentProvider的工作过程</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/26_service/" title="无题">无题</a><time datetime="2024-02-14T11:37:45.559Z" title="发表于 2024-02-14 19:37:45">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/25_intent%E5%92%8CPendingIntent/" title="无题">无题</a><time datetime="2024-02-14T11:37:40.152Z" title="发表于 2024-02-14 19:37:40">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/10/gallery/" title="图库">图库</a><time datetime="2024-02-10T15:25:25.435Z" title="发表于 2024-02-10 23:25:25">2024-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/15/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC15%E7%AB%A0%20Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" title="第十五章 Android性能优化">第十五章 Android性能优化</a><time datetime="2021-01-15T14:07:08.000Z" title="发表于 2021-01-15 22:07:08">2021-01-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/14/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC14%E7%AB%A0%20JNI%E5%92%8CNDK%E7%BC%96%E7%A8%8B/" title="第十四章 JNI和NDK编程">第十四章 JNI和NDK编程</a><time datetime="2021-01-14T14:07:08.000Z" title="发表于 2021-01-14 22:07:08">2021-01-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Junyong Tu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.12.0"></script><script src="/js/main.js?v=4.12.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

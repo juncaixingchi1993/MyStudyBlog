@@ -1,0 +1,641 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第八章　理解Windows和WindowManager | Junyong Tu の 杂记</title><meta name="author" content="Junyong Tu"><meta name="copyright" content="Junyong Tu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Window表示一个窗口的概念，在日常开发中直接接触Window的机会并不多，但是在某些特殊时候我们需要在桌面上显示一个类似悬浮窗的东西，那么这种效果就需要用到Window来实现。Window是一个抽象类，它的具体实现是PhoneWindow。创建一个Window是很简单的事，只需要通过WindowManager即可完成。WindowManager是外界访问Window的入口，Window的具体实">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第八章　理解Windows和WindowManager">
+<meta property="og:url" content="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/08/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC8%E7%AB%A0%20%E7%90%86%E8%A7%A3Window%E5%92%8CWindowManager/index.html">
+<meta property="og:site_name" content="Junyong Tu の 杂记">
+<meta property="og:description" content="Window表示一个窗口的概念，在日常开发中直接接触Window的机会并不多，但是在某些特殊时候我们需要在桌面上显示一个类似悬浮窗的东西，那么这种效果就需要用到Window来实现。Window是一个抽象类，它的具体实现是PhoneWindow。创建一个Window是很简单的事，只需要通过WindowManager即可完成。WindowManager是外界访问Window的入口，Window的具体实">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4">
+<meta property="article:published_time" content="2021-01-08T14:07:08.000Z">
+<meta property="article:modified_time" content="2024-02-14T11:20:09.200Z">
+<meta property="article:author" content="Junyong Tu">
+<meta property="article:tag" content="android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/08/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC8%E7%AB%A0%20%E7%90%86%E8%A7%A3Window%E5%92%8CWindowManager/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css?v=4.12.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第八章　理解Windows和WindowManager',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-02-14 19:20:09'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://img2.baidu.com/it/u=1361506290,4036378790&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=800&amp;h=500')"><nav id="nav"><span id="blog-info"><a href="/" title="Junyong Tu の 杂记"><span class="site-name">Junyong Tu の 杂记</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第八章　理解Windows和WindowManager</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-01-08T14:07:08.000Z" title="发表于 2021-01-08 22:07:08">2021-01-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-02-14T11:20:09.200Z" title="更新于 2024-02-14 19:20:09">2024-02-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/">艺术探索</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第八章　理解Windows和WindowManager"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>Window表示一个窗口的概念，在日常开发中直接接触Window的机会并不多，但是在某些特殊时候我们需要在桌面上显示一个类似悬浮窗的东西，那么这种效果就需要用到Window来实现。Window是一个抽象类，它的具体实现是PhoneWindow。创建一个Window是很简单的事，只需要通过WindowManager即可完成。WindowManager是外界访问Window的入口，Window的具体实现位于WindowManagerService中，WindowManager和Window-ManagerService的交互是一个IPC过程。Android中所有的视图都是通过Window来呈现的，不管是Activity、Dialog还是Toast，它们的视图实际上都是附加在Window上的，因此Window实际是View的直接管理者。从第4章中所讲述的View的事件分发机制也可以知道，单击事件由Window传递给DecorView，然后再由DecorView传递给我们的View，就连Activity的设置视图的方法setContentView在底层也是通过Window来完成的。</p>
+<h2 id="8-1-Window和WindowManager"><a href="#8-1-Window和WindowManager" class="headerlink" title="8.1　Window和WindowManager"></a>8.1　Window和WindowManager</h2><p>为了分析Window的工作机制，我们需要先了解如何使用WindowManager添加一个Window。下面的代码演示了通过WindowManager添加Window的过程，是不是很简单呢？</p>
+<p>mFloatingButton &#x3D; new Button(this);</p>
+<p>    mFloatingButton.setText(“button”);</p>
+<p>    mLayoutParams &#x3D; new WindowManager.LayoutParams(</p>
+<p>                LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,0,0,</p>
+<p>                PixelFormat.TRANSPARENT);</p>
+<p>    mLayoutParams.flags &#x3D; LayoutParams.FLAG_NOT_TOUCH_MODAL</p>
+<p>                | LayoutParams.FLAG_NOT_FOCUSABLE</p>
+<p>                | LayoutParams. FLAG_SHOW_WHEN_LOCKED</p>
+<p>    mLayoutParams.gravity &#x3D; Gravity.LEFT | Gravity.TOP;</p>
+<p>    mLayoutParams.x &#x3D; 100;</p>
+<p>    mLayoutParams.y &#x3D; 300;</p>
+<p>    mWindowManager.addView(mFloatingButton,mLayoutParams);</p>
+<p>上述代码可以将一个Button添加到屏幕坐标为（100，300）的位置上。WindowManager. LayoutParams中的flags和type这两个参数比较重要，下面对其进行说明。</p>
+<p>Flags参数表示Window的属性，它有很多选项，通过这些选项可以控制Window的显示特性，这里主要介绍几个比较常用的选项，剩下的请查看官方文档。</p>
+<p>FLAG_NOT_FOCUSABLE</p>
+<p>表示Window不需要获取焦点，也不需要接收各种输入事件，此标记会同时启用FLAG_NOT_TOUCH_MODAL，最终事件会直接传递给下层的具有焦点的Window。</p>
+<p>FLAG_NOT_TOUCH_MODAL</p>
+<p>在此模式下，系统会将当前Window区域以外的单击事件传递给底层的Window，当前Window区域以内的单击事件则自己处理。这个标记很重要，一般来说都需要开启此标记，否则其他Window将无法收到单击事件。</p>
+<p>FLAG_SHOW_WHEN_LOCKED</p>
+<p>开启此模式可以让Window显示在锁屏的界面上。</p>
+<p>Type参数表示Window的类型，Window有三种类型，分别是应用Window、子Window和系统Window。应用类Window对应着一个Activity。子Window不能单独存在，它需要附属在特定的父Window之中，比如常见的一些Dialog就是一个子Window。系统Window是需要声明权限在能创建的Window，比如Toast和系统状态栏这些都是系统Window。</p>
+<p>Window是分层的，每个Window都有对应的z-ordered，层级大的会覆盖在层级小的Window的上面，这和HTML中的z-index的概念是完全一致的。在三类Window中，应用Window的层级范围是1~99，子Window的层级范围是1000～1999，系统Window的层级范围是2000～2999，这些层级范围对应着WindowManager.LayoutParams的type参数。如果想要Window位于所有Window的最顶层，那么采用较大的层级即可。很显然系统Window的层级是最大的，而且系统层级有</p>
+<p>很多值，一般我们可以选用TYPE_SYSTEM_OVERLAY或者TYPE_SYSTEM_ERROR，如果采用TYPE_SYSTEM_ERROR，只需要为type参数指定这个层级即可：mLayoutParams.type &#x3D; LayoutParams.TYPE_SYSTEM_ERROR；同时声明权限：<uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />。因为系统类型的Window是需要检查权限的，如果不在AndroidManifest中使用相应的权限，那么创建Window的时候就会报错，错误如下所示。</p>
+<p>E&#x2F;AndroidRuntime(8071): Caused by: android.view.WindowManager$BadToken-  Exception: Unable to add window android.view.ViewRootImpl$W@42882fe8 – permission denied for this window type</p>
+<p>    E&#x2F;AndroidRuntime(8071): at android.view.ViewRootImpl.setView(ViewRootImpl. java:677)</p>
+<p>    E&#x2F;AndroidRuntime(8071): at android.view.WindowManagerImpl.addView(Window-ManagerImpl.java:326)</p>
+<p>    E&#x2F;AndroidRuntime(8071): at android.view.WindowManagerImpl.addView(Window-ManagerImpl.java:224)</p>
+<p>    E&#x2F;AndroidRuntime(8071): at android.view.WindowManagerImpl$CompatMode-Wrapper.addView(WindowManagerImpl.java:149)</p>
+<p>    E&#x2F;AndroidRuntime(8071): at android.view.Window$LocalWindowManager.addView(Window.java:558)</p>
+<p>    E&#x2F;AndroidRuntime(8071): at com.ryg.chapter_8.TestActiv</p>
+<p>ity.onButtonClick(TestActivity.java:60)</p>
+<p>    E&#x2F;AndroidRuntime(8071): … 14 more</p>
+<p>    W&#x2F;ActivityManager( 514):   Force finishing activity com.ryg.chapter_8&#x2F;.TestActivity</p>
+<p>WindowManager所提供的功能很简单，常用的只有三个方法，即添加View、更新View和删除View，这三个方法定义在ViewManager中，而WindowManager继承了ViewManager。</p>
+<p>public interface ViewManager</p>
+<p>     {</p>
+<p>         public void addView(View view,ViewGroup.LayoutParams params);</p>
+<p>         public void updateViewLayout(View view,ViewGroup.LayoutParams params);</p>
+<p>         public void removeView(View view);</p>
+<p>    }</p>
+<p>对开发者来说，WindowManager常用的就只有这三个功能而已，但是这三个功能已经足够我们使用了。它可以创建一个Window并向其添加View，还可以更新Window中的View，另外如果想要删除一个Window，那么只需要删除它里面的View即可。由此来看，WindowManager操作Window的过程更像是在操作Window中的View。我们时常见到那种可以拖动的Window效果，其实是很好实现的，只需要根据手指的位置来设定LayoutParams中的x和y的值即可改变Window的位置。首先给View设置onTouchListener：mFloatingButton.setOnTouchListener(this)。</p>
+<p>然后在onTouch方法中不断更新View的位置即可：</p>
+<p>public boolean onTouch(View v,MotionEvent event) {</p>
+<p>        int rawX &#x3D; (int) event.getRawX();</p>
+<p>        int rawY &#x3D; (int) event.getRawY();</p>
+<p>        switch (event.getAction()) {</p>
+<p>        case MotionEvent.ACTION_MOVE: {</p>
+<p>                mLayoutParams.x &#x3D; rawX;</p>
+<p>                mLayoutParams.y &#x3D; rawY;</p>
+<p>                mWindowManager.updateViewLayout(mFloatingButton,mLayoutParams);</p>
+<p>                break;</p>
+<p>        }</p>
+<p>        default:</p>
+<p>                break;</p>
+<p>        }</p>
+<p>        return false;</p>
+<p>    }</p>
+<h2 id="8-2-Window的内部机制"><a href="#8-2-Window的内部机制" class="headerlink" title="8.2　Window的内部机制"></a>8.2　Window的内部机制</h2><p>Window是一个抽象的概念，每一个Window都对应着一个View和一个ViewRootImpl，Window和View通过ViewRootImpl来建立联系，因此Window并不是实际存在的，它是以View的形式存在。这点从WindowManager的定义也可以看出，它提供的三个接口方法addView、updateViewLayout以及removeView都是针对View的，这说明View才是Window存在的实体。在实际使用中无法直接访问Window，对Window的访问必须通过WindowManager。为了分析Window的内部机制，这里从Window的添加、删除以及更新说起。</p>
+<h3 id="8-2-1-Window的添加过程"><a href="#8-2-1-Window的添加过程" class="headerlink" title="8.2.1　Window的添加过程"></a>8.2.1　Window的添加过程</h3><p>Window的添加过程需要通过WindowManager的addView来实现，WindowManager是一个接口，它的真正实现是WindowManagerImpl类。在WindowManagerImpl中Window的三大操作的实现如下：</p>
+<p>@Override</p>
+<p>    public void addView(View view,ViewGroup.LayoutParams params) {</p>
+<p>        mGlobal.addView(view,params,mDisplay,mParentWindow);</p>
+<p>    }</p>
+<p>    @Override</p>
+<p>    public void updateViewLayout(View view,ViewGroup.LayoutParams params) {</p>
+<p>        mGlobal.updateViewLayout(view,params);</p>
+<p>    }</p>
+<p>    @Override</p>
+<p>    public void removeView(View view) {</p>
+<p>        mGlobal.removeView(view,false);</p>
+<p>    }</p>
+<p>可以发现，WindowManagerImpl并没有直接实现Window的三大操作，而是全部交给了WindowManagerGlobal来处理，WindowManagerGlobal以工厂的形式向外提供自己的实例，在WindowManagerGlobal中有如下一段代码：private final WindowManagerGlobal mGlobal &#x3D; WindowManagerGlobal.getInstance()。WindowManagerImpl这种工作模式是典型的桥接模式，将所有的操作全部委托给WindowManagerGlobal来实现。WindowManager-Global的addView方法主要分为如下几步。</p>
+<ol>
+<li>检查参数是否合法，如果是子Window那</li>
+</ol>
+<p>么还需要调整一些布局参数</p>
+<p>if (view &#x3D;&#x3D; null) {</p>
+<p>        throw new IllegalArgumentException(“view must not be null”);</p>
+<p>    }</p>
+<p>    if (display &#x3D;&#x3D; null) {</p>
+<p>        throw new IllegalArgumentException(“display must not be null”);</p>
+<p>    }</p>
+<p>    if (!(params instanceof WindowManager.LayoutParams)) {</p>
+<p>        throw new IllegalArgumentException(“Params must be WindowManager.LayoutParams”);</p>
+<p>    }</p>
+<p>    final WindowManager.LayoutParams wparams &#x3D; (WindowManager.LayoutParams)    params;</p>
+<p>    if (parentWindow !&#x3D; null) {</p>
+<p>        parentWindow.adjustLayoutParamsForSubWindow(wparams);</p>
+<p>    }</p>
+<ol start="2">
+<li>创建ViewRootImpl并将View添加到列表中</li>
+</ol>
+<p>在WindowManagerGlobal内部有如下几个列表比较重要：</p>
+<p>private final ArrayList<View> mViews &#x3D; new ArrayList<View>();</p>
+<p>         private final ArrayList<ViewRootImpl> mRoots &#x3D; new ArrayList</p>
+<p>         <ViewRootImpl>();</p>
+<p>         private final ArrayList&lt;WindowManager.LayoutParams&gt; mParams &#x3D;</p>
+<p>                 new ArrayList&lt;WindowManager.LayoutParams&gt;();</p>
+<p>    private final ArraySet<View> mDyingViews &#x3D; new ArraySet<View>();</p>
+<p>在上面的声明中，mViews存储的是所有Window所对应的View，mRoots存储的是所有Window所对应的ViewRootImpl，mParams存储的是所有Window所对应的布局参数，而mDyingViews则存储了那些正在被删除的View对象，或者说是那些已经调用removeView方法但是删除操作还未完成的Window对象。在addView中通过如下方式将Window的一系列对象添加到列表中：</p>
+<p>root &#x3D; new ViewRootImpl(view.getContext(),display);</p>
+<p>    view.setLayoutParams(wparams);</p>
+<p>    mViews.add(view);</p>
+<p>    mRoots.add(root);</p>
+<p>    mParams.add(wparams);</p>
+<ol start="3">
+<li>通过ViewRootImpl来更新界面并完成Window的添加过程</li>
+</ol>
+<p>这个步骤由ViewRootImpl的setView方法来完成，从第4章可以知道，View的绘制过程是由ViewRootImpl来完成的，这里当然也不例外，在setView内部会通过requestLayout来完成异步刷新请求。在下面的代码中，scheduleTraversals实际是View绘制的入口：</p>
+<p>public void requestLayout() {</p>
+<p>        if (!mHandlingLayoutInLayoutRequest) {</p>
+<p>                checkThread();</p>
+<p>                mLayoutRequested &#x3D; true;</p>
+<p>                scheduleTraversals();</p>
+<p>        }</p>
+<p>    }</p>
+<p>接着会通过WindowSession最终来完成Wind</p>
+<p>ow的添加过程。在下面的代码中，mWindowSession的类型是IWindowSession，它是一个Binder对象，真正的实现类是Session，也就是Window的添加过程是一次IPC调用。</p>
+<p>try {</p>
+<p>        mOrigWindowType &#x3D; mWindowAttributes.type;</p>
+<p>        mAttachInfo.mRecomputeGlobalAttributes &#x3D; true;</p>
+<p>        collectViewAttributes();</p>
+<p>        res &#x3D; mWindowSession.addToDisplay(mWindow,mSeq,mWindowAttributes,</p>
+<p>                        getHostVisibility(),mDisplay.getDisplayId(),</p>
+<p>                        mAttachInfo.mContentInsets,mInputChannel);</p>
+<p>    } catch (RemoteException e) {</p>
+<p>        mAdded &#x3D; false;</p>
+<p>        mView &#x3D; null;</p>
+<p>        mAttachInfo.mRootView &#x3D; null;</p>
+<p>        mInputChannel &#x3D; null;</p>
+<p>        mFallbackEventHandler.setView(null);</p>
+<p>        unscheduleTraversals();</p>
+<p>        setAccessibilityFocus(null,null);</p>
+<p>        throw new RuntimeException(“Adding window failed”,e);</p>
+<p>    }</p>
+<p>在Session内部会通过WindowManagerService来实现Window的添加，代码如下所示。</p>
+<p>public int addToDisplay(IWindow window,int seq,WindowManager.LayoutParams</p>
+<p>    attrs,</p>
+<p>                int viewVisibility,int displayId,Rect outContentInsets,</p>
+<p>    </p>
+<p>InputChannel outInputChannel) {</p>
+<p>        return mService.addWindow(this,window,seq,attrs,viewVisibility,displayId,</p>
+<p>                        outContentInsets,outInputChannel);</p>
+<p>    }</p>
+<p>如此一来，Window的添加请求就交给WindowManagerService去处理了，在Window-ManagerService内部会为每一个应用保留一个单独的Session。具体Window在Window-ManagerService内部是怎么添加的，本章不对其进行进一步的分析，这是因为到此为止我们对Window的添加这一流程已经清楚了，而在WindowManagerService内部主要是代码细节，深入进去没有太大的意义，读者可以自行阅读源码或者参考相关的源码分析书籍，本书对源码的分析侧重的是整体流程，会尽量避免出现深入代码逻辑无法自拔的情形。</p>
+<h3 id="8-2-2-Window的删除过程"><a href="#8-2-2-Window的删除过程" class="headerlink" title="8.2.2　Window的删除过程"></a>8.2.2　Window的删除过程</h3><p>Window的删除过程和添加过程一样，都是先通过WindowManagerImpl后，再进一步通过WindowManagerGlobal来实现的。下面是WindowManagerGlobal的removeView的实现：</p>
+<p>public void removeView(View view,boolean immediate) {</p>
+<p>        if (view &#x3D;&#x3D; null) {</p>
+<p>                throw new IllegalArgumentException(“view must not be null”);</p>
+<p>        }</p>
+<p>        synchronized (mLock) {</p>
+<p>      </p>
+<p>int index &#x3D; findViewLocked(view,true);</p>
+<p>                View curView &#x3D; mRoots.get(index).getView();</p>
+<p>                removeViewLocked(index,immediate);</p>
+<p>                if (curView &#x3D;&#x3D; view) {</p>
+<p>                        return;</p>
+<p>                }</p>
+<p>                throw new IllegalStateException(“Calling with view “ + view</p>
+<p>                                + “ but the ViewAncestor is attached to “ + curView);</p>
+<p>        }</p>
+<p>    }</p>
+<p>removeView的逻辑很清晰，首先通过findViewLocked来查找待删除的View的索引，这个查找过程就是建立的数组遍历，然后再调用removeViewLocked来做进一步的删除，如下所示。</p>
+<p>private void removeViewLocked(int index,boolean immediate) {</p>
+<p>        ViewRootImpl root &#x3D; mRoots.get(index);</p>
+<p>        View view &#x3D; root.getView();</p>
+<p>        if (view !&#x3D; null) {</p>
+<p>                InputMethodManager imm &#x3D; InputMethodManager.getInstance();</p>
+<p>                if (imm !&#x3D; null) {</p>
+<p>                        imm.windowDismissed(mViews.get(index).getWindowToken());</p>
+<p>                }</p>
+<p>        }</p>
+<p>        boolean deferred &#x3D; root.die(immediate);</p>
+<p>        if (view !&#x3D; null) {</p>
+<p>                view.assignParent(null);</p>
+<p>                if (deferred) {</p>
+<p>    </p>
+<p>mDyingViews.add(view);</p>
+<p>                }</p>
+<p>        }</p>
+<p>    }</p>
+<p>removeViewLocked是通过ViewRootImpl来完成删除操作的。在WindowManager中提供了两种删除接口removeView和removeViewImmediate，它们分别表示异步删除和同步删除，其中removeViewImmediate使用起来需要特别注意，一般来说不需要使用此方法来删除Window以免发生意外的错误。这里主要说异步删除的情况，具体的删除操作由ViewRoot-Impl的die方法来完成。在异步删除的情况下，die方法只是发送了一个请求删除的消息后就立刻返回了，这个时候View并没有完成删除操作，所以最后会将其添加到mDyingViews中，mDyingViews表示待删除的View列表。ViewRootImpl的die方法如下所示。</p>
+<p>boolean die(boolean immediate) {</p>
+<p>        &#x2F;&#x2F; Make sure we do execute immediately if we are in the middle of a traversal              or the damage</p>
+<p>        &#x2F;&#x2F; done by dispatchDetachedFromWindow will cause havoc on return.</p>
+<p>        if (immediate &amp;&amp; !mIsInTraversal) {</p>
+<p>                doDie();</p>
+<p>                return false;</p>
+<p>        }</p>
+<p>        if (!mIsDrawing) {</p>
+<p>                destroyHardwareRenderer();</p>
+<p>        } else {</p>
+<p>                Log.e(TAG,”Attempting to destroy the window while drawing!\n” +</p>
+<p> </p>
+<p> “ window&#x3D;” + this + “,title&#x3D;” + mWindowAttributes.</p>
+<p>                                getTitle());</p>
+<p>        }</p>
+<p>        mHandler.sendEmptyMessage(MSG_DIE);</p>
+<p>        return true;</p>
+<p>    }</p>
+<p>在die方法内部只是做了简单的判断，如果是异步删除，那么就发送一个MSG_DIE的消息，ViewRootImpl中的Handler会处理此消息并调用doDie方法，如果是同步删除（立即删除），那么就不发消息直接调用doDie方法，这就是这两种删除方式的区别。在doDie内部会调用dispatchDetachedFromWindow方法，真正删除View的逻辑在dispatchDetachedFromWindow方法的内部实现。dispatchDetachedFromWindow方法主要做四件事：</p>
+<p>（1）垃圾回收相关的工作，比如清除数据和消息、移除回调。</p>
+<p>（2）通过Session的remove方法删除Window：mWindowSession.remove(mWindow)，这同样是一个IPC过程，最终会调用WindowManagerService的removeWindow方法。</p>
+<p>（3）调用View的dispatchDetachedFromWindow方法，在内部会调用View的onDetached-FromWindow()以及onDetachedFromWindowInternal()。对于onDetachedFromWindow()大家一定不陌生，当View从Window中移除时，这个方法就会被调用，可以在这个方法内部做一些资源回</p>
+<p>收的工作，比如终止动画、停止线程等。</p>
+<p>（4）调用WindowManagerGlobal的doRemoveView方法刷新数据，包括mRoots、mParams以及mDyingViews，需要将当前Window所关联的这三类对象从列表中删除。</p>
+<h3 id="8-2-3-Window的更新过程"><a href="#8-2-3-Window的更新过程" class="headerlink" title="8.2.3　Window的更新过程"></a>8.2.3　Window的更新过程</h3><p>到这里，Window的删除过程已经分析完毕了，下面分析Window的更新过程，还是要看WindowManagerGlobal的updateViewLayout方法，如下所示。</p>
+<p>public void updateViewLayout(View view,ViewGroup.LayoutParams params) {</p>
+<p>        if (view &#x3D;&#x3D; null) {</p>
+<p>                throw new IllegalArgumentException(“view must not be null”);</p>
+<p>        }</p>
+<p>        if (!(params instanceof WindowManager.LayoutParams)) {</p>
+<p>                throw new IllegalArgumentException(“Params must be WindowManager.LayoutParams”);</p>
+<p>        }</p>
+<p>        final WindowManager.LayoutParams wparams &#x3D; (WindowManager.Layout-Params)params;</p>
+<p>        view.setLayoutParams(wparams);</p>
+<p>        synchronized (mLock) {</p>
+<p>                int index &#x3D; findViewLocked(view,true);</p>
+<p>                ViewRootImpl root &#x3D; mRoots.get(index);</p>
+<p>                mParams.remove(index);</p>
+<p>                mParams.add(index,wparams);</p>
+<p> </p>
+<p>root.setLayoutParams(wparams,false);</p>
+<p>        }</p>
+<p>    }</p>
+<p>updateViewLayout方法做的事情就比较简单了，首先它需要更新View的LayoutParams并替换掉老的LayoutParams，接着再更新ViewRootImpl中的LayoutParams，这一步是通过ViewRootImpl的setLayoutParams方法来实现的。在ViewRootImpl中会通过scheduleTraversals方法来对View重新布局，包括测量、布局、重绘这三个过程。除了View本身的重绘以外，ViewRootImpl还会通过WindowSession来更新Window的视图，这个过程最终是由WindowManagerService的relayoutWindow()来具体实现的，它同样是一个IPC过程。</p>
+<h2 id="8-3-Window的创建过程"><a href="#8-3-Window的创建过程" class="headerlink" title="8.3　Window的创建过程"></a>8.3　Window的创建过程</h2><p>通过上面的分析可以看出，View是Android中的视图的呈现方式，但是View不能单独存在，它必须附着在Window这个抽象的概念上面，因此有视图的地方就有Window。哪些地方有视图呢？这个读者都比较清楚，Android中可以提供视图的地方有Activity、Dialog、Toast，除此之外，还有一些依托Window而实现的视图，比如PopUpWindow、菜单，它们也是视图，有视图的地方就有Window，因此Activity、Dialog、Toast等视图都对应着一个Window。本节将分析这些视图元素中的Window的创建过程，通过本节可以使读者进一步加深对Window的理解</p>
+<p>。</p>
+<h3 id="8-3-1-Activity的Window创建过程"><a href="#8-3-1-Activity的Window创建过程" class="headerlink" title="8.3.1　Activity的Window创建过程"></a>8.3.1　Activity的Window创建过程</h3><p>要分析Activity中的Window的创建过程就必须了解Activity的启动过程，详细的过程会在第9章进行介绍，这里先大概了解即可。Activity的启动过程很复杂，最终会由ActivityThread中的performLaunchActivity()来完成整个启动过程，在这个方法内部会通过类加载器创建Activity的实例对象，并调用其attach方法为其关联运行过程中所依赖的一系列上下文环境变量，代码如下所示。</p>
+<p>java.lang.ClassLoader cl &#x3D; r.packageInfo.getClassLoader();</p>
+<p>    activity &#x3D; mInstrumentation.newActivity(</p>
+<p>                cl,component.getClassName(),r.intent);</p>
+<p>     …</p>
+<p>    if (activity !&#x3D; null) {</p>
+<p>        Context appContext &#x3D; createBaseContextForActivity(r,activity);</p>
+<p>        CharSequence title &#x3D; r.activityInfo.loadLabel(appContext.getPackage-Manager());</p>
+<p>        Configuration config &#x3D; new Configuration(mCompatConfiguration);</p>
+<p>        if (DEBUG_CONFIGURATION) Slog.v(TAG,”Launching activity “</p>
+<p>                        + r.activityInfo.name + “ with config “ + config);</p>
+<p>        activity.attach(appContext,this,getInstrumentation(),r.token,</p>
+<p>                        r.ide</p>
+<p>nt,app,r.intent,r.activityInfo,title,r.parent,</p>
+<p>                        r.embeddedID,r.lastNonConfigurationInstances,config,</p>
+<p>                        r.voiceInteractor);</p>
+<p>        …</p>
+<p>    }</p>
+<p>在Activity的attach方法里，系统会创建Activity所属的Window对象并为其设置回调接口，Window对象的创建是通过PolicyManager的makeNewWindow方法实现的。由于Activity实现了Window的Callback接口，因此当Window接收到外界的状态改变时就会回调Activity的方法。Callback接口中的方法很多，但是有几个却是我们都非常熟悉的，比如onAttachedToWindow、onDetachedFromWindow、dispatchTouchEvent，等等，代码如下所示。</p>
+<p>mWindow &#x3D; PolicyManager.makeNewWindow(this);</p>
+<p>    mWindow.setCallback(this);</p>
+<p>    mWindow.setOnWindowDismissedCallback(this);</p>
+<p>    mWindow.getLayoutInflater().setPrivateFactory(this);</p>
+<p>    if (info.softInputMode !&#x3D; WindowManager.LayoutParams.SOFT_INPUT_STATE_    UNSPECIFIED) {</p>
+<p>        mWindow.setSoftInputMode(info.softInputMode);</p>
+<p>    }</p>
+<p>    if (info.uiOptions !&#x3D; 0) {</p>
+<p>        mWindow.setUiOptions(info.uiOptions);</p>
+<p>    }</p>
+<p>从上面的分析可以看出，Activity的Window是通过PolicyManager的一个工厂方法来创建</p>
+<p>的，但是从PolicyManager的类名可以看出，它不是一个普通的类，它是一个策略类。PolicyManager中实现的几个工厂方法全部在策略接口IPolicy中声明了，IPolicy的定义如下：</p>
+<p>public interface IPolicy {</p>
+<p>         public Window makeNewWindow(Context context);</p>
+<p>         public LayoutInflater makeNewLayoutInflater(Context context);</p>
+<p>         public WindowManagerPolicy makeNewWindowManager();</p>
+<p>         public FallbackEventHandler makeNewFallbackEventHandler(Context</p>
+<p>         context);</p>
+<p>    }</p>
+<p>在实际的调用中，PolicyManager的真正实现是Policy类，Policy类中的makeNewWindow方法的实现如下，由此可以发现，Window的具体实现的确是PhoneWindow。</p>
+<p>public Window makeNewWindow(Context context) {</p>
+<p>        return new PhoneWindow(context);</p>
+<p>    }</p>
+<p>关于策略类PolicyManager是如何关联到Policy上面的，这个无法从源码中的调用关系来得出，这里猜测可能是由编译环节动态控制的。到这里Window已经创建完成了，下面分析Activity的视图是怎么附属在Window上的。由于Activity的视图由setContentView方法提供，我们只需要看setContentView方法的实现即可</p>
+<p>。</p>
+<p>public void setContentView(int layoutResID) {</p>
+<p>        getWindow().setContentView(layoutResID);</p>
+<p>        initWindowDecorActionBar();</p>
+<p>    }</p>
+<p>从Activity的setContentView的实现可以看出，Activity将具体实现交给了Window处理，而Window的具体实现是PhoneWindow，所以只需要看PhoneWindow的相关逻辑即可。PhoneWindow的setContentView方法大致遵循如下几个步骤。</p>
+<ol>
+<li>如果没有DecorView，那么就创建它</li>
+</ol>
+<p>DecorView是一个FrameLayout，在第4章已经做了初步的介绍，这里再简单说一下。DecorView是Activity中的顶级View，一般来说它的内部包含标题栏和内部栏，但是这个会随着主题的变换而发生改变。不管怎么样，内容栏是一定要存在的，并且内容来具体固定的id，那就是“content”，它的完整id是android.R.id.content。DecorView的创建过程由installDecor方法来完成，在方法内部会通过generateDecor方法来直接创建DecorView，这个时候DecorView还只是一个空白的FrameLayout：</p>
+<p>protected DecorView generateDecor() {</p>
+<p>        return new DecorView(getContext(),-1);</p>
+<p>    }</p>
+<p>为了初始化DecorView的结构，PhoneWindow还需要通过generateLayout方法来加载具体的布局文件到DecorView中，具体的布局文件和系统版本以及主题有关，这个过程如下所示。</p>
+<p>View in &#x3D; mLayoutInflater.inflate(layoutResource,null);</p>
+<p>    decor.addView(in,new ViewGroup.LayoutParams(MATCH_PARENT,MATCH_PARENT));</p>
+<p>    mContentRoot &#x3D; (ViewGroup) in;</p>
+<p>    ViewGroup contentParent &#x3D; (ViewGroup)findViewById(ID_ANDROID_CONTENT);</p>
+<p>其中ID_ANDROID_CONTENT的定义如下，这个id所对应的ViewGroup就是mContentParent：</p>
+<p>public static final int ID_ANDROID_CONTENT &#x3D; com.android.internal.R.id.content</p>
+<ol start="2">
+<li>将View添加到DecorView的mContentParent中</li>
+</ol>
+<p>这个过程就比较简单了，由于在步骤1中已经创建并初始化了DecorView，因此这一步直接将Activity的视图添加到DecorView的mContentParent中即可：mLayoutInflater.inflate(layoutResID,mContentParent)。到此为止，Activity的布局文件已经添加到DecorView里面了，由此可以理解Activity的setContentView这个方法的来历了。不知道读者是否曾经怀疑过：为什么不叫setView呢？它明明是给Activity设置视图的啊！从这里来看，它的确不适合</p>
+<p>叫setView，因为Activity的布局文件只是被添加到DecorView的mContentParent中，因此叫setContentView更加准确。</p>
+<ol start="3">
+<li>回调Activity的onContentChanged方法通知Activity视图已经发生改变</li>
+</ol>
+<p>这个过程就更简单了，由于Activity实现了Window的Callback接口，这里表示Activity的布局文件已经被添加到DecorView的mContentParent中了，于是需要通知Activity，使其可以做相应的处理。Activity的onContentChanged方法是个空实现，我们可以在子Activity中处理这个回调。这个过程的代码如下所示。</p>
+<p>final Callback cb &#x3D; getCallback();</p>
+<p>    if (cb !&#x3D; null &amp;&amp; !isDestroyed()) {</p>
+<p>        cb.onContentChanged();</p>
+<p>    }</p>
+<p>经过了上面的三个步骤，到这里为止DecorView已经被创建并初始化完毕，Activity的布局文件也已经成功添加到了DecorView的mContentParent中，但是这个时候DecorView还没有被WindowManager正式添加到Window中。这里需要正确理解Window的概念，Window更多表示的是一种抽象的功能集合，虽然说早在Activity的attach方法中Window就已经被创建了，但是这个时候由于DecorView并没有被WindowManager识别，所以这个时候的Window无法提供具体功能，因为它还无法接收外界的输入信息。在ActivityThread的handleResumeActivity方法中</p>
+<p>，首先会调用Activity的onResume方法，接着会调用Activity的makeVisible()，正是在makeVisible方法中，DecorView真正地完成了添加和显示这两个过程，到这里Activity的视图才能被用户看到，如下所示。</p>
+<p>void makeVisible() {</p>
+<p>        if (!mWindowAdded) {</p>
+<p>                ViewManager wm &#x3D; getWindowManager();</p>
+<p>                wm.addView(mDecor,getWindow().getAttributes());</p>
+<p>                mWindowAdded &#x3D; true;</p>
+<p>        }</p>
+<p>        mDecor.setVisibility(View.VISIBLE);</p>
+<p>    }</p>
+<p>到这里，Activity中的Window的创建过程已经分析完了，读者对整个过程是不是有了更进一步的理解了呢？</p>
+<h3 id="8-3-2-Dialog的Window创建过程"><a href="#8-3-2-Dialog的Window创建过程" class="headerlink" title="8.3.2　Dialog的Window创建过程"></a>8.3.2　Dialog的Window创建过程</h3><p>Dialog的Window的创建过程和Activity类似，有如下几个步骤。</p>
+<ol>
+<li>创建Window</li>
+</ol>
+<p>Dialog中Window的创建同样是通过PolicyManager的makeNewWindow方法来完成的，从8.3.1节中可以知道，创建后的对象实际上就是PhoneWindow，这个过程和Activity的Window的创建过程是一致的，这里就不再详细说明了。</p>
+<p>Dialog(Context context,int theme,boolean createContextThemeWrapper) {</p>
+<p>        …</p>
+<p> </p>
+<p>mWindowManager &#x3D; (WindowManager)context.getSystemService(Context. WINDOW_SERVICE);</p>
+<p>        Window w &#x3D; PolicyManager.makeNewWindow(mContext);</p>
+<p>        mWindow &#x3D; w;</p>
+<p>        w.setCallback(this);</p>
+<p>        w.setOnWindowDismissedCallback(this);</p>
+<p>        w.setWindowManager(mWindowManager,null,null);</p>
+<p>        w.setGravity(Gravity.CENTER);</p>
+<p>        mListenersHandler &#x3D; new ListenersHandler(this);</p>
+<p>    }</p>
+<ol start="2">
+<li>初始化DecorView并将Dialog的视图添加到DecorView中</li>
+</ol>
+<p>这个过程也和Activity的类似，都是通过Window去添加指定的布局文件。</p>
+<p>public void setContentView(int layoutResID) {</p>
+<p>        mWindow.setContentView(layoutResID);</p>
+<p>    }</p>
+<ol start="3">
+<li>将DecorView添加到Window中并显示</li>
+</ol>
+<p>在Dialog的show方法中，会通过WindowManager将DecorView添加到Window中，如下所示。</p>
+<p>mWindowManager.addView(mDecor,l);</p>
+<p>    mShowing &#x3D; true;</p>
+<p>从上面三个步骤可以发现，Dialog的Window创建和Activity的Window创建过程很类似，二者几乎没有什么区别。当Dialog被关闭时，它会通过WindowManager来移除DecorView：mW</p>
+<p>indowManager.removeViewImmediate(mDecor)。</p>
+<p>普通的Dialog有一个特殊之处，那就是必须采用Activity的Context，如果采用Application的Context，那么就会报错。</p>
+<p>Dialog dialog &#x3D; new Dialog(this.getApplicationContext());</p>
+<p>    TextView textView &#x3D; new TextView(this);</p>
+<p>    textView.setText(“this is toast!”);</p>
+<p>    dialog.setContentView(textView);</p>
+<p>    dialog.show();</p>
+<p>上述代码运行时会报错，错误信息如下所示。</p>
+<p>E&#x2F;AndroidRuntime(1185): Caused by: android.view.WindowManager$BadToken-Exception: Unable to add window –token null is not for an application</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.view.ViewRootImpl.setView(ViewRoot-Impl.java:657)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.view.WindowManagerImpl.addView(Window-ManagerImpl.java:326)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.view.WindowManagerImpl.addView(Window-ManagerImpl.java:224)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.view.WindowManagerImpl$CompatMode-Wrapper.addView(WindowManagerImpl.java:149)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.app.Dialog.show(Dialog.java:316)</p>
+<p>  </p>
+<p>E&#x2F;AndroidRuntime(1185): at com.ryg.chapter_8.DemoActivity_1.initView(DemoActivity_1.java:26)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at com.ryg.chapter_8.DemoActivity_1.onCreate(DemoActivity_1.java:18)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.app.Activity.performCreate(Activity.java:5086)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.app.Instrumentation.callActivityOn-Create(Instrumentation.java:1079)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.app.ActivityThread.performLaunch-Activity(ActivityThread.java:2056)</p>
+<p>上面的错误信息很明确，是没有应用token所导致的，而应用token一般只有Activity拥有，所以这里只需要用Activity作为Context来显示对话框即可。另外，系统Window比较特殊，它可以不需要token，因此在上面的例子中，只需要指定对话框的Window为系统类型就可以正常弹出对话框。在本章一开始讲到，WindowManager.LayoutParams中的type表示Window的类型，而系统Window的层级范围是2000～2999，这些层级范围就对应着type参数。系统Window的层级有很多值，对于本例来说，可以选用TYPE_SYSTEM_OVERLAY来指定对话框的Window类型为系统Window，如下所示。</p>
+<p>dialog.getWindow().setType(LayoutParams.TYPE_SYSTEM_ERROR)</p>
+<p>E&#x2F;AndroidRuntime(1185): at com.ryg.chapter_8.DemoActivity_1.initView(DemoActivity_1.java:26)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at com.ryg.chapter_8.DemoActivity_1.onCreate(DemoActivity_1.java:18)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.app.Activity.performCreate(Activity.java:5086)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.app.Instrumentation.callActivityOn-Create(Instrumentation.java:1079)</p>
+<p>    E&#x2F;AndroidRuntime(1185): at android.app.ActivityThread.performLaunch-Activity(ActivityThread.java:2056)</p>
+<p>上面的错误信息很明确，是没有应用token所导致的，而应用token一般只有Activity拥有，所以这里只需要用Activity作为Context来显示对话框即可。另外，系统Window比较特殊，它可以不需要token，因此在上面的例子中，只需要指定对话框的Window为系统类型就可以正常弹出对话框。在本章一开始讲到，WindowManager.LayoutParams中的type表示Window的类型，而系统Window的层级范围是2000～2999，这些层级范围就对应着type参数。系统Window的层级有很多值，对于本例来说，可以选用TYPE_SYSTEM_OVERLAY来指定对话框的Window类型为系统Window，如下所示。</p>
+<p>dialog.getWindow().setType(LayoutParams.TYPE_SYSTEM_ERROR)</p>
+<p>led”);</p>
+<p>        }</p>
+<p>        INotificationManager service &#x3D; getService();</p>
+<p>        String pkg &#x3D; mContext.getOpPackageName();</p>
+<p>        TN tn &#x3D; mTN;</p>
+<p>        tn.mNextView &#x3D; mNextView;</p>
+<p>        try {</p>
+<p>                service.enqueueToast(pkg,tn,mDuration);</p>
+<p>        } catch (RemoteException e) {</p>
+<p>                &#x2F;&#x2F; Empty</p>
+<p>        }</p>
+<p>    }</p>
+<p>    public void cancel() {</p>
+<p>        mTN.hide();</p>
+<p>        try {</p>
+<p>                getService().cancelToast(mContext.getPackageName(),mTN);</p>
+<p>        } catch (RemoteException e) {</p>
+<p>                &#x2F;&#x2F; Empty</p>
+<p>        }</p>
+<p>    }</p>
+<p>从上面的代码可以看到，显示和隐藏Toast都需要通过NMS来实现，由于NMS运行在系统的进程中，所以只能通过远程调用的方式来显示和隐藏Toast。需要注意的是TN这个类，它是一个Binder类，在Toast和NMS进行IPC的过程中，当NMS处理Toast的显示或隐藏请求时会跨进程回调TN中的方法，这个时候由于TN运行在Binder线程池中，所以需要通过Handler将其切换到当前线程中。这里的当前线程是指发送Toast请求所在的线程。注意，由于这里使用了Handler，所以这意味着Toast无法在没有Looper的线程中弹出，这是因为Handler需要使用Looper才能完成切换线程的功能，关于Handler和Looper的具体介绍请参看第10章。</p>
+<p>首先看Toast的显示过程，它调用了NMS中</p>
+<p>的enqueueToast方法，如下所示。</p>
+<p>INotificationManager service &#x3D; getService();</p>
+<p>    String pkg &#x3D; mContext.getOpPackageName();</p>
+<p>    TN tn &#x3D; mTN;</p>
+<p>    tn.mNextView &#x3D; mNextView;</p>
+<p>    try {</p>
+<p>        service.enqueueToast(pkg,tn,mDuration);</p>
+<p>    } catch (RemoteException e) {</p>
+<p>        &#x2F;&#x2F; Empty</p>
+<p>    }</p>
+<p>NMS的enqueueToast方法的第一个参数表示当前应用的包名，第二个参数tn表示远程回调，第三个参数表示Toast的时长。enqueueToast首先将Toast请求封装为ToastRecord对象并将其添加到一个名为mToastQueue的队列中。mToastQueue其实是一个ArrayList。对于非系统应用来说，mToastQueue中最多能同时存在50个ToastRecord，这样做是为了防止DOS（Denial of Service）。如果不这么做，试想一下，如果我们通过大量的循环去连续弹出Toast，这将会导致其他应用没有机会弹出Toast，那么对于其他应用的Toast请求，系统的行为就是拒绝服务，这就是拒绝服务攻击的含义，这种手段常用于网络攻击中。</p>
+<p>&#x2F;&#x2F; Limit the number of toasts that any given package except the android</p>
+<p>    &#x2F;&#x2F; package can enqueue. Prevents DOS attacks and deals with leaks.</p>
+<p>    if (!isSystemToast) {</p>
+<p>        int count &#x3D; 0;</p>
+<p>        final int N &#x3D; mToastQueue.size();</p>
+<p>        for (int </p>
+<p>i&#x3D;0; i&lt;N; i++) {</p>
+<p>                 final ToastRecord r &#x3D; mToastQueue.get(i);</p>
+<p>                 if (r.pkg.equals(pkg)) {</p>
+<p>                         count++;</p>
+<p>                         if (count &#x3D;&gt; MAX_PACKAGE_NOTIFICATIONS) {</p>
+<p>                                 Slog.e(TAG,”Package has already posted “ + count</p>
+<p>                                                + “ toasts. Not showing more. Package&#x3D;” + pkg);</p>
+<p>                                 return;</p>
+<p>               }</p>
+<p>                 }</p>
+<p>        }</p>
+<p>    }</p>
+<p>正常情况下，一个应用不可能达到上限，当ToastRecord被添加到mToastQueue中后，NMS就会通过showNextToastLocked方法来显示当前的Toast。下面的代码很好理解，需要注意的是，Toast的显示是由ToastRecord的callback来完成的，这个callback实际上就是Toast中的TN对象的远程Binder，通过callback来访问TN中的方法是需要跨进程来完成的，最终被调用的TN中的方法会运行在发起Toast请求的应用的Binder线程池中。</p>
+<p>void showNextToastLocked() {</p>
+<p>        ToastRecord record &#x3D; mToastQueue.get(0);</p>
+<p>        while (record !&#x3D; null) {</p>
+<p>                if (DBG) Slog.d(TAG,”Show pkg&#x3D;” + record.pkg + “ callback&#x3D;” + record.callback);</p>
+<p>                try {</p>
+<p>   </p>
+<p> record.callback.show();</p>
+<p>                        scheduleTimeoutLocked(record);</p>
+<p>   </p>
+<p>Toast显示以后，NMS还会通过scheduleTimeoutLocked方法来发送一个延时消息，具体的延时取决于Toast的时长，如下所示。</p>
+<p>private void scheduleTimeoutLocked(ToastRecord r)</p>
+<p>     {</p>
+<p>        mHandler.removeCallbacksAndMessages(r);</p>
+<p>        Message m &#x3D; Message.obtain(mHandler,MESSAGE_TIMEOUT,r);</p>
+<p>        long delay &#x3D; r.duration &#x3D;&#x3D; Toast.LENGTH_LONG ? LONG_DELAY : SHORT_DELAY;</p>
+<p>        mHandler.sendMessageDelayed(m,delay);</p>
+<p>    }</p>
+<p>在上面的代码中，LONG_DELAY是3.5s，而SHORT_DELAY是2s。延迟相应的时间后，NMS会通过cancelToastLocked方法来隐藏Toast并将其从mToastQueue中移除，这个时候如果mToastQueue中还有其他Toast，那么NMS就继续显示其他Toast。</p>
+<p>Toast的隐藏也是通过ToastRecord的callback来完成的，这同样也是一次IPC过程，它的工作方式和Toast的显示过程是类似的，如下所示。</p>
+<p>try {</p>
+<p>        record.callback.hide();</p>
+<p>    } catch (RemoteException e) {</p>
+<p>        Slog.w(TAG,”Object died trying to hide notific</p>
+<p>ation “ + record.callback</p>
+<p>                        + “ in package “ + record.pkg);</p>
+<p>        &#x2F;&#x2F; don’t worry about this,we’re about to remove it from</p>
+<p>        &#x2F;&#x2F; the list anyway</p>
+<p>    }</p>
+<p>通过上面的分析，大家知道Toast的显示和影响过程实际上是通过Toast中的TN这个类来实现的，它有两个方法show和hide，分别对应Toast的显示和隐藏。由于这两个方法是被NMS以跨进程的方式调用的，因此它们运行在Binder线程池中。为了将执行环境切换到Toast请求所在的线程，在它们的内部使用了Handler，如下所示。</p>
+<p>&#x2F;**</p>
+<p>      * schedule handleShow into the right thread</p>
+<p>      *&#x2F;</p>
+<p>    @Override</p>
+<p>    public void show() {</p>
+<p>        if (localLOGV) Log.v(TAG,”SHOW: “ + this);</p>
+<p>        mHandler.post(mShow);</p>
+<p>    }</p>
+<p>     &#x2F;**</p>
+<p>      * schedule handleHide into the right thread</p>
+<p>      *&#x2F;</p>
+<p>    @Override</p>
+<p>    public void hide() {</p>
+<p>        if (localLOGV) Log.v(TAG,”HIDE: “ + this);</p>
+<p>        mHandler.post(mHide);</p>
+<p>    }</p>
+<p>上述代码中，mShow和mHide是两个Runnable，它们内部分别调用了handleShow和handleHide方法。由此可见，handleShow和handleHide才是真正完成显示和隐藏Toast的地方。TN的handleShow中会将Toast的视图添加到Window中</p>
+<p>，如下所示。</p>
+<p>mWM &#x3D; (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);</p>
+<p>    mWM.addView(mView,mParams)</p>
+<p>而NT的handleHide中会将Toast的视图从Window中移除，如下所示。</p>
+<p>if (mView.getParent() !&#x3D; null) {</p>
+<p>        if (localLOGV) Log.v(TAG,”REMOVE! “ + mView + “ in “ + this);</p>
+<p>        mWM.removeView(mView);</p>
+<p>    }</p>
+<p>到这里Toast的Window的创建过程已经分析完了，相信读者对Toast的工作过程有了一个更加全面的理解了。除了上面已经提到的Activity、Dialog和Toast以外，PopupWindow、菜单以及状态栏等都是通过Window来实现的，这里就不一一介绍了，读者可以找自己感兴趣的内容来分析。</p>
+<p>本章的意义在于让读者对Window有一个更加清晰的认识，同时能够深刻理解Window和View的依赖关系，这有助于理解其他更深层次的概念，比如SurfaceFlinger。通过本章读者应该知道，任何View都是附属在一个Window上面的，那么这里问一个问题：一个应用中到底有多少个Window呢？相信读者都已经清楚了。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/android/">android</a></div><div class="post_share"><div class="social-share" data-image="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/01/07/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC7%E7%AB%A0%20Android%E5%8A%A8%E7%94%BB%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90/" title="第七章　Android动画深入分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第七章　Android动画深入分析</div></div></a></div><div class="next-post pull-right"><a href="/2021/01/09/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC9%E7%AB%A0%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E7%9A%84%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B/" title="第九章　四大组件的工作过程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第九章　四大组件的工作过程</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/01/01/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC1%E7%AB%A0%20Activity%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%92%8C%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F/" title="第一章 Activity的生命周期和启动模式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-01</div><div class="title">第一章 Activity的生命周期和启动模式</div></div></a></div><div><a href="/2021/01/03/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC3%E7%AB%A0%20View%E7%9A%84%E4%BA%8B%E4%BB%B6%E4%BD%93%E7%B3%BB/" title="第三章　View的事件体系"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-03</div><div class="title">第三章　View的事件体系</div></div></a></div><div><a href="/2021/01/04/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC4%E7%AB%A0%20View%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" title="第四章　View的工作原理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-04</div><div class="title">第四章　View的工作原理</div></div></a></div><div><a href="/2021/01/05/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC5%E7%AB%A0%20%E7%90%86%E8%A7%A3RemoteViews/" title="第五章　理解RemoteViews"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-05</div><div class="title">第五章　理解RemoteViews</div></div></a></div><div><a href="/2021/01/06/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC6%E7%AB%A0%20Android%E7%9A%84Drawable/" title="第六章　Android的Drawable"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-06</div><div class="title">第六章　Android的Drawable</div></div></a></div><div><a href="/2021/01/07/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC7%E7%AB%A0%20Android%E5%8A%A8%E7%94%BB%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90/" title="第七章　Android动画深入分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-07</div><div class="title">第七章　Android动画深入分析</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Junyong Tu</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" href="https://github.com/juncaixingchi1993"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#8-1-Window%E5%92%8CWindowManager"><span class="toc-number">1.</span> <span class="toc-text">8.1　Window和WindowManager</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-2-Window%E7%9A%84%E5%86%85%E9%83%A8%E6%9C%BA%E5%88%B6"><span class="toc-number">2.</span> <span class="toc-text">8.2　Window的内部机制</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-1-Window%E7%9A%84%E6%B7%BB%E5%8A%A0%E8%BF%87%E7%A8%8B"><span class="toc-number">2.1.</span> <span class="toc-text">8.2.1　Window的添加过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-2-Window%E7%9A%84%E5%88%A0%E9%99%A4%E8%BF%87%E7%A8%8B"><span class="toc-number">2.2.</span> <span class="toc-text">8.2.2　Window的删除过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-3-Window%E7%9A%84%E6%9B%B4%E6%96%B0%E8%BF%87%E7%A8%8B"><span class="toc-number">2.3.</span> <span class="toc-text">8.2.3　Window的更新过程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#8-3-Window%E7%9A%84%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">8.3　Window的创建过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-1-Activity%E7%9A%84Window%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="toc-number">3.1.</span> <span class="toc-text">8.3.1　Activity的Window创建过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-2-Dialog%E7%9A%84Window%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="toc-number">3.2.</span> <span class="toc-text">8.3.2　Dialog的Window创建过程</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/26_service/" title="无题">无题</a><time datetime="2024-02-14T11:37:45.559Z" title="发表于 2024-02-14 19:37:45">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/25_intent%E5%92%8CPendingIntent/" title="无题">无题</a><time datetime="2024-02-14T11:37:40.152Z" title="发表于 2024-02-14 19:37:40">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/10/gallery/" title="图库">图库</a><time datetime="2024-02-10T15:25:25.435Z" title="发表于 2024-02-10 23:25:25">2024-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/15/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC15%E7%AB%A0%20Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" title="第十五章 Android性能优化">第十五章 Android性能优化</a><time datetime="2021-01-15T14:07:08.000Z" title="发表于 2021-01-15 22:07:08">2021-01-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/14/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC14%E7%AB%A0%20JNI%E5%92%8CNDK%E7%BC%96%E7%A8%8B/" title="第十四章 JNI和NDK编程">第十四章 JNI和NDK编程</a><time datetime="2021-01-14T14:07:08.000Z" title="发表于 2021-01-14 22:07:08">2021-01-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Junyong Tu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.12.0"></script><script src="/js/main.js?v=4.12.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

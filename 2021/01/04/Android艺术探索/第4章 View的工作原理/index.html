@@ -1,0 +1,1001 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第四章　View的工作原理 | Junyong Tu の 杂记</title><meta name="author" content="Junyong Tu"><meta name="copyright" content="Junyong Tu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在本章中主要介绍两方面的内容，首先介绍View的工作原理，接着介绍自定义View的实现方式。在Android的知识体系中，View扮演着很重要的角色，简单来理解，View是Android在视觉上的呈现。在界面上Android提供了一套GUI库，里面有很多控件，但是很多时候我们并不满足于系统提供的控件，因为这样就意味这应用界面的同类化比较严重。那么怎么才能做出与众不同的效果呢？答案是自定义View，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第四章　View的工作原理">
+<meta property="og:url" content="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/04/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC4%E7%AB%A0%20View%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="Junyong Tu の 杂记">
+<meta property="og:description" content="在本章中主要介绍两方面的内容，首先介绍View的工作原理，接着介绍自定义View的实现方式。在Android的知识体系中，View扮演着很重要的角色，简单来理解，View是Android在视觉上的呈现。在界面上Android提供了一套GUI库，里面有很多控件，但是很多时候我们并不满足于系统提供的控件，因为这样就意味这应用界面的同类化比较严重。那么怎么才能做出与众不同的效果呢？答案是自定义View，">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4">
+<meta property="article:published_time" content="2021-01-04T14:07:08.000Z">
+<meta property="article:modified_time" content="2024-02-14T11:19:13.271Z">
+<meta property="article:author" content="Junyong Tu">
+<meta property="article:tag" content="android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/04/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC4%E7%AB%A0%20View%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css?v=4.12.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第四章　View的工作原理',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-02-14 19:19:13'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://img2.baidu.com/it/u=1361506290,4036378790&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=800&amp;h=500')"><nav id="nav"><span id="blog-info"><a href="/" title="Junyong Tu の 杂记"><span class="site-name">Junyong Tu の 杂记</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第四章　View的工作原理</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-01-04T14:07:08.000Z" title="发表于 2021-01-04 22:07:08">2021-01-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-02-14T11:19:13.271Z" title="更新于 2024-02-14 19:19:13">2024-02-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/">艺术探索</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第四章　View的工作原理"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>在本章中主要介绍两方面的内容，首先介绍View的工作原理，接着介绍自定义View的实现方式。在Android的知识体系中，View扮演着很重要的角色，简单来理解，View是Android在视觉上的呈现。在界面上Android提供了一套GUI库，里面有很多控件，但是很多时候我们并不满足于系统提供的控件，因为这样就意味这应用界面的同类化比较严重。那么怎么才能做出与众不同的效果呢？答案是自定义View，也可以叫自定义控件，通过自定义View我们可以实现各种五花八门的效果。但是自定义View是有一定难度的，尤其是复杂的自定义View，大部分时候我们仅仅了解基本控件的使用方法是无法做出复杂的自定义控件的。为了更好地自定义View，还需要掌握View的底层工作原理，比如View的测量流程、布局流程以及绘制流程，掌握这几个基本流程后，我们就对View的底层更加了解，这样我们就可以做出一个比较完善的自定义View。</p>
+<p>除了View的三大流程以外，View常见的回调方法也是需要熟练掌握的，比如构造方法、onAttach、onVisibilityChanged、onDetach等。另外对于一些具有滑动效果的自定义View，我们还需要处理View的滑动，如果遇到滑动冲突就还需要解决相应的滑动冲突，关于滑动和滑动冲突这一块内容已经在第3章中进行了全面介绍。自定义View的实现看起来很复杂，实际上说简单也简单。总结来说，自定义View是有几种固定类型的，有的直接继承自View和ViewGroup，而有的则选择继承现有的系统控件，这些都可以，关键是要选择最适合当前需要的方式，选对自定义View的实现方式可以起到事半功倍的效果，下面就围绕着这些话题一一展开。</p>
+<h2 id="4-1-初识ViewRoot和DecorView"><a href="#4-1-初识ViewRoot和DecorView" class="headerlink" title="4.1　初识ViewRoot和DecorView"></a>4.1　初识ViewRoot和DecorView</h2><p>在正式介绍View的三大流程之前，我们必须先介绍一些基本概念，这样才能更好地理解View的measure、layout和draw过程，本节主要介绍ViewRoot和DecorView的概念。</p>
+<p>ViewRoot对应于ViewRootImpl类，它是连接WindowManager和DecorView的纽带，View的三大流程均是通过ViewRoot来完成的。在ActivityThread中，当Activity对象被创建完毕后，会将DecorView添加到Window中，同时会创建ViewRootImpl对象，并将ViewRootImpl对象和DecorView建立关联，这个过程可参看如下源码：</p>
+<pre><code>root = new ViewRootImpl(view.getContext(),display);
+</code></pre>
+<p>    root.setView(view,wparams,panelParentView);</p>
+<p>View的绘制流程是从ViewRoot的performTraversals方法开始的，它经过measure、layout和draw三个过程才能最终将一个View绘制出来，其中measure用来测量View的宽和高，layout用来确定View在父容器中的放置位置，而draw则负责将View绘制在屏幕上。针对performTraversals的大致流程，可用流程图4-1来表示。</p>
+<p><img src="data:image/png;base64,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" alt="图片"></p>
+<p>4-1　performTraversals的工作流程图</p>
+<p>如图4-1所示，performTraversals会依次调用performMeasure、performLayout和performDraw三个方法，这三个方法分别完成顶级View的measure、layout和draw这三大流程，其中在performMeasure中会调用measure方法，在measure方法中又会调用onMeasure方法，在onMeasure方法中则会对所有的子元素进行measure过程，这个时候measure流程就从父容器传递到子元素中了，这样就完成了一次measure过程。接着子元素会重复父容器的measure过程，如此反复就完成了整个View树的遍历。同理，performLayout和performDraw的传递流程和performMeasure是类似的，唯一不同的是，performDraw的传递过程是在draw方法中通过dispatchDraw来实现的，不过这并没有本质区别。</p>
+<p>measure过程决定了View的宽&#x2F;高，Measure完成以后，可以通过getMeasuredWidth和getMeasuredHeight方法来获取到View测量后的宽&#x2F;高，在几乎所有的情况下它都等同于View最终的宽&#x2F;高，但是特殊情况除外，这点在本章后面会进行说明。Layout过程决定了View的四个顶点的坐标和实际的View的宽&#x2F;高，完成以后，可以通过getTop、getBottom、getLeft和getRight来拿到View的四个顶点的位置，并可以通过getWidth和getHeight方法来拿到View的最终宽&#x2F;高。Draw过程则决定了View的显示，只有draw方法完成以后View的内容才能呈现在屏幕上。</p>
+<p><img src="data:image/png;base64,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" alt="图片"></p>
+<p>图4-2　顶级View：DecorView的结构</p>
+<p>如图4-2所示，DecorView作为顶级View，一般情况下它内部会包含一个竖直方向的LinearLayout，在这个LinearLayout里面有上下两个部分（具体情况和Android版本及主题有关），上面是标题栏，下面是内容栏。在Activity中我们通过setContentView所设置的布局文件其实就是被加到内容栏之中的，而内容栏的id是content，因此可以理解为Activity指定布局的方法不叫setview而叫setContentView，因为我们的布局的确加到了id为content的FrameLayout中。如何得到content呢？可以这样：ViewGroup content&#x3D; findViewById (R.android.id.content)。如何得到我们设置的View呢？可以这样：content.getChildAt(0)。同时，通过源码我们可以知道，DecorView其实是一个FrameLayout，View层的事件都先经过</p>
+<p>DecorView，然后才传递给我们的View。</p>
+<h2 id="4-2-理解MeasureSpec"><a href="#4-2-理解MeasureSpec" class="headerlink" title="4.2　理解MeasureSpec"></a>4.2　理解MeasureSpec</h2><p>为了更好地理解View的测量过程，我们还需要理解MeasureSpec。从名字上来看，MeasureSpec看起来像“测量规格”或者“测量说明书”，不管怎么翻译，它看起来都好像是或多或少地决定了View的测量过程。通过源码可以发现，MeasureSpec的确参与了View的measure过程。读者可能有疑问，MeasureSpec是干什么的呢？确切来说，MeasureSpec在很大程度上决定了一个View的尺寸规格，之所以说是很大程度上是因为这个过程还受父容器的影响，因为父容器影响View的MeasureSpec的创建过程。在测量过程中，系统会将View的LayoutParams根据父容器所施加的规则转换成对应的MeasureSpec，然后再根据这个measureSpec来测量出View的宽&#x2F;高。上面提到过，这里的宽&#x2F;高是测量宽&#x2F;高，不一定等于View的最终宽&#x2F;高。MeasureSpec看起来有点复杂，其实它的实现是很简单的，下面会详细地分析MeasureSpec。</p>
+<h3 id="4-2-1-MeasureSpec"><a href="#4-2-1-MeasureSpec" class="headerlink" title="4.2.1　MeasureSpec"></a>4.2.1　MeasureSpec</h3><p>MeasureSpec代表一个32位int值，高2位代表SpecMode，低30位代表SpecSize，SpecMode是指测量模式，而SpecSize是指在某种测量模式下的规格大小。下面先看一下MeasureSpec内部的一些常量的定义，通过下面的代码，应该不难理解MeasureSpec的工作原理：</p>
+<pre><code>private static final int MODE_SHIFT = 30;
+</code></pre>
+<p>    private static final int MODE_MASK &#x3D; 0x3 &lt;&lt; MODE_SHIFT;</p>
+<p>    public static final int UNSPECIFIED &#x3D; 0 &lt;&lt; MODE_SHIFT;</p>
+<p>    public static final int EXACTLY &#x3D; 1 &lt;&lt; MODE_SHIFT;</p>
+<p>    public static final int AT_MOST &#x3D; 2 &lt;&lt; MODE_SHIFT;</p>
+<p>    public static int makeMeasureSpec(int size,int mode) {</p>
+<p>        if (sUseBrokenMakeMeasureSpec) {</p>
+<p>                return size + mode;</p>
+<p>        } else {</p>
+<p>                return (size &amp; ~MODE_MASK) | (mode &amp; MODE_MASK);</p>
+<p>        }</p>
+<p>    }</p>
+<p>    public static int getMode(int measureSpec) {</p>
+<p>        return (measureSpec &amp; MODE_MASK);</p>
+<p>    }</p>
+<p>    public static int getSize(int measureSpec) {</p>
+<p>        return (measureSpec &amp; ~MODE_MASK);</p>
+<p>    }</p>
+<p>MeasureSpec通过将SpecMode和SpecSize打包成一个int值来避免过多的对象内存分配，为了方便操作，其提供了打包和解包方法。SpecMode和SpecSize也是一个int值，一组SpecMode和SpecSize可以打包为一个MeasureSpec，而一个MeasureSpec可以通过解包的形式来得出其原始的SpecMode和SpecSize，需要注意的是这里提到的MeasureSpec是指MeasureSpec所代表的int值，而并非MeasureSpec本身。</p>
+<p>SpecMode有三类，每一类都表示特殊的含义，如下所示。</p>
+<p>UNSPECIFIED</p>
+<p>父容器不对View有任何限制，要多大给多大，这种情况一般用于系统内部，表示一种测量的状态。</p>
+<p>EXACTLY</p>
+<p>父容器已经检测出View所需要的精确大小，这个时候View的最终大小就是SpecSize所指定的值。它对应于LayoutParams中的match_parent和具体的数值这两种模式。</p>
+<p>AT_MOST</p>
+<p>父容器指定了一个可用大小即SpecSize，View的大小不能大于这个值，具体是什么值要看不同View的具体实现。它对应于LayoutParams中的wrap_content。</p>
+<h3 id="4-2-2-MeasureSpec和LayoutParams的对应关系"><a href="#4-2-2-MeasureSpec和LayoutParams的对应关系" class="headerlink" title="4.2.2　MeasureSpec和LayoutParams的对应关系"></a>4.2.2　MeasureSpec和LayoutParams的对应关系</h3><p>上面提到，系统内部是通过MeasureSpec来进行View的测量，但是正常情况下我们使用View指定MeasureSpec，尽管如此，但是我们可以给View设置LayoutParams。在View测量的时候，系统会将LayoutParams在父容器的约束下转换成对应的MeasureSpec，然后再根据这个MeasureSpec来确定View测量后的宽&#x2F;高。需要注意的是，MeasureSpec不是唯一由LayoutParams决定的，LayoutParams需要和父容器一起才能决定View的MeasureSpec，从而进一步决定View的宽&#x2F;高。另外，对于顶级View（即DecorView）和普通View来说，MeasureSpec的转换过程略有不同。对于DecorView，其MeasureSpec由窗口的尺寸和其自身的LayoutParams来共同确定；对于普通View，其MeasureSpec由父容器的MeasureSpec和自身的LayoutParams来共同决定，MeasureSpec一旦确定后，onMeasure中就可以确定View的测量宽&#x2F;高。</p>
+<p>对于DecorView来说，在ViewRootImpl中的measureHierarchy方法中有如下一段代码，它展示了DecorView的MeasureSpec的创建过程，其中desiredWindowWidth和desiredWindowHeight是屏幕的尺寸：</p>
+<p>childWidthMeasureSpec &#x3D; getRootMeasureSpec(desiredWindowWidth,lp.width);</p>
+<p>childHeightMeasureSpec &#x3D; getRootMeasureSpec(desiredWindowHeight,lp.height);</p>
+<p>performMeasure(childWidthMeasureSpec,childHeightMeasureSpec);</p>
+<p>接着再看一下getRootMeasureSpec方法的实现：</p>
+<p>private static int getRootMeasureSpec(int windowSize,int rootDimension) {</p>
+<p>        int measureSpec;</p>
+<p>        switch (rootDimension) </p>
+<p>{</p>
+<p>        case ViewGroup.LayoutParams.MATCH_PARENT:</p>
+<p>                &#x2F;&#x2F; Window can’t resize. Force root view to be windowSize.</p>
+<p>                measureSpec &#x3D; MeasureSpec.makeMeasureSpec(windowSize,MeasureSpec.EXACTLY);</p>
+<p>                break;</p>
+<p>        case ViewGroup.LayoutParams.WRAP_CONTENT:</p>
+<p>                &#x2F;&#x2F; Window can resize. Set max size for root view.</p>
+<p>                measureSpec &#x3D; MeasureSpec.makeMeasureSpec(windowSize,MeasureSpec.AT_MOST);</p>
+<p>                break;</p>
+<p>        default:</p>
+<p>                &#x2F;&#x2F; Window wants to be an exact size. Force root view to be that size.</p>
+<p>                measureSpec &#x3D; MeasureSpec.makeMeasureSpec(rootDimension,Measure-Spec.EXACTLY);</p>
+<p>                break;</p>
+<p>        }</p>
+<p>        return measureSpec;</p>
+<p>    }</p>
+<p>通过上述代码，DecorView的MeasureSpec的产生过程就很明确了，具体来说其遵守如下规则，根据它的LayoutParams中的宽&#x2F;高的参数来划分。</p>
+<p>LayoutParams.MATCH_PARENT：精确模式，大小就是窗口的大小；</p>
+<p>LayoutParams.WRAP_CONTENT：最大模式，大小不定，但是不能超过窗口的大小；</p>
+<p>固定大小（比如100dp）：精确模式，大小为LayoutParams中指定的大小。</p>
+<p>对于普通View来说，这里是指我们布局中的View，View的measure过程由ViewGroup传递而来，先看一下ViewGroup的measureChildWithMargins方法：</p>
+<p>protected void measureChildWithMargins(View child,</p>
+<p>                int parentWidthMeasureSpec,int widthUsed,</p>
+<p>                int parentHeightMeasureSpec,int heightUsed) {</p>
+<p>        final MarginLayoutParams lp &#x3D; (MarginLayoutParams) child.getLayoutParams();</p>
+<p>        final int childWidthMeasureSpec &#x3D; getChildMeasureSpec(parentWidthMeasureSpec,mPaddingLeft + mPaddingRight + lp.leftMargin + lp.rightMargin+ widthUsed,lp.width);</p>
+<p>        final int childHeightMeasureSpec &#x3D; getChildMeasureSpec(parentHeight-MeasureSpec,mPaddingTop + mPaddingBottom + lp.topMargin + lp.bottomMargin</p>
+<p>                                        + heightUsed,lp.height);</p>
+<p>        child.measure(childWidthMeasureSpec,childHeightMeasureSpec);</p>
+<p>    }</p>
+<p>上述方法会对子元素进行measure，在调用子元素的measure方法之前会先通过getChildMeasureSpec方法来得到子元素的MeasureSpec。从代码来看，很显然，子元素的MeasureSpec的创建与父容器的MeasureSpec和子元素本身的LayoutParams有关，此外还和View的margin及padding有关，具体情况可以看一下ViewGroup的getChildMeasureSpec方法，如下所示。</p>
+<p>public static int getChildMeasureSpec(int spec,int padding,int child-Dimension) {</p>
+<p>        int specMode &#x3D; MeasureSpec.getMode(spec);</p>
+<p>        int specSize &#x3D; MeasureSpec.getSize(spec);</p>
+<p>        int size &#x3D; Math.max(0,specSize -padding);</p>
+<p>        int resultSize &#x3D; 0;</p>
+<p>        int resultMode &#x3D; 0;</p>
+<p>        switch (specMode) {</p>
+<p>        &#x2F;&#x2F; Parent has imposed an exact size on us</p>
+<p>        case MeasureSpec.EXACTLY:</p>
+<p>                if (childDimension &#x3D;&gt; 0) {</p>
+<p>                        resultSize &#x3D; childDimension;</p>
+<p>                        resultMode &#x3D; MeasureSpec.EXACTLY;</p>
+<p>                } else if (childDimension &#x3D;&#x3D; LayoutParams.MATCH_PARENT) {</p>
+<p>                        &#x2F;&#x2F; Child wants to be our size. So be it.</p>
+<p>                        resultSize &#x3D; size;</p>
+<p>                        resultMode &#x3D; MeasureSpec.EXACTLY;</p>
+<p>                } else if (childDimension &#x3D;&#x3D; LayoutParams.WRAP_CONTENT) {</p>
+<p>                        &#x2F;&#x2F; Child wants to determine its own size. It can’t be</p>
+<p>                        &#x2F;&#x2F; bigger than us.</p>
+<p>                        resultSize &#x3D; size;</p>
+<p>            </p>
+<p>上述方法不难理解，它的主要作用是根据父容器的MeasureSpec同时结合View本身的LayoutParams来确定子元素的MeasureSpec，参数中的padding是指父容器中已占用的空间大小，因此子元素可用的大小为父容器的尺寸减去padding，具体代码如下所示。</p>
+<pre><code>int specSize = MeasureSpec.getSize(spec);
+</code></pre>
+<p>    int size &#x3D; Math.max(0,specSize -padding);</p>
+<p>getChildMeasureSpec清楚展示了普通View的MeasureSpec的创建规则，为了更清晰地理解getChildMeasureSpec的逻辑，这里提供一个表，表中对getChildMeasureSpec的工作原理进行了梳理，请看表4-1。注意，表中的parentSize是指父容器中目前可使用的大小。</p>
+<p>表4-1　普通View的MeasureSpec的创建规则</p>
+<p><img src="data:image/png;base64,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" alt="图片"></p>
+<p>针对表4-1，这里再做一下说明。前面已经提到，对于普通View，其MeasureSpec由父容器的MeasureSpec和自身的LayoutParams来共同决定，那么针对不同的父容器和View本身不同的LayoutParams，View就可以有多种MeasureSpec。这里简单说一下，当View采用固定宽&#x2F;高的时候，不管父容器的MeasureSpec是什么，View的MeasureSpec都是精确模式并且其大小遵循Layoutparams中的大小。当View的宽&#x2F;高是match_parent时，如果父容器的模式是精准模式，那么View也是精准模式并且其大小是父容器的剩余空间；如果父容器是最大模式，那么View也是最大模式并且其大小不会超过父容器的剩余空间。当View的宽&#x2F;高是wrap_content时，不管父容器的模式是精准还是最大化，View的模式总是最大化并且大小不能超过父容器的剩余空间。可能读者会发现，在我们的分析中漏掉了UNSPECIFIED模式，那是因为这个模式主要用于系统内部多次Measure的情形，一般来说，我们不需要关注此模式。</p>
+<p>通过表4-1可以看出，只要提供父容器的MeasureSpec和子元素的LayoutParams，就可以快速地确定出子元素的MeasureSpec了，有了MeasureSpec就可以进一步确定出子元素测量后的大小了。需要说明的是，表4-1并非是什么经验总结，它只是getChildMeasureSpec这个方法以表格的方式呈现出来而已。</p>
+<h2 id="4-3-View的工作流程"><a href="#4-3-View的工作流程" class="headerlink" title="4.3　View的工作流程"></a>4.3　View的工作流程</h2><p>View的工作流程主要是指measure、layout、draw这三大流程，即测量、布局和绘制，其中measure确定View的测量宽&#x2F;高，layout确定View的最终宽&#x2F;高和四个顶点的位置，而draw则将View绘制到屏幕上。</p>
+<h3 id="4-3-1-measure过程"><a href="#4-3-1-measure过程" class="headerlink" title="4.3.1　measure过程"></a>4.3.1　measure过程</h3><p>measure过程要分情况来看，如果只是一个原始的View，那么通过measure方法就完成了其测量过程，如果是一个ViewGroup，除了完成自己的测量过程外，还会遍历去调用所有子元素的measure方法，各个子元素再递归去执行这个流程，下面针对这两种情况分别讨论。</p>
+<ol>
+<li>View的measure过程</li>
+</ol>
+<p>View的measure过程由其measure方法来完成，measure方法是一个final类型的方法，这意味着子类不能重写此方法，在View的measure方法中会去调用View的onMeasure方法，因此只需要看onMeasure的实现即可，View的onMeasure方法如下所示。</p>
+<p>protected void onMeasure(int widthMeasureSpec,int heightMeasureSpec) {</p>
+<p>        setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(),widthMeasureSpec),getDefaultSize(getSuggestedMinimumHeight(),heightMeasureSpec));</p>
+<p>    }</p>
+<p>上述代码很简洁，但是简洁并不代表简单，setMeasuredDimension方法会设置View宽&#x2F;高的测量值，因此我们只需要看getDefaultSize这个方法即可：</p>
+<p>public static int getDefaultSize(int size,int measureSpec) {</p>
+<p>        int result &#x3D; size;</p>
+<p>        int specMode &#x3D; MeasureSpec.getMode(measureSpec);</p>
+<p>        int specSize &#x3D; MeasureSpec.getSize(measureSpec);</p>
+<p>        switch (specMode) {</p>
+<p>        case MeasureSpec.UNSPECIFIED:</p>
+<p>                result &#x3D; size;</p>
+<p>                break;</p>
+<p>        case MeasureSpec.AT_MOST:</p>
+<p>        case MeasureSpec.EXACTLY:</p>
+<p>                result &#x3D; specSize;</p>
+<p>                break;</p>
+<p>        }</p>
+<p>        return result;</p>
+<p>    }</p>
+<p>可以看出，getDefaultSize这个方法的逻辑很简单，对于我们来说，我们只需要看AT_MOST和.EXACTLY这两种情况。简单地理解，其实getDefaultSize返回的大小就是measureSpec中的specSize，而这个specSize就是View测量后的大小，这里多次提到测量后的大小，是因为View最终的大小是在layout阶段确定的，所以这里必须要加以区分，但是几乎所有情况下View的测量大小和最终大小是相等的。</p>
+<p>至于UNSPECIFIED这种情况，一般用于系统内部的测量过程，在这种情况下，View的大小为getDefaultSize的第一个参数size，即宽&#x2F;高分别为getSuggestedMinimumWidth和getSuggestedMinimumHeight这两个方法的返回值，看一下它们的源码：</p>
+<p>protected int getSuggestedMinimumWidth() {</p>
+<p>        return (mBackground &#x3D;&#x3D; null) ? mMinWidth : max(mMinWidth,mBackground.getMinimumWidth());</p>
+<p>    }</p>
+<p>    protected int getSuggestedMinimumHeight() {</p>
+<p>        return (mBackground &#x3D;&#x3D; null) ? mMinHeight : max(mMinHeight,mBackground.getMinimumHeight());</p>
+<p>    }</p>
+<p>这里只分析getSuggestedMinimumWidth方法的实现，getSuggestedMinimumHeight和它的实现原理是一样的。从getSuggestedMinimumWidth的代码可以看出，如果View没有设置背景，那么View的宽度为mMinWidth，而mMinWidth对应于android:minWidth这个属性所指定的值，因此View的宽度即为android:minWidth属性所指定的值。这个属性如果不指定，那么mMinWidth则默认为0；如果View指定了背景，则View的宽度为max(mMinWidth,mBackground.getMinimumWidth())。mMinWidth的含义我们已经知道了，那么mBackground.getMinimumWidth()是什么呢？我们看一下Drawable的getMinimumWidth方法，如下所示。</p>
+<p>public int getMinimumWidth() {</p>
+<p>        final int intrinsicWidth &#x3D; getIntrinsicWidth();</p>
+<p>        return intrinsicWidth &gt; 0 ? intrinsicWidth : 0;</p>
+<p>    }</p>
+<p>可以看出，getMinimumWidth返回的就是Drawable的原始宽度，前提是这个Drawable有原始宽度，否则就返回0。那么Drawable在什么情况下有原始宽度呢？这里先举个例子说明一下，ShapeDrawable无原始宽&#x2F;高，而BitmapDrawable有原始宽&#x2F;高（图片的尺寸），详细内容会在第6章进行介绍。</p>
+<p>这里再总结一下getSuggestedMinimumWidth的逻辑：如果View没有设置背景，那么返回android:minWidth这个属性所指定的值，这个值可以为0；如果View设置了背景，则返回android:minWidth和背景的最小宽度这两者中的最大值，getSuggestedMinimumWidth和getSuggestedMinimumHeight的返回值就是View在UNSPECIFIED情况下的测量宽&#x2F;高。</p>
+<p>从getDefaultSize方法的实现来看，View的宽&#x2F;高由specSize决定，所以我们可以得出如下结论：直接继承View的自定义控件需要重写onMeasure方法并设置wrap_content时的自身大小，否则在布局中使用wrap_content就相当于使用match_parent。为什么呢？这个原因需要结合上述代码和表4-1才能更好地理解。从上述代码中我们知道，如果View在布局中使用wrap_content，那么它的specMode是AT_MOST模式，在这种模式下，它的宽&#x2F;高等于specSize；查表4-1可知，这种情况下View的specSize是parentSize，而parentSize是父容器中目前可以使用的大小，也就是父容器当前剩余的空间大小。很显然，View的宽&#x2F;高就等于父容器当前剩余的空间大小，这种效果和在布局中使用match_parent完全一致。如何解决这个问题呢？也很简单，代码如下所示。</p>
+<p>protected void onMeasure(int widthMeasureSpec,int heightMeasureSpec) {</p>
+<p>        super.onMeasure(widthMeasureSpec,heightMeasureSpec);</p>
+<p>        int widthSpecMode &#x3D; MeasureSpec.getMode(widthMeasureSpec);</p>
+<p>        int widthSpecSize &#x3D; MeasureSpec.getSize(widthMeasureSpec);</p>
+<p>        int heightSpecMode &#x3D; MeasureSpec.getMode(heightMeasureSpec);</p>
+<p>        int heightSpecSize &#x3D; MeasureSpec.getSize(heightMeasureSpec);</p>
+<p>        if (widthSpecMode &#x3D;&#x3D; MeasureSpec.AT_MOST &amp;&amp; heightSpecMode &#x3D;&#x3D;                           MeasureSpec.AT_MOST) {</p>
+<p>                setMeasuredDimension(mWidth,mHeight);</p>
+<p>        } else if (widthSpecMode &#x3D;&#x3D; MeasureSpec.AT_MOST) {</p>
+<p>                setMeasuredDimension(mWidth,heightSpecSize);</p>
+<p>        } else if (heightSpecMode &#x3D;&#x3D; MeasureSpec.AT_MOST) {</p>
+<p>                setMeasuredDimension(widthSpecSize,mHeight);</p>
+<p>        }</p>
+<p>    }</p>
+<p>在上面的代码中，我们只需要给View指定一个默认的内部宽&#x2F;高（mWidth和mHeight），并在wrap_content时设置此宽&#x2F;高即可。对于非wrap_content情形，我们沿用系统的测量值即可，至于这个默认的内部宽&#x2F;高的大小如何指定，这个没有固定的依据，根据需要灵活指定即可。如果查看TextView、ImageView等的源码就可以知道，针对wrap_content情形，它们的onMeasure方法均做了特殊处理，读者可以自行查看它们的源码。</p>
+<ol start="2">
+<li>ViewGroup的measure过程</li>
+</ol>
+<p>对于ViewGroup来说，除了完成自己的measure过程以外，还会遍历去调用所有子元素的measure方法，各个子元素再递归去执行这个过程。和View不同的是，ViewGroup是一个抽象类，因此它没有重写View的onMeasure方法，但是它提供了一个叫measureChildren的方法，如下所示。</p>
+<p>protected void measureChildren(int widthMeasureSpec,int heightMeasureSpec) {</p>
+<p>        final int size &#x3D; mChildrenCount;</p>
+<p>        final View[] children &#x3D; mChildren;</p>
+<p>        for (int i &#x3D; 0; i &lt; size; ++i) {</p>
+<p>                final View child &#x3D; children[i];</p>
+<p>                if ((child.mViewFlags &amp; VISIBILITY_MASK) !&#x3D; GONE) {</p>
+<p>                        measureChild(child,widthMeasureSpec,heightMeasureSpec);</p>
+<p>                }</p>
+<p>        }</p>
+<p>    }</p>
+<p>从上述代码来看，ViewGroup在measure时，会对每一个子元素进行measure，measureChild这个方法的实现也很好理解，如下所示。</p>
+<p>protected void measureChild(View child,int parentWidthMeasureSpec,</p>
+<p>                int parentHeightMeasureSpec) {</p>
+<p>        final LayoutParams lp &#x3D; child.getLayoutParams();</p>
+<p>        final int childWidthMeasureSpec &#x3D; getChildMeasureSpec(parentWidth-MeasureSpec, mPaddingLeft + mPaddingRight,lp.width);</p>
+<p>        final int childHeightMeasureSpec &#x3D; getChildMeasureSpec(parentHeight-MeasureSpec, mPaddingTop + mPaddingBottom,lp.height);</p>
+<p>        child.measure(childWidthMeasureSpec,childHeightMeasureSpec);</p>
+<p>    }</p>
+<p>很显然，measureChild的思想就是取出子元素的LayoutParams，然后再通过getChildMeasureSpec来创建子元素的MeasureSpec，接着将MeasureSpec直接传递给View的measure方法来进行测量。getChildMeasureSpec的工作过程已经在上面进行了详细分析，通过表4-1可以更清楚地了解它的逻辑。</p>
+<p>我们知道，ViewGroup并没有定义其测量的具体过程，这是因为ViewGroup是一个抽象类，其测量过程的onMeasure方法需要各个子类去具体实现，比如LinearLayout、RelativeLayout等，为什么ViewGroup不像View一样对其onMeasure方法做统一的实现呢？那是因为不同的ViewGroup子类有不同的布局特性，这导致它们的测量细节各不相同，比如LinearLayout和RelativeLayout这两者的布局特性显然不同，因此ViewGroup无法做统一实现。下面就通过LinearLayout的onMeasure方法来分析ViewGroup的measure过程，其他Layout类型读者可以自行分析。</p>
+<p>首先来看LinearLayout的onMeasure方法，如下所示。</p>
+<p>protected void onMeasure(int widthMeasureSpec,int heightMeasureSpec) {</p>
+<p>        if (mOrientation &#x3D;&#x3D; VERTICAL) {</p>
+<p>                measureVertical(widthMeasureSpec,heightMeasureSpec);</p>
+<p>        } else {</p>
+<p>                measureHorizontal(widthMeasureSpec,heightMeasureSpec);</p>
+<p>        }</p>
+<p>    }</p>
+<p>上述代码很简单，我们选择一个来看一下，比如选择查看竖直布局的LinearLayout的测量过程，即measureVertical方法，measureVertical的源码比较长，下面只描述其大概逻辑，首先看一段代码：</p>
+<p>&#x2F;&#x2F; See how tall everyone is. Also remember max width.</p>
+<p>    for (int i &#x3D; 0; i &lt; count; ++i) {</p>
+<p>        final View child &#x3D; getVirtualChildAt(i);</p>
+<p>        …</p>
+<p>        &#x2F;&#x2F; Determine how big this child would like to be. If this or</p>
+<p>        &#x2F;&#x2F; previous children have given a weight,then we allow it to</p>
+<p>        &#x2F;&#x2F; use all available space (and we will shrink things later</p>
+<p>        &#x2F;&#x2F; if needed).</p>
+<p>        measureChildBeforeLayout(</p>
+<p>                   child,i,widthMeasureSpec,0,heightMeasureSpec,</p>
+<p>                   totalWeight &#x3D;&#x3D; 0 ? mTotalLength : 0);</p>
+<p>        if (oldHeight !&#x3D; Integer.MIN_VALUE) {</p>
+<p>           lp.height &#x3D; oldHeight;</p>
+<p>        }</p>
+<p>        final int childHeight &#x3D; child.getMeasuredHeight();</p>
+<p>        final int totalLength &#x3D; mTotalLength;</p>
+<p>        mTotalLength&#x3D;Math.max(totalLength,totalLength+childHeight+lp.topMargin +</p>
+<p>                   lp.bottomMargin + getNextLocationOffset(child));</p>
+<p>    }</p>
+<p>从上面这段代码可以看出，系统会遍历子元素并对每个子元素执行measureChild-BeforeLayout方法，这个方法内部会调用子元素的measure方法，这样各个子元素就开始依次进入measure过程，并且系统会通过mTotalLength这个变量来存储LinearLayout在竖直方向的初步高度。每测量一个子元素，mTotalLength就会增加，增加的部分主要包括了子元素的高度以及子元素在竖直方向上的margin等。当子元素测量完毕后，LinearLayout会测量自己的大小，源码如下所示。</p>
+<pre><code>// Add in our padding
+</code></pre>
+<p>    mTotalLength +&#x3D; mPaddingTop + mPaddingBottom;</p>
+<p>    int heightSize &#x3D; mTotalLength;</p>
+<p>    &#x2F;&#x2F; Check against our minimum height</p>
+<p>    heightSize &#x3D; Math.max(heightSize,getSuggestedMinimumHeight());</p>
+<p>    &#x2F;&#x2F; Reconcile our calculated size with the heightMeasureSpec</p>
+<p>    int heightSizeAndState&#x3D;resolveSizeAndState(heightSize,heightMeasureSpec,</p>
+<p>    0);</p>
+<p>    heightSize &#x3D; heightSizeAndState &amp; MEASURED_SIZE_MASK;</p>
+<p>     …</p>
+<p>    setMeasuredDimension(resolveSizeAndState(maxWidth,widthMeasureSpec,</p>
+<p>    childState),</p>
+<p>    heightSizeAndState);</p>
+<p>这里对上述代码进行说明，当子元素测量完毕后，LinearLayout会根据子元素的情况来测量自己的大小。针对竖直的LinearLayout而言，它在水平方向的测量过程遵循View的测量过程，在竖直方向的测量过程则和View有所不同。具体来说是指，如果它的布局中高度采用的是match_parent或者具体数值，那么它的测量过程和View一致，即高度为specSize；如果它的布局中高度采用的是wrap_content，那么它的高度是所有子元素所占用的高度总和，但是仍然不能超过它的父容器的剩余空间，当然它的最终高度还需要考虑其在竖直方向的padding，这个过程可以进一步参看如下源码：</p>
+<p>public static int resolveSizeAndState(int size,int measureSpec,int</p>
+<p>    childMeasuredState) {</p>
+<p>        int result &#x3D; size;</p>
+<p>        int specMode &#x3D; MeasureSpec.getMode(measureSpec);</p>
+<p>        int specSize &#x3D;  MeasureSpec.getSize(measureSpec);</p>
+<p>        switch (specMode) {</p>
+<p>        case MeasureSpec.UNSPECIFIED:</p>
+<p>                result &#x3D; size;</p>
+<p>                break;</p>
+<p>        case MeasureSpec.AT_MOST:</p>
+<p>                if (specSize &lt; size) {</p>
+<p>                        result &#x3D; specSize | MEASURED_STATE_TOO_SMALL;</p>
+<p>                } else {</p>
+<p>                        result &#x3D; size;</p>
+<p>                }</p>
+<p>                break;</p>
+<p>        case MeasureSpec.EXACTLY:</p>
+<p>                result &#x3D; specSize;</p>
+<p>                break;</p>
+<p>        }</p>
+<p>        return result | (childMeasuredState&amp;MEASURED_STATE_MASK);</p>
+<p>    }</p>
+<p>View的measure过程是三大流程中最复杂的一个，measure完成以后，通过getMeasured-Width&#x2F;Height方法就可以正确地获取到View的测量宽&#x2F;高。需要注意的是，在某些极端情况下，系统可能需要多次measure才能确定最终的测量宽&#x2F;高，在这种情形下，在onMeasure方法中拿到的测量宽&#x2F;高很可能是不准确的。一个比较好的习惯是在onLayout方法中去获取View的测量宽&#x2F;高或者最终宽&#x2F;高。</p>
+<p>上面已经对View的measure过程进行了详细的分析，现在考虑一种情况，比如我们想在Activity已启动的时候就做一件任务，但是这一件任务需要获取某个View的宽&#x2F;高。读者可能会说，这很简单啊，在onCreate或者onResume里面去获取这个View的宽&#x2F;高不就行了？读者可以自行试一下，实际上在onCreate、onStart、onResume中均无法正确得到某个View的宽&#x2F;高信息，这是因为View的measure过程和Activity的生命周期方法不是同步执行的，因此无法保证Activity执行了onCreate、onStart、onResume时某个View已经测量完毕了，如果View还没有测量完毕，那么获得的宽&#x2F;高就是0。有没有什么方法能解决这个问题呢？答案是有的，这里给出四种方法来解决这个问题：</p>
+<p>（1）Activity&#x2F;View#onWindowFocusChanged。</p>
+<p>onWindowFocusChanged这个方法的含义是：View已经初始化完毕了，宽&#x2F;高已经准备好了，这个时候去获取宽&#x2F;高是没问题的。需要注意的是，onWindowFocusChanged会被调用多次，当Activity的窗口得到焦点和失去焦点时均会被调用一次。具体来说，当Activity继续执行和暂停执行时，onWindowFocusChanged均会被调用，如果频繁地进行onResume和onPause，那么onWindowFocusChanged也会被频繁地调用。典型代码如下：</p>
+<p>public void onWindowFocusChanged(boolean hasFocus) {</p>
+<p>        super.onWindowFocusChanged(hasFocus);</p>
+<p>        if (hasFocus) {</p>
+<p>                int width &#x3D; view.getMeasuredWidth();</p>
+<p>                int height &#x3D; view.getMeasuredHeight();</p>
+<p>        }</p>
+<p>    }</p>
+<p>（2）view.post(runnable)。</p>
+<p>通过post可以将一个runnable投递到消息队列的尾部，然后等待Looper调用此runnable的时候，View也已经初始化好了。典型代码如下：</p>
+<p>protected void onStart() {</p>
+<p>        super.onStart();</p>
+<p>        view.post(new Runnable() {</p>
+<p>                @Override</p>
+<p>                public void run() {</p>
+<p>                        int width &#x3D; view.getMeasuredWidth();</p>
+<p>                        int height &#x3D; view.getMeasuredHeight();</p>
+<p>                }</p>
+<p>        });</p>
+<p>    }</p>
+<p>（3）ViewTreeObserver。</p>
+<p>使用ViewTreeObserver的众多回调可以完成这个功能，比如使用OnGlobalLayoutListener这个接口，当View树的状态发生改变或者View树内部的View的可见性发现改变时，onGlobalLayout方法将被回调，因此这是获取View的宽&#x2F;高一个很好的时机。需要注意的是，伴随着View树的状态改变等，onGlobalLayout会被调用多次。典型代码如下：</p>
+<p>protected void onStart() {</p>
+<p>        super.onStart();</p>
+<p>        ViewTreeObserver observer &#x3D; view.getViewTreeObserver();</p>
+<p>        observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {</p>
+<p>                @SuppressWarnings(“deprecation”)</p>
+<p>                @Override</p>
+<p>                public void onGlobalLayout() {</p>
+<p>                        view.getViewTreeObserver().removeGlobalOnLayoutListener(this);</p>
+<p>                        int width &#x3D; view.getMeasuredWidth();</p>
+<p>                        int height &#x3D; view.getMeasuredHeight();</p>
+<p>                }</p>
+<p>        });</p>
+<p>    }</p>
+<p>（4）view.measure(int widthMeasureSpec,int heightMeasureSpec)。</p>
+<p>通过手动对View进行measure来得到View的宽&#x2F;高。这种方法比较复杂，这里要分情况处理，根据View的LayoutParams来分：</p>
+<p>match_parent</p>
+<p>直接放弃，无法measure出具体的宽&#x2F;高。原因很简单，根据View的measure过程，如表4-1所示，构造此种MeasureSpec需要知道parentSize，即父容器的剩余空间，而这个时候我们无法知道parentSize的大小，所以理论上不可能测量出View的大小。</p>
+<p>具体的数值（dp&#x2F;px）</p>
+<p>比如宽&#x2F;高都是100px，如下measure：</p>
+<p>int widthMeasureSpec &#x3D; MeasureSpec.makeMeasureSpec(100,MeasureSpec.</p>
+<p>    EXACTLY);</p>
+<p>    int heightMeasureSpec &#x3D; MeasureSpec.makeMeasureSpec(100,MeasureSpec.</p>
+<p>    EXACTLY);</p>
+<p>    view.measure(widthMeasureSpec,heightMeasureSpec);</p>
+<p>wrap_content</p>
+<p>如下measure：</p>
+<p>int widthMeasureSpec &#x3D; MeasureSpec.makeMeasureSpec( (1 &lt;&lt; 30) -1,</p>
+<p>    MeasureSpec.AT_MOST);</p>
+<p>    int heightMeasureSpec &#x3D; MeasureSpec.makeMeasureSpec( (1 &lt;&lt; 30) -1,</p>
+<p>    MeasureSpec.AT_MOST);</p>
+<p>         view.measure(widthMeasureSpec,heightMeasureSpec);</p>
+<p>注意到(1 &lt;&lt; 30)-1，通过分析MeasureSpec的实现可以知道，View的尺寸使用30位二进制表示，也就是说最大是30个1（即2^30 - 1），也就是(1 &lt;&lt; 30) - 1，在最大化模式下，我们用View理论上能支持的最大值去构造MeasureSpec是合理的。</p>
+<p>关于View的measure，网络上有两个错误的用法。为什么说是错误的，首先其违背了系统的内部实现规范（因为无法通过错误的MeasureSpec去得出合法的SpecMode，从而导致measure过程出错），其次不能保证一定能measure出正确的结果。</p>
+<p>第一种错误用法：</p>
+<p>int widthMeasureSpec &#x3D; MeasureSpec.makeMeasureSpec(-1,MeasureSpec.</p>
+<p>    UNSPECIFIED);</p>
+<p>    int heightMeasureSpec &#x3D; MeasureSpec.makeMeasureSpec(-1,MeasureSpec.</p>
+<p>    UNSPECIFIED);</p>
+<p>    view.measure(widthMeasureSpec,heightMeasureSpec);</p>
+<p>第二种错误用法：</p>
+<p>view.measure(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT)</p>
+<h3 id="4-3-2-layout过程"><a href="#4-3-2-layout过程" class="headerlink" title="4.3.2　layout过程"></a>4.3.2　layout过程</h3><p>Layout的作用是ViewGroup用来确定子元素的位置，当ViewGroup的位置被确定后，它在onLayout中会遍历所有的子元素并调用其layout方法，在layout方法中onLayout方法又会被调用。Layout过程和measure过程相比就简单多了，layout方法确定View本身的位置，而onLayout方法则会确定所有子元素的位置，先看View的layout方法，如下所示。</p>
+<p>public void layout(int l,int t,int r,int b) {</p>
+<p>        if ((mPrivateFlags3 &amp; PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT) !&#x3D; 0) {</p>
+<p>                onMeasure(mOldWidthMeasureSpec,mOldHeightMeasureSpec);</p>
+<p>                mPrivateFlags3 &amp;&#x3D; ~PFLAG3_MEASURE_NEEDED_BEFORE_LAYOUT;</p>
+<p>        }</p>
+<p>        int oldL &#x3D; mLeft;</p>
+<p>        int oldT &#x3D; mTop;</p>
+<p>        int oldB &#x3D; mBottom;</p>
+<p>        int oldR &#x3D; mRight;</p>
+<p>        boolean changed &#x3D; isLayoutModeOptical(mParent) ?</p>
+<p>                        setOpticalFrame(l,t,r,b) : setFrame(l,t,r,b);</p>
+<p>        if (changed || (mPrivateFlags &amp; PFLAG_LAYOUT_REQUIRED) &#x3D;&#x3D; PFLAG_LAYOUT_REQUIRED) {</p>
+<p>                onLayout(changed,l,t,r,b);</p>
+<p>                mPrivateFlags &amp;&#x3D; ~PFLAG_LAYOUT_REQUIRED;</p>
+<p>                ListenerInfo li &#x3D; mListenerInfo;</p>
+<p>                if (li !&#x3D; null &amp;&amp; li.mOnLayoutChangeListeners !&#x3D; null) {</p>
+<p>                        ArrayList<OnLayoutChangeListener> listenersCopy &#x3D;</p>
+<p>        </p>
+<p>  (ArrayList<OnLayoutChangeListener>)li.mOnLayout-ChangeListeners.clone();</p>
+<p>                        int numListeners &#x3D; listenersCopy.size();</p>
+<p>                        for (int i &#x3D; 0; i &lt; numListeners; ++i) {</p>
+<p>                                listenersCopy.get(i).onLayoutChange(this,l,t,r,b,oldL,oldT,oldR,oldB);</p>
+<p>                        }</p>
+<p>                }</p>
+<p>        }</p>
+<p>        mPrivateFlags &amp;&#x3D; ~PFLAG_FORCE_LAYOUT;</p>
+<p>        mPrivateFlags3 |&#x3D; PFLAG3_IS_LAID_OUT;</p>
+<p>    }</p>
+<p>layout方法的大致流程如下：首先会通过setFrame方法来设定View的四个顶点的位置，即初始化mLeft、mRight、mTop和mBottom这四个值，View的四个顶点一旦确定，那么View在父容器中的位置也就确定了；接着会调用onLayout方法，这个方法的用途是父容器确定子元素的位置，和onMeasure方法类似，onLayout的具体实现同样和具体的布局有关，所以View和ViewGroup均没有真正实现onLayout方法。接下来，我们可以看一下LinearLayout的onLayout方法，如下所示。</p>
+<p>protected void onLayout(boolean changed,int l,int t,int r,int b) {</p>
+<p>        if (mOrientation &#x3D;&#x3D; VERTICAL) {</p>
+<p>                layoutVertical(l,t,r,b);</p>
+<p>        } else {</p>
+<p>                layoutHorizontal(l,t,r,b);</p>
+<p>        }</p>
+<p>    }</p>
+<p>LinearLayout中onLayout的实现逻辑和onMeasure的实现逻辑类似，这里选择layoutVertical继续讲解，为了更好地理解其逻辑，这里只给出了主要的代码：</p>
+<p>void layoutVertical(int left,int top,int right,int bottom) {</p>
+<p>        …</p>
+<p>        final int count &#x3D; getVirtualChildCount();</p>
+<p>        for (int i &#x3D; 0; i &lt; count; i++) {</p>
+<p>                final View child &#x3D; getVirtualChildAt(i);</p>
+<p>                if (child &#x3D;&#x3D; null) {</p>
+<p>                        childTop +&#x3D; measureNullChild(i);</p>
+<p>                } else if (child.getVisibility() !&#x3D; GONE) {</p>
+<p>                        final int childWidth &#x3D; child.getMeasuredWidth();</p>
+<p>                        final int childHeight &#x3D; child.getMeasuredHeight();</p>
+<p>                        final LinearLayout.LayoutParams lp &#x3D;</p>
+<p>                                        (LinearLayout.LayoutParams) child.getLayoutParams();</p>
+<p>                                   if (hasDividerBeforeChildAt(i)) {</p>
+<p>                                childTop +&#x3D; mDividerHeight;</p>
+<p>                        }</p>
+<p>                        childTop +&#x3D; lp.topMargin;</p>
+<p>                        setChildFrame(child,childLeft,childTop + getLocationOffset(child),childWidth,childHeight);</p>
+<p>                        childTop +&#x3D; childHeight + lp.bottomMargin + getNextLocation-</p>
+<p>                        Offset(child);</p>
+<p>                        i +&#x3D; getChildrenSkipCount(child,i);</p>
+<p>                }</p>
+<p>        }</p>
+<p>    }</p>
+<p>这里分析一下layoutVertical的代码逻辑，可以看到，此方法会遍历所有子元素并调用setChildFrame方法来为子元素指定对应的位置，其中childTop会逐渐增大，这就意味着后面的子元素会被放置在靠下的位置，这刚好符合竖直方向的LinearLayout的特性。至于setChildFrame，它仅仅是调用子元素的layout方法而已，这样父元素在layout方法中完成自己的定位以后，就通过onLayout方法去调用子元素的layout方法，子元素又会通过自己的layout方法来确定自己的位置，这样一层一层地传递下去就完成了整个View树的layout过程。setChildFrame方法的实现如下所示。</p>
+<pre><code>private void setChildFrame(View child,int left,int top,int width,int height) &#123;
+</code></pre>
+<p>        child.layout(left,top,left + width,top + height);</p>
+<p>    }</p>
+<p>我们注意到，setChildFrame中的width和height实际上就是子元素的测量宽&#x2F;高，从下面的代码可以看出这一点：</p>
+<pre><code>final int childWidth = child.getMeasuredWidth();
+</code></pre>
+<p>    final int childHeight &#x3D; child.getMeasuredHeight();</p>
+<p>    setChildFrame(child,childLeft,childTop + getLocationOffset(child),</p>
+<p>    childWidth,childHeight);</p>
+<p>而在layout方法中会通过setFrame去设置子元素的四个顶点的位置，在setFrame中有如下几句赋值语句，这样一来子元素的位置就确定了：</p>
+<p>mLeft &#x3D; left;</p>
+<p>    mTop &#x3D; top;</p>
+<p>    mRight &#x3D; right;</p>
+<p>    mBottom &#x3D; bottom;</p>
+<p>下面我们来回答一个在4.3.2节中提到的问题：View的测量宽&#x2F;高和最终&#x2F;宽高有什么区别？这个问题可以具体为：View的getMeasuredWidth和getWidth这两个方法有什么区别，至于getMeasuredHeight和getHeight的区别和前两者完全一样。为了回答这个问题，首先，我们看一下getwidth和getHeight这两个方法的具体实现：</p>
+<p>public final int getWidth() {</p>
+<p>        return mRight -mLeft;</p>
+<p>    }</p>
+<p>    public final int getHeight() {</p>
+<p>        return mBottom -mTop;</p>
+<p>    }</p>
+<p>从getWidth和getHeight的源码再结合mLeft、mRight、mTop和mBottom这四个变量的赋值过程来看，getWidth方法的返回值刚好就是View的测量宽度，而getHeight方法的返回值也刚好就是View的测量高度。经过上述分析，现在我们可以回答这个问题了：在View的默认实现中，View的测量宽&#x2F;高和最终宽&#x2F;高是相等的，只不过测量宽&#x2F;高形成于View的measure过程，而最终宽&#x2F;高形成于View的layout过程，即两者的赋值时机不同，测量宽&#x2F;高的赋值时机稍微早一些。因此，在日常开发中，我们可以认为View的测量宽&#x2F;高就等于最终宽&#x2F;高，但是的确存在某些特殊情况会导致两者不一致，下面举例说明。</p>
+<p>如果重写View的layout方法，代码如下：</p>
+<p>public void layout(int l,int t,int r,int b) {</p>
+<p>        super.layout(l,t,r + 100,b + 100);</p>
+<p>    }</p>
+<p>上述代码会导致在任何情况下View的最终宽&#x2F;高总是比测量宽&#x2F;高大100px，虽然这样做会导致View显示不正常并且也没有实际意义，但是这证明了测量宽&#x2F;高的确可以不等于最终宽&#x2F;高。另外一种情况是在某些情况下，View需要多次measure才能确定自己的测量宽&#x2F;高，在前几次的测量过程中，其得出的测量宽&#x2F;高有可能和最终宽&#x2F;高不一致，但最终来说，测量宽&#x2F;高还是和最终宽&#x2F;高相同。</p>
+<h3 id="4-3-3-draw过程"><a href="#4-3-3-draw过程" class="headerlink" title="4.3.3　draw过程"></a>4.3.3　draw过程</h3><p>Draw过程就比较简单了，它的作用是将View绘制到屏幕上面。View的绘制过程遵循如下几步：</p>
+<p>（1）绘制背景background.draw(canvas)。</p>
+<p>（2）绘制自己（onDraw）。</p>
+<p>（3）绘制children（dispatchDraw）。</p>
+<p>（4）绘制装饰（onDrawScrollBars）。</p>
+<p>这一点通过draw方法的源码可以明显看出来，如下所示。</p>
+<p>public void draw(Canvas canvas) {</p>
+<p>        final int privateFlags &#x3D; mPrivateFlags;</p>
+<p>        final boolean dirtyOpaque &#x3D; (privateFlags &amp; PFLAG_DIRTY_MASK) &#x3D;&#x3D; PFLAG_DIRTY_OPAQUE &amp;&amp;</p>
+<p>                (mAttachInfo &#x3D;&#x3D; null || !mAttachInfo.mIgnoreDirtyState);</p>
+<p>        mPrivateFlags &#x3D; (privateFlags &amp; ~PFLAG_DIRTY_MASK) | PFLAG_DRAWN;</p>
+<p>        &#x2F;*</p>
+<p>         * Draw traversal performs several drawing steps which must be executed</p>
+<p>         * in the appropriate order:</p>
+<p>         *</p>
+<p>         *      1. Draw the background</p>
+<p>         *      2. If necessary,save the canvas’ layers to prepare for fading</p>
+<p>         *      3. Draw view’s content</p>
+<p>         *      4. Draw children</p>
+<p>         *      5. If necessary,draw the fading edges and restore layers</p>
+<p>         *      6. Draw decorations (scrollbars for instance)</p>
+<p>         *&#x2F;</p>
+<p>        &#x2F;&#x2F; Step 1,draw the background,if needed</p>
+<p>        int saveCount;</p>
+<p>        if (!dirtyOpaque) {</p>
+<p>                drawBackground(canvas);</p>
+<p>        }</p>
+<p>        &#x2F;&#x2F; skip step 2 &amp; 5 if possible (common case)</p>
+<p>        final int viewFlags &#x3D; mViewFlags;</p>
+<p>    </p>
+<p>View绘制过程的传递是通过dispatchDraw来实现的，dispatchDraw会遍历调用所有子元素的draw方法，如此draw事件就一层层地传递了下去。View有一个特殊的方法setWillNotDraw，先看一下它的源码，如下所示。</p>
+<p>&#x2F;**</p>
+<p>      * If this view doesn’t do any drawing on its own,set this flag to</p>
+<p>      * allow further optimizations. By default,this flag is not set on</p>
+<p>      * View,but could be set on some View subclasses such as ViewGroup.</p>
+<p>      *</p>
+<p>      * Typically,if you override {@link #onDraw(android.graphics.Canvas)}</p>
+<p>      * you should clear this flag.</p>
+<p>      *</p>
+<p>      * @param willNotDraw whether or not this View draw on its own</p>
+<p>      *&#x2F;</p>
+<p>    public void setWillNotDraw(boolean willNotDraw) {</p>
+<p>        setFlags(willNotDraw ? WILL_NOT_DRAW : 0,DRAW_MASK);</p>
+<p>    }</p>
+<p>从setWillNotDraw这个方法的注释中可以看出，如果一个View不需要绘制任何内容，那么设置这个标记位为true以后，系统会进行相应的优化。默认情况下，View没有启用这个优化标记位，但是ViewGroup会默认启用这个优化标记位。这个标记位对实际开发的意义是：当我们的自定义控件继承于ViewGroup并且本身不具备绘制功能时，就可以开启这个标记位从而便于系统进行后续的优化。当然，当明确知道一个ViewGroup需要通过onDraw来绘制内容时，我们需要显式地关闭WILL_NOT_DRAW这个标记位。</p>
+<h2 id="4-4-自定义View"><a href="#4-4-自定义View" class="headerlink" title="4.4　自定义View"></a>4.4　自定义View</h2><p>本节将详细介绍自定义View相关的知识。自定义View的作用不用多说，这个读者都应该清楚，如果想要做出绚丽的界面效果仅仅靠系统的控件是远远不够的，这个时候就必须通过自定义View来实现这些绚丽的效果。自定义View是一个综合的技术体系，它涉及View的层次结构、事件分发机制和View的工作原理等技术细节，而这些技术细节每一项又都是初学者难以掌握的，因此就不难理解为什么初学者都觉得自定义View很难这一现状了。考虑到这一点，本书在第3章和第4章的前半部分对自定义View的各种技术细节都做了详细的分析，目的就是为了让读者更好地掌握本节的内容。尽管自定义View很难，甚至面对各种复杂的效果时往往还会觉得有点无章可循。但是，本节将从一定高度来重新审视自定义View，并以综述的形式介绍自定义View的分类和须知，旨在帮助初学者能够透过现象看本质，避免陷入只见树木不见森林的状态之中。同时为了让读者更好地理解自定义View，在本节最后还会针对自定义View的不同类别分别提供一个实际的例子，通过这些例子能够让读者更深入地掌握自定义View。</p>
+<h3 id="4-4-1-自定义View的分类"><a href="#4-4-1-自定义View的分类" class="headerlink" title="4.4.1　自定义View的分类"></a>4.4.1　自定义View的分类</h3><p>自定义View的分类标准不唯一，而笔者则把自定义View分为4类。</p>
+<ol>
+<li>继承View重写onDraw方法</li>
+</ol>
+<p>这种方法主要用于实现一些不规则的效果，即这种效果不方便通过布局的组合方式来达到，往往需要静态或者动态地显示一些不规则的图形。很显然这需要通过绘制的方式来实现，即重写onDraw方法。采用这种方式需要自己支持wrap_content，并且padding也需要自己处理。</p>
+<ol start="2">
+<li>继承ViewGroup派生特殊的Layout</li>
+</ol>
+<p>这种方法主要用于实现自定义的布局，即除了LinearLayout、RelativeLayout、FrameLayout这几种系统的布局之外，我们重新定义一种新布局，当某种效果看起来很像几种View组合在一起的时候，可以采用这种方法来实现。采用这种方式稍微复杂一些，需要合适地处理ViewGroup的测量、布局这两个过程，并同时处理子元素的测量和布局过程。</p>
+<ol start="3">
+<li>继承特定的View（比如TextView）</li>
+</ol>
+<p>这种方法比较常见，一般是用于扩展某种已有的View的功能，比如TextView，这种方法比较容易实现。这种方法不需要自己支持wrap_content和padding等。</p>
+<ol start="4">
+<li>继承特定的ViewGroup（比如LinearLayout）</li>
+</ol>
+<p>这种方法也比较常见，当某种效果看起来很像几种View组合在一起的时候，可以采用这种方法来实现。采用这种方法不需要自己处理ViewGroup的测量和布局这两个过程。需要注意这种方法和方法2的区别，一般来说方法2能实现的效果方法4也都能实现，两者的主要差别在于方法2更接近View的底层。</p>
+<p>上面介绍了自定义View的4种方式，读者可以仔细体会一下，是不是的确可以这么划分？但是这里要说的是，自定义View讲究的是灵活性，一种效果可能多种方法都可以实现，我们需要做的就是找到一种代价最小、最高效的方法去实现，在4.4.2节会列举一些自定义View过程中常见的注意事项。</p>
+<h3 id="4-4-2-自定义View须知"><a href="#4-4-2-自定义View须知" class="headerlink" title="4.4.2　自定义View须知"></a>4.4.2　自定义View须知</h3><p>本节将介绍自定义View过程中的一些注意事项，这些问题如果处理不好，有些会影响View的正常使用，而有些则会导致内存泄露等，具体的注意事项如下所示。</p>
+<ol>
+<li>让View支持wrap_content</li>
+</ol>
+<p>这是因为直接继承View或者ViewGroup的控件，如果不在onMeasure中对wrap_content做特殊处理，那么当外界在布局中使用wrap_content时就无法达到预期的效果，具体情形已经在4.3.1节中进行了详细的介绍，这里不再重复了。</p>
+<ol start="2">
+<li>如果有必要，让你的View支持padding</li>
+</ol>
+<p>这是因为直接继承View的控件，如果不在draw方法中处理padding，那么padding属性是无法起作用的。另外，直接继承自ViewGroup的控件需要在onMeasure和onLayout中考虑padding和子元素的margin对其造成的影响，不然将导致padding和子元素的margin失效。</p>
+<ol start="3">
+<li>尽量不要在View中使用Handler，没必要</li>
+</ol>
+<p>这是因为View内部本身就提供了post系列的方法，完全可以替代Handler的作用，当然除非你很明确地要使用Handler来发送消息。</p>
+<ol start="4">
+<li>View中如果有线程或者动画，需要及时停止，参考View#onDetachedFromWindow</li>
+</ol>
+<p>这一条也很好理解，如果有线程或者动画需要停止时，那么onDetachedFromWindow是一个很好的时机。当包含此View的Activity退出或者当前View被remove时，View的onDetachedFromWindow方法会被调用，和此方法对应的是onAttachedToWindow，当包含此View的Activity启动时，View的onAttachedToWindow方法会被调用。同时，当View变得不可见时我们也需要停止线程和动画，如果不及时处理这种问题，有可能会造成内存泄漏。</p>
+<ol start="5">
+<li>View带有滑动嵌套情形时，需要处理好滑动冲突</li>
+</ol>
+<p>如果有滑动冲突的话，那么要合适地处理滑动冲突，否则将会严重影响View的效果，具体怎么解决滑动冲突请参看第3章。</p>
+<h3 id="4-4-3-自定义View示例"><a href="#4-4-3-自定义View示例" class="headerlink" title="4.4.3　自定义View示例"></a>4.4.3　自定义View示例</h3><p>4.4.1节和4.4.2节分别介绍了自定义View的类别和注意事项，本节将通过几个实际的例子来演示如何自定义一个规范的View，通过本节的例子再结合上面两节的内容，可以让读者更好地掌握自定义View。下面仍然按照自定义View的分类来介绍具体的实现细节。</p>
+<ol>
+<li>继承View重写onDraw方法</li>
+</ol>
+<p>这种方法主要用于实现一些不规则的效果，一般需要重写onDraw方法。采用这种方式需要自己支持wrap_content，并且padding也需要自己处理。下面通过一个具体的例子来演示如何实现这种自定义View。</p>
+<p>为了更好地展示一些平时不容易注意到的问题，这里选择实现一个很简单的自定义控件，简单到只是绘制一个圆，尽管如此，需要注意的细节还是很多的。为了实现一个规范的控件，在实现过程中必须考虑到wrap_content模式以及padding，同时为了提高便捷性，还要对外提供自定义属性。我们先来看一下最简单的实现，代码如下所示。</p>
+<p>public class CircleView extends View {</p>
+<p>         private int mColor &#x3D; Color.RED;</p>
+<p>         private Paint mPaint &#x3D; new Paint(Paint.ANTI_ALIAS_FLAG);</p>
+<p>         public CircleView(Context context) {</p>
+<p>             super(context);</p>
+<p>             init();</p>
+<p>         }</p>
+<p>         public CircleView(Context context,AttributeSet attrs) {</p>
+<p>             super(context,attrs);</p>
+<p>             init();</p>
+<p>         }</p>
+<p>         public CircleView(Context context,AttributeSet attrs,int defStyleAttr) {</p>
+<p>             super(context,attrs,defStyleAttr);</p>
+<p>             init();</p>
+<p>         }</p>
+<p>         private void init() {</p>
+<p>             mPaint.setColor(mColor);</p>
+<p>         }</p>
+<p>         @Override</p>
+<p>         protected void onDraw(Canvas canvas) {</p>
+<p>             super.onDraw(canvas);</p>
+<p>             int width &#x3D; getWidth();</p>
+<p>             int height &#x3D; getHeight();</p>
+<p>             int radius &#x3D; Math.min(width,height) &#x2F; 2;</p>
+<p>             canvas.drawCircle(width &#x2F; 2,height &#x2F; 2,radius,mPaint);</p>
+<p>         }</p>
+<p>    }</p>
+<p>上面的代码实现了一个具有圆形效果的自定义View，它会在自己的中心点以宽&#x2F;高的最小值为直径绘制一个红色的实心圆，它的实现很简单，并且上面的代码相信大部分初学者都能写出来，但是不得不说，上面的代码只是一种初级的实现，并不是一个规范的自定义View，为什么这么说呢？我们通过调整布局参数来对比一下。</p>
+<p>请看下面的布局：</p>
+<p>&lt;LinearLayout xmlns:android&#x3D;”<a target="_blank" rel="noopener" href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>“</p>
+<p>         xmlns:tools&#x3D;”<a target="_blank" rel="noopener" href="http://schemas.android.com/tools">http://schemas.android.com/tools</a>“</p>
+<p> </p>
+<p>  android:layout_width&#x3D;”match_parent”</p>
+<p>         android:layout_height&#x3D;”match_parent”</p>
+<p>         android:background&#x3D;”#ffffff”</p>
+<p>         android:orientation&#x3D;”vertical” &gt;</p>
+<p>         &lt;com.ryg.chapter_4.ui.CircleView</p>
+<p>             android:id&#x3D;”@+id&#x2F;circleView1”</p>
+<p>             android:layout_width&#x3D;”match_parent”</p>
+<p>             android:layout_height&#x3D;”100dp”</p>
+<p>             android:background&#x3D;”#000000”&#x2F;&gt;</p>
+<p>    </LinearLayout></p>
+<p>再看一下运行的效果，如图4-3中的（1）所示，这是我们预期的效果。接着再调整CircleView的布局参数，为其设置20dp的margin，调整后的布局如下所示。</p>
+<p>&lt;com.ryg.chapter_4.ui.CircleView</p>
+<p>        android:id&#x3D;”@+id&#x2F;circleView1”</p>
+<p>        android:layout_width&#x3D;” match_parent”</p>
+<p>        android:layout_height&#x3D;”100dp”</p>
+<p>        android:layout_margin&#x3D;”20dp”</p>
+<p>        android:background&#x3D;”#000000”&#x2F;&gt;</p>
+<p>运行后看一下效果，如图4-3中的（2）所示，这也是我们预期的效果，这说明margin属性是生效的。这是因为margin属性是由父容器控制的，因此不需要在CircleView中做特殊处理。再调整CircleView的布局参数，为其设置20dp的padding，如下所示。</p>
+<p>&lt;com.ryg.chapter_4.ui.CircleView</p>
+<p>        android:id&#x3D;”@+id&#x2F;circleView1”</p>
+<p>        android:layout_width&#x3D;”match_parent”</p>
+<p>        android:layout_height&#x3D;”100dp”</p>
+<p>        android:layout_margin&#x3D;”20dp”</p>
+<p>        android:padding&#x3D;”20dp”</p>
+<p>        android:background&#x3D;”#000000”&#x2F;&gt;</p>
+<p>运行后看一下效果，如图4-3中的（3）所示。结果发现padding根本没有生效，这就是我们在前面提到的直接继承自View和ViewGroup的控件，padding是默认无法生效的，需要自己处理。再调整一下CircleView的布局参数，将其宽度设置为wrap_content，如下所示。</p>
+<p>&lt;com.ryg.chapter_4.ui.CircleView</p>
+<p>        android:id&#x3D;”@+id&#x2F;circleView1”</p>
+<p>        android:layout_width&#x3D;”wrap_content”</p>
+<p>        android:layout_height&#x3D;”100dp”</p>
+<p>        android:layout_margin&#x3D;”20dp”</p>
+<p>        android:padding&#x3D;”20dp”</p>
+<p>        android:background&#x3D;”#000000”&#x2F;&gt;</p>
+<p>运行后看一下效果，如图4-3中的（4）所示，结果发现wrap_content并没有达到预期的效果。对比下（3）和（4）的效果图，发现宽度使用wrap_content和使用match_parent没有任何区别。的确是这样的，这一点在前面也已经提到过：对于直接继承自View的控件，如果不对wrap_content做特殊处理，那么使用wrap_content就相当于使用match_parent。</p>
+<p><img src="data:image/png;base64,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" alt="图片"></p>
+<p>图4-3　CircleView运行效果图</p>
+<p>为了解决上面提到的几种问题，我们需要做如下处理：</p>
+<p>首先，针对wrap_content的问题，其解决方法在4.3.1节中已经做了详细的介绍，这里只需要指定一个wrap_content模式的默认宽&#x2F;高即可，比如选择200px作为默认的宽&#x2F;高。</p>
+<p>其次，针对padding的问题，也很简单，只要在绘制的时候考虑一下padding即可，因此我们需要对onDraw稍微做一下修改，修改后的代码如下所示。</p>
+<p>protected void onDraw(Canvas canvas) {</p>
+<p>        super.onDraw(canvas);</p>
+<p>        final int paddingLeft &#x3D; getPaddingLeft();</p>
+<p>        final int paddingRight &#x3D; getPaddingLeft();</p>
+<p>        final int paddingTop &#x3D; getPaddingLeft();</p>
+<p>        final int paddingBottom &#x3D; getPaddingLeft();</p>
+<p>        int width &#x3D; getWidth() -paddingLeft -paddingRight;</p>
+<p>        int height &#x3D; getHeight() -paddingTop -paddingBottom;</p>
+<p>        int radius &#x3D; Math.min(width,height) &#x2F; 2;</p>
+<p>        canvas.drawCircle(paddingLeft + width &#x2F; 2,paddingTop + height&#x2F;2,radius,</p>
+<p>        mPaint);</p>
+<p>    }</p>
+<p>上面的代码很简单，中心思想就是在绘制的时候考虑到View四周的空白即可，其中圆心和半径都会考虑到View四周的padding，从而做相应的调整。</p>
+<p>&lt;com.ryg.chapter_4.ui.CircleView</p>
+<p>        android:id&#x3D;”@+id&#x2F;circleView1”</p>
+<p>        android:layout_width&#x3D;”wrap_content”</p>
+<p>        android:layout_height&#x3D;”100dp”</p>
+<p>        android:layout_margin&#x3D;”20dp”</p>
+<p>        android:padding&#x3D;”20dp”</p>
+<p>        android:background&#x3D;”#000000”&#x2F;&gt;</p>
+<p>针对上面的布局参数，我们再次运行一下，结果如图4-4中的（1）所示，可以发现布局参数中的wrap_content和padding均生效了。</p>
+<p>图4-4　CircleView运行效果图</p>
+<p>最后，为了让我们的View更加容易使用，很多情况下我们还需要为其提供自定义属性，像android:layout_width和android:padding这种以android开头的属性是系统自带的属性，那么如何添加自定义属性呢？这也不是什么难事，遵循如下几步：</p>
+<p>第一步，在values目录下面创建自定义属性的XML，比如attrs.xml，也可以选择类似于attrs_circle_view.xml等这种以attrs_开头的文件名，当然这个文件名并没有什么限制，可以随便取名字。针对本例来说，选择创建attrs.xml文件，文件内容如下：</p>
+<?xml version="1.0" encoding="utf-8"?>
+
+<p>    <resources></p>
+<p>         <declare-styleable name="CircleView"></p>
+<p>             <attr name="circle_color" format="color" /></p>
+<p>         </declare-styleable></p>
+<p>    </resources></p>
+<p>在上面的XML中声明了一个自定义属性集合“CircleView”，在这个集合里面可以有很多自定义属性，这里只定义了一个格式为“color”的属性“circle_color”，这里的格式color指的是颜色。除了颜色格式，自定义属性还有其他格式，比如reference是指资源id，dimension是指尺寸，而像string、integer和boolean这种是指基本数据类型。除了列举的这些还有其他类型，这里就不一一描述了，读者查看一下文档即可，这并没有什么难度。</p>
+<p>第二步，在View的构造方法中解析自定义属性的值并做相应处理。对于本例来说，我们需要解析circle_color这个属性的值，代码如下所示。</p>
+<p>public CircleView(Context context,AttributeSet attrs,int defStyleAttr) {</p>
+<p>        super(context,attrs,defStyleAttr);</p>
+<p>        TypedArray a &#x3D; context.obtainStyledAttributes(attrs,R.styleable.CircleView);</p>
+<p>        mColor &#x3D; a.getColor(styleable.CircleView_circle_color,Color.RED);</p>
+<p>        a.recycle();</p>
+<p>        init();</p>
+<p>    }</p>
+<p>这看起来很简单，首先加载自定义属性集合CircleView，接着解析CircleView属性集合中的circle_color属性，它的id为R.styleable.CircleView_circle_color。在这一步骤中，如果在使用时没有指定circle_color这个属性，那么就会选择红色作为默认的颜色值，解析完自定义属性后，通过recycle方法来实现资源，这样CircleView中所做的工作就完成了。</p>
+<p>第三步，在布局文件中使用自定义属性，如下所示。</p>
+<p>&lt;LinearLayout xmlns:android&#x3D;”<a target="_blank" rel="noopener" href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>“</p>
+<p>         xmlns:app&#x3D;”<a target="_blank" rel="noopener" href="http://schemas.android.com/apk/res-auto">http://schemas.android.com/apk/res-auto</a>“</p>
+<p>         android:layout_width&#x3D;”match_parent”</p>
+<p>         android:layout_height&#x3D;”match_parent”</p>
+<p>         android:background&#x3D;”#ffffff”</p>
+<p>         android:orientation&#x3D;”vertical” &gt;</p>
+<p>         &lt;com.ryg.chapter_4.ui.CircleView</p>
+<p>             android:id&#x3D;”@+id&#x2F;circleView1”</p>
+<p>             android:layout_width&#x3D;”wrap_content”</p>
+<p>             android:layout_height&#x3D;”100dp”</p>
+<p>             android:layout_margin&#x3D;”20dp”</p>
+<p>             app:circle_color&#x3D;”@color&#x2F;light_green”</p>
+<p>             android:padding&#x3D;”20dp”</p>
+<p>             android:background&#x3D;”#000000”&#x2F;&gt;</p>
+<p>    </LinearLayout></p>
+<p>上面的布局文件中有一点需要注意，首先，为了使用自定义属性，必须在布局文件中添加schemas声明：xmlns:app&#x3D;<a target="_blank" rel="noopener" href="http://schemas.android.com/apk/res-auto%E3%80%82%E5%9C%A8%E8%BF%99%E4%B8%AA%E5%A3%B0%E6%98%8E%E4%B8%AD%EF%BC%8Capp%E6%98%AF%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7%E7%9A%84%E5%89%8D%E7%BC%80%EF%BC%8C%E5%BD%93%E7%84%B6%E5%8F%AF%E4%BB%A5%E6%8D%A2%E5%85%B6%E4%BB%96%E5%90%8D%E5%AD%97%EF%BC%8C%E4%BD%86%E6%98%AFCircleView%E4%B8%AD%E7%9A%84%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7%E7%9A%84%E5%89%8D%E7%BC%80%E5%BF%85%E9%A1%BB%E5%92%8C%E8%BF%99%E9%87%8C%E7%9A%84%E4%B8%80%E8%87%B4%EF%BC%8C%E7%84%B6%E5%90%8E%E5%B0%B1%E5%8F%AF%E4%BB%A5%E5%9C%A8CircleView%E4%B8%AD%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E5%B1%9E%E6%80%A7%E4%BA%86%EF%BC%8C%E6%AF%94%E5%A6%82%EF%BC%9Aapp:circle_color=%22@color/light_green%22%E3%80%82%E5%8F%A6%E5%A4%96%EF%BC%8C%E4%B9%9F%E6%9C%89%E6%8C%89%E7%85%A7%E5%A6%82%E4%B8%8B%E6%96%B9%E5%BC%8F%E5%A3%B0%E6%98%8Eschemas%EF%BC%9Axmlns:app=http://schemas.android.com/apk/res/com.ryg.chapter_4%EF%BC%8C%E8%BF%99%E7%A7%8D%E6%96%B9%E5%BC%8F%E4%BC%9A%E5%9C%A8apk/res/%E5%90%8E%E9%9D%A2%E9%99%84%E5%8A%A0%E5%BA%94%E7%94%A8%E7%9A%84%E5%8C%85%E5%90%8D%E3%80%82%E4%BD%86%E6%98%AF%E8%BF%99%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F%E5%B9%B6%E6%B2%A1%E6%9C%89%E6%9C%AC%E8%B4%A8%E5%8C%BA%E5%88%AB%EF%BC%8C%E7%AC%94%E8%80%85%E6%AF%94%E8%BE%83%E5%96%9C%E6%AC%A2%E7%9A%84%E6%98%AFxmlns:app=http://schemas.android.com/apk/res-auto%E8%BF%99%E7%A7%8D%E5%A3%B0%E6%98%8E%E6%96%B9%E5%BC%8F%E3%80%82">http://schemas.android.com/apk/res-auto。在这个声明中，app是自定义属性的前缀，当然可以换其他名字，但是CircleView中的自定义属性的前缀必须和这里的一致，然后就可以在CircleView中使用自定义属性了，比如：app:circle_color=&quot;@color/light_green&quot;。另外，也有按照如下方式声明schemas：xmlns:app=http://schemas.android.com/apk/res/com.ryg.chapter_4，这种方式会在apk/res/后面附加应用的包名。但是这两种方式并没有本质区别，笔者比较喜欢的是xmlns:app=http://schemas.android.com/apk/res-auto这种声明方式。</a></p>
+<p>到这里自定义属性的使用过程就完成了，运行一下程序，效果如图4-4中的（2）所示，很显然，CircleView的自定义属性circle_color生效了。下面给出CircleView的完整代码，这时的CircleView已经是一个很规范的自定义View了，如下所示。</p>
+<p>public class CircleView extends View {</p>
+<p>         private int mColor &#x3D; Color.RED;</p>
+<p>         private Paint mPaint &#x3D; new Paint(Paint.ANTI_ALIAS_FLAG);</p>
+<p>         public CircleView(Context context) {</p>
+<p>             super(context);</p>
+<p>             init();</p>
+<p>         }</p>
+<p>         public CircleView(Context context,AttributeSet attrs) {</p>
+<p>             this(context,attrs,0);</p>
+<p>         }</p>
+<p>         public CircleView(Context context,AttributeSet attrs,int defStyleAttr) {</p>
+<p>             super(context,attrs,defStyleAttr);</p>
+<p>             TypedArray a &#x3D; context.obtainStyledAttributes(attrs,R.styleable.CircleView);</p>
+<p>             mColor &#x3D; a.getColor(R.styleable.CircleView_circle_color,Color.RED);</p>
+<p>             a.recycle();</p>
+<p>             init();</p>
+<p>         }</p>
+<p>         private void init() {</p>
+<p>             mPaint.setColor(mColor);</p>
+<p>         }</p>
+<p>         @Override</p>
+<p>         protected void onMeasure(int widthMeasureSpec,int heightMeasureSpec) {</p>
+<p>             super.onMeasure(widthMeasureSpec,heightMeasureSpec);</p>
+<p>             int widthSpecMode &#x3D; MeasureSpec.getMode(widthMeasureSpec);</p>
+<p>       </p>
+<ol start="2">
+<li>继承ViewGroup派生特殊的Layout</li>
+</ol>
+<p>这种方法主要用于实现自定义的布局，采用这种方式稍微复杂一些，需要合适地处理ViewGroup的测量、布局这两个过程，并同时处理子元素的测量和布局过程。在第3章的3.5.3节中，我们分析了滑动冲突的两种方式并实现了两个自定义View：HorizontalScrollViewEx和StickyLayout，其中HorizontalScrollViewEx就是通过继承ViewGroup来实现的自定义View，这里会再次分析它的measure和layout过程。</p>
+<p>需要说明的是，如果要采用此种方法实现一个很规范的自定义View，是有一定的代价的，这点通过查看LinearLayout等的源码就知道，它们的实现都很复杂。对于HorizontalScrollViewEx来说，这里不打算实现它的方方面面，仅仅是完成主要功能，但是需要规范化的地方会给出说明。</p>
+<p>这里再回顾一下HorizontalScrollViewEx的功能，它主要是一个类似于ViewPager的控件，也可以说是一个类似于水平方向的LinearLayout的控件，它内部的子元素可以进行水平滑动并且子元素的内部还可以进行竖直滑动，这显然是存在滑动冲突的，但是HorizontalScrollViewEx内部解决了水平和竖直方向的滑动冲突问题。关于HorizontalScrollViewEx是如何解决滑动冲突的，请参看第3章的相关内容。这里有一个假设，那就是所有子元素的宽&#x2F;高都是一样的。下面主要看一下它的onMeasure和onLayout方法的实现，先看onMeasure，如下所示。</p>
+<p>protected void onMeasure(int widthMeasureSpec,int heightMeasureSpec) {</p>
+<p>        super.onMeasure(widthMeasureSpec,heightMeasureSpec);</p>
+<p>        int measuredWidth &#x3D; 0;</p>
+<p>        int measuredHeight &#x3D; 0;</p>
+<p>        final int childCount &#x3D; getChildCount();</p>
+<p>        measureChildren(widthMeasureSpec,heightMeasureSpec);</p>
+<p>        int widthSpaceSize &#x3D; MeasureSpec.getSize(widthMeasureSpec);</p>
+<p>        int widthSpecMode &#x3D; MeasureSpec.getMode(widthMeasureSpec);</p>
+<p>        int heightSpaceSize &#x3D; MeasureSpec.getSize(heightMeasureSpec);</p>
+<p>        int heightSpecMode &#x3D; MeasureSpec.getMode(heightMeasureSpec);</p>
+<p>        if (childCount &#x3D;&#x3D; 0) {</p>
+<p>                setMeasuredDimension(0,0);</p>
+<p>        } else if (widthSpecMode &#x3D;&#x3D; MeasureSpec.AT_MOST &amp;&amp; heightSpecMode &#x3D;&#x3D;</p>
+<p>        MeasureSpec.AT_MOST) {</p>
+<p>                final View childView &#x3D; getChildAt(0);</p>
+<p>                measuredWidth &#x3D; childView.getMeasuredWidth() * childCount;</p>
+<p>                measuredHeight &#x3D; childView.getMeasuredHeight();</p>
+<p>                setMeasuredDimension(measuredWidth,measuredHeight);</p>
+<p>        } else if (heightSpecMode &#x3D;&#x3D; MeasureSpec.AT_MOST) {</p>
+<p>                final View childView &#x3D; getChildAt(0);</p>
+<p>                measuredHeight &#x3D; childView.getMeasuredHeight();</p>
+<p>                setMeasuredDimension(widthSpaceSize,childView.getMeasuredHeight());</p>
+<p> } else if (widthSpecMode &#x3D;&#x3D; MeasureSpec.AT_MOST) {</p>
+<p>                final View childView &#x3D; getChildAt(0);</p>
+<p>                measuredWidth &#x3D; childView.getMeasuredWidth() * childCount;</p>
+<p>                setMeasuredDimension(measuredWidth,heightSpaceSize);</p>
+<p>        }</p>
+<p>    }</p>
+<p>这里说明一下上述代码的逻辑，首先会判断是否有子元素，如果没有子元素就直接把自己的宽&#x2F;高设为0；然后就是判断宽和高是不是采用了wrap_content，如果宽采用了wrap_content，那么HorizontalScrollViewEx的宽度就是所有子元素的宽度之和；如果高度采用了wrap_content，那么HorizontalScrollViewEx的高度就是第一个子元素的高度。</p>
+<p>上述代码不太规范的地方有两点：第一点是没有子元素的时候不应该直接把宽&#x2F;高设为0，而应该根据LayoutParams中的宽&#x2F;高来做相应处理；第二点是在测量HorizontalScrollViewEx的宽&#x2F;高时没有考虑到它的padding以及子元素的margin，因为它的padding以及子元素的margin会影响到HorizontalScrollViewEx的宽&#x2F;高。这是很好理解的，因为不管是自己的padding还是子元素的margin，占用的都是HorizontalScrollViewEx的空间。</p>
+<p>接着再看一下HorizontalScrollViewEx的onLayout方法，如下所示。</p>
+<p>protected void onLayout(boolean changed,int l,int t,int r,int b) {</p>
+<p>        int childLeft &#x3D; 0;</p>
+<p>        final int childCount &#x3D; getChildCount();</p>
+<p>        mChildrenSize &#x3D; childCount;</p>
+<p>        for (int i &#x3D; 0; i &lt; childCount; i++) {</p>
+<p>                final View childView &#x3D; getChildAt(i);</p>
+<p>                if (childView.getVisibility() !&#x3D; View.GONE) {</p>
+<p>                        final int childWidth &#x3D; childView.getMeasuredWidth();</p>
+<p>                        mChildWidth &#x3D; childWidth;</p>
+<p>                        childView.layout(childLeft,0,childLeft + childWidth,</p>
+<p>                                        childView.getMeasuredHeight());</p>
+<p>                        childLeft +&#x3D; childWidth;</p>
+<p>                }</p>
+<p>        }</p>
+<p>    }</p>
+<p>上述代码的逻辑并不复杂，其作用是完成子元素的定位。首先会遍历所有的子元素，如果这个子元素不是处于GONE这个状态，那么就通过layout方法将其放置在合适的位置上。从代码上来看，这个放置过程是由左向右的，这和水平方向的LinearLayout比较类似。上述代码的不完美之处仍然在于放置子元素的过程没有考虑到自身的padding以及子元素的margin，而从一个规范的控件的角度来看，这些都是应该考虑的。下面给出Horizontal-ScrollViewEx的完整代码，如下所示。</p>
+<p>public class HorizontalScrollViewEx extends ViewGroup {</p>
+<p>         private static final String TAG &#x3D; “HorizontalScrollViewEx”;</p>
+<p>         private int mChildrenSize;</p>
+<p>         private int mChildWidth;</p>
+<p>         private int mChildIndex;</p>
+<p>         &#x2F;&#x2F; 分别记录上次滑动的坐标</p>
+<p>         private int mLastX &#x3D; 0;</p>
+<p>         private int mLastY &#x3D; 0;</p>
+<p>         &#x2F;&#x2F; 分别记录上次滑动的坐标(onInterceptTouchEvent)</p>
+<p>         private int mLastXIntercept &#x3D; 0;</p>
+<p>         private int mLastYIntercept &#x3D; 0;</p>
+<p>         private Scroller mScroller;</p>
+<p>         private VelocityTracker mVelocityTracker;</p>
+<p>         public HorizontalScrollViewEx(Context context) {</p>
+<p>             super(context);</p>
+<p>             init();</p>
+<p>         }</p>
+<p>         public HorizontalScrollViewEx(Context context,AttributeSet attrs) {</p>
+<p>             super(context,attrs);</p>
+<p>             init();</p>
+<p>         }</p>
+<p>         public HorizontalScrollViewEx(Context context,AttributeSet attrs,</p>
+<p>                 int</p>
+<p> defStyle) {</p>
+<p>             super(context,attrs,defStyle);</p>
+<p>             init();</p>
+<p>         }</p>
+<p>         private void init() {</p>
+<p>             if (mScroller &#x3D;&#x3D; null) {</p>
+<p>                 mScroller &#x3D; new Scroller(getContext());</p>
+<p>                 mVelocityTracker &#x3D; VelocityTracker.obtain();</p>
+<p>             }</p>
+<p>         }</p>
+<p>         @Override</p>
+<p>         public boolean onInterceptTouchEvent(MotionEvent event) {</p>
+<p>             boolean intercepted &#x3D; false;</p>
+<p>             int x &#x3D; (int) event.getX();</p>
+<p>             int y &#x3D; (int) event.getY();</p>
+<p>             switch (event.getAction()) {</p>
+<p>             case MotionEvent.ACTION_DOWN: {</p>
+<p>                 intercepted &#x3D; false;</p>
+<p>                 if (!mScroller.isFinished()) {</p>
+<p>                     mScroller.abortAnimation();</p>
+<p>                     intercepted &#x3D; true;</p>
+<p>                 }</p>
+<p>                 break;</p>
+<p>             }</p>
+<p>             case MotionEvent.ACTION_MOVE: {</p>
+<p>                 int deltaX &#x3D; x -mLastXIntercept;</p>
+<p>                 int deltaY &#x3D; y -mLastYIntercept;</p>
+<p>                 if (Math.abs(deltaX) &gt; Math.abs(deltaY)) {</p>
+<p>                     intercepted &#x3D; true;</p>
+<p>                 } else {</p>
+<p>                     intercepted &#x3D; false;</p>
+<p>                 }</p>
+<p>                 break;</p>
+<p>             }</p>
+<p>             case MotionEvent.ACTION_UP: {</p>
+<p>                 intercepted &#x3D; false;</p>
+<p>                 break;</p>
+<p>             }</p>
+<p>             default:</p>
+<p>                 break;</p>
+<p>             }</p>
+<p>             Log.d(TAG,”intercepted&#x3D;” + intercepted);</p>
+<p>             mLastX &#x3D; x;</p>
+<p>             mLastY &#x3D; y;</p>
+<p>             mLastXIntercept &#x3D; x;</p>
+<p>             mLastYIntercept &#x3D; y;</p>
+<p>             return intercepted;</p>
+<p>         }</p>
+<p>         @Override</p>
+<p>         public boolean onTouchEvent(MotionEvent event) {</p>
+<p>             mVelocityTracker.addMovement(event);</p>
+<p>             int x &#x3D; (int) event.getX();</p>
+<p>             int y &#x3D; (int) event.getY();</p>
+<p>             switch (event.getAction()) {</p>
+<p>             case MotionEvent.ACTION_DOWN: {</p>
+<p>                 if (!mScroller.isFinished()) {</p>
+<p>                     mScroller.abortAnimation();</p>
+<p>                 }</p>
+<p>                 break;</p>
+<p>             }</p>
+<p>             case MotionEvent.ACTION_MOVE: {</p>
+<p>                 int deltaX &#x3D; x -mLastX;</p>
+<p>                 int deltaY &#x3D; y -mLastY;</p>
+<p>                 scrollBy(-deltaX,0);</p>
+<p>                 break;</p>
+<p>             }</p>
+<p>             case MotionEvent.ACTION_UP: {</p>
+<p>                 int scrollX &#x3D; getScrollX();</p>
+<p>                 mVelocityTracker.computeCurrentVelocity(1000);</p>
+<p>                 float xVelocity &#x3D; mVelocityTracker.getXVelocity();</p>
+<p>                 if (Math.abs(xVelocity) &#x3D;&gt; 50) {</p>
+<p>                     mChildIndex &#x3D; xVelocity &gt; 0 ? mChildIndex -1 : mChildIndex + 1;</p>
+<p>                 } else {</p>
+<p>                     mChildIndex &#x3D; (scrollX + mChildWidth &#x2F; 2) &#x2F; mChildWidth;</p>
+<p>                 }</p>
+<p>                 mChildIndex &#x3D; Math.max(0,Math.min(mChildIndex,mChildrenSize -1));</p>
+<p>                 int dx &#x3D; mChildIndex * mChildWidth -scrollX;</p>
+<p>                 smoothScrollBy(dx,0);</p>
+<p>                 mVelocityTracker.clear();</p>
+<p>                 break;</p>
+<p>             }</p>
+<p>             default:</p>
+<p>                 break;</p>
+<p>             }</p>
+<p>             mLastX &#x3D; x;</p>
+<p>             mLastY &#x3D; y;</p>
+<p>             return true;</p>
+<p>         }</p>
+<p>         @Override</p>
+<p>         protected void onMeasure(int widthMeasureSpec,int heightMeasureSpec) {</p>
+<p>             super.onMeasure(widthMeasureSpec,heightMeasureSpec);</p>
+<p>             int measuredWidth &#x3D; 0;</p>
+<p>             int measuredHeight &#x3D; 0;</p>
+<p>             final int childCount &#x3D; getChildCount();</p>
+<p>             measureChildren(widthMeasureSpec,heightMeasureSpec);</p>
+<p>             int widthSpaceSize &#x3D; MeasureSpec.getSize(widthMeasureSpec);</p>
+<p>             int widthSpecMode &#x3D; MeasureSpec.getMode(widthMeasureSpec);</p>
+<p>             int heightSpaceSize &#x3D; MeasureSpec.getSize(heightMeasureSpec);</p>
+<p>             int heightSpecMode &#x3D; MeasureSpec.getMode(heightMeasureSpec);</p>
+<p>             if (childCount &#x3D;&#x3D; 0) {</p>
+<p>                 setMeasuredDimension(0,0);</p>
+<p>             } else if (widthSpecMode &#x3D;&#x3D; MeasureSpec.AT_MOST &amp;&amp; heightSpecMode &#x3D;&#x3D;</p>
+<p>             MeasureSpec.AT_MOST) {</p>
+<p> </p>
+<p>继承特定的View（比如TextView）和继承特定的ViewGroup（比如LinearLayout）这两种方式比较简单，这里就不再举例说明了，关于第3章中提到的StickyLayout的具体实现，大家可以参看笔者在Github上的开源项目：<a href="https://github.com/singwhatiwanna/PinnedHeaderExpandableListView">https://github.com/singwhatiwanna/PinnedHeaderExpandableListView</a>。</p>
+<h3 id="4-4-4-自定义View的思想"><a href="#4-4-4-自定义View的思想" class="headerlink" title="4.4.4　自定义View的思想"></a>4.4.4　自定义View的思想</h3><p>到这里，自定义View相关的知识都已经介绍完了，可能读者还是觉得有点模糊。前面说过，自定义View是一个综合的技术体系，很多情况下需要灵活地分析从而找出最高效的方法，因此本章不可能去分析一个个具体的自定义View的实现，因为自定义View五花八门，是不可能全部分析一遍的。虽然我们不能把自定义View都分析一遍，但是我们能够提取出一种思想，在面对陌生的自定义View时，运用这个思想去快速地解决问题。这种思想的描述如下：首先要掌握基本功，比如View的弹性滑动、滑动冲突、绘制原理等，这些东西都是自定义View所必须的，尤其是那些看起来很炫的自定义View，它们往往对这些技术点的要求更高；熟练掌握基本功以后，在面对新的自定义View时，要能够对其分类并选择合适的实现思路，自定义View的实现方法的分类在4.4.1节中已经介绍过了；另外平时还需要多积累一些自定义View相关的经验，并逐渐做到融会贯通，通过这种思想慢慢地就可以提高自定义View的水平了。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/android/">android</a></div><div class="post_share"><div class="social-share" data-image="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/01/03/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC3%E7%AB%A0%20View%E7%9A%84%E4%BA%8B%E4%BB%B6%E4%BD%93%E7%B3%BB/" title="第三章　View的事件体系"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第三章　View的事件体系</div></div></a></div><div class="next-post pull-right"><a href="/2021/01/05/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC5%E7%AB%A0%20%E7%90%86%E8%A7%A3RemoteViews/" title="第五章　理解RemoteViews"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">第五章　理解RemoteViews</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/01/01/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC1%E7%AB%A0%20Activity%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%92%8C%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F/" title="第一章 Activity的生命周期和启动模式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-01</div><div class="title">第一章 Activity的生命周期和启动模式</div></div></a></div><div><a href="/2021/01/03/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC3%E7%AB%A0%20View%E7%9A%84%E4%BA%8B%E4%BB%B6%E4%BD%93%E7%B3%BB/" title="第三章　View的事件体系"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-03</div><div class="title">第三章　View的事件体系</div></div></a></div><div><a href="/2021/01/05/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC5%E7%AB%A0%20%E7%90%86%E8%A7%A3RemoteViews/" title="第五章　理解RemoteViews"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-05</div><div class="title">第五章　理解RemoteViews</div></div></a></div><div><a href="/2021/01/06/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC6%E7%AB%A0%20Android%E7%9A%84Drawable/" title="第六章　Android的Drawable"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-06</div><div class="title">第六章　Android的Drawable</div></div></a></div><div><a href="/2021/01/07/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC7%E7%AB%A0%20Android%E5%8A%A8%E7%94%BB%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90/" title="第七章　Android动画深入分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-07</div><div class="title">第七章　Android动画深入分析</div></div></a></div><div><a href="/2021/01/08/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC8%E7%AB%A0%20%E7%90%86%E8%A7%A3Window%E5%92%8CWindowManager/" title="第八章　理解Windows和WindowManager"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-08</div><div class="title">第八章　理解Windows和WindowManager</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Junyong Tu</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" href="https://github.com/juncaixingchi1993"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#4-1-%E5%88%9D%E8%AF%86ViewRoot%E5%92%8CDecorView"><span class="toc-number">1.</span> <span class="toc-text">4.1　初识ViewRoot和DecorView</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-2-%E7%90%86%E8%A7%A3MeasureSpec"><span class="toc-number">2.</span> <span class="toc-text">4.2　理解MeasureSpec</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-1-MeasureSpec"><span class="toc-number">2.1.</span> <span class="toc-text">4.2.1　MeasureSpec</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-2-MeasureSpec%E5%92%8CLayoutParams%E7%9A%84%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB"><span class="toc-number">2.2.</span> <span class="toc-text">4.2.2　MeasureSpec和LayoutParams的对应关系</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-3-View%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">4.3　View的工作流程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-1-measure%E8%BF%87%E7%A8%8B"><span class="toc-number">3.1.</span> <span class="toc-text">4.3.1　measure过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-2-layout%E8%BF%87%E7%A8%8B"><span class="toc-number">3.2.</span> <span class="toc-text">4.3.2　layout过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-3-draw%E8%BF%87%E7%A8%8B"><span class="toc-number">3.3.</span> <span class="toc-text">4.3.3　draw过程</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-4-%E8%87%AA%E5%AE%9A%E4%B9%89View"><span class="toc-number">4.</span> <span class="toc-text">4.4　自定义View</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-1-%E8%87%AA%E5%AE%9A%E4%B9%89View%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-number">4.1.</span> <span class="toc-text">4.4.1　自定义View的分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-2-%E8%87%AA%E5%AE%9A%E4%B9%89View%E9%A1%BB%E7%9F%A5"><span class="toc-number">4.2.</span> <span class="toc-text">4.4.2　自定义View须知</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-3-%E8%87%AA%E5%AE%9A%E4%B9%89View%E7%A4%BA%E4%BE%8B"><span class="toc-number">4.3.</span> <span class="toc-text">4.4.3　自定义View示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-4-%E8%87%AA%E5%AE%9A%E4%B9%89View%E7%9A%84%E6%80%9D%E6%83%B3"><span class="toc-number">4.4.</span> <span class="toc-text">4.4.4　自定义View的思想</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/26_service/" title="无题">无题</a><time datetime="2024-02-14T11:37:45.559Z" title="发表于 2024-02-14 19:37:45">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/25_intent%E5%92%8CPendingIntent/" title="无题">无题</a><time datetime="2024-02-14T11:37:40.152Z" title="发表于 2024-02-14 19:37:40">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/10/gallery/" title="图库">图库</a><time datetime="2024-02-10T15:25:25.435Z" title="发表于 2024-02-10 23:25:25">2024-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/15/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC15%E7%AB%A0%20Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" title="第十五章 Android性能优化">第十五章 Android性能优化</a><time datetime="2021-01-15T14:07:08.000Z" title="发表于 2021-01-15 22:07:08">2021-01-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/14/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC14%E7%AB%A0%20JNI%E5%92%8CNDK%E7%BC%96%E7%A8%8B/" title="第十四章 JNI和NDK编程">第十四章 JNI和NDK编程</a><time datetime="2021-01-14T14:07:08.000Z" title="发表于 2021-01-14 22:07:08">2021-01-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Junyong Tu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.12.0"></script><script src="/js/main.js?v=4.12.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

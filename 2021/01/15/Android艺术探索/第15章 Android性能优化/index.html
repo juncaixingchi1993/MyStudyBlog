@@ -1,0 +1,452 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>第十五章 Android性能优化 | Junyong Tu の 杂记</title><meta name="author" content="Junyong Tu"><meta name="copyright" content="Junyong Tu"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本章是本书的最后一章，所介绍的主题是Android的性能优化方法和程序设计的一些思想。通过本章的内容，读者可以掌握常见的性能优化方法，这将有助于提高Android程序的性能；另一方面，本章还讲解了Android程序设计的一些思想，这将有助于提高程序的可维护性和可扩展性。另外，2015年Google在YouTube上发布了关于Android性能优化典范的专题，通过一系列短视频来帮助开发者创建更快更优">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第十五章 Android性能优化">
+<meta property="og:url" content="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/15/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC15%E7%AB%A0%20Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="Junyong Tu の 杂记">
+<meta property="og:description" content="本章是本书的最后一章，所介绍的主题是Android的性能优化方法和程序设计的一些思想。通过本章的内容，读者可以掌握常见的性能优化方法，这将有助于提高Android程序的性能；另一方面，本章还讲解了Android程序设计的一些思想，这将有助于提高程序的可维护性和可扩展性。另外，2015年Google在YouTube上发布了关于Android性能优化典范的专题，通过一系列短视频来帮助开发者创建更快更优">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4">
+<meta property="article:published_time" content="2021-01-15T14:07:08.000Z">
+<meta property="article:modified_time" content="2024-02-14T11:25:02.141Z">
+<meta property="article:author" content="Junyong Tu">
+<meta property="article:tag" content="android">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&refer=http%3A%2F%2Fsafe-img.xhscdn.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=auto?sec=1710160772&t=4038984b7822fc46c9a8d50e0c5106b4"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://github.com/juncaixingchi1993/juncaixingchi1993.github.io/2021/01/15/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC15%E7%AB%A0%20Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css?v=4.12.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '第十五章 Android性能优化',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-02-14 19:25:02'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 7.1.1"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://img2.baidu.com/it/u=1361506290,4036378790&amp;fm=253&amp;fmt=auto&amp;app=138&amp;f=JPEG?w=800&amp;h=500')"><nav id="nav"><span id="blog-info"><a href="/" title="Junyong Tu の 杂记"><span class="site-name">Junyong Tu の 杂记</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 清单</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">第十五章 Android性能优化</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2021-01-15T14:07:08.000Z" title="发表于 2021-01-15 22:07:08">2021-01-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-02-14T11:25:02.141Z" title="更新于 2024-02-14 19:25:02">2024-02-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/">艺术探索</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="第十五章 Android性能优化"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>本章是本书的最后一章，所介绍的主题是Android的性能优化方法和程序设计的一些思想。通过本章的内容，读者可以掌握常见的性能优化方法，这将有助于提高Android程序的性能；另一方面，本章还讲解了Android程序设计的一些思想，这将有助于提高程序的可维护性和可扩展性。另外，2015年Google在YouTube上发布了关于Android性能优化典范的专题，通过一系列短视频来帮助开发者创建更快更优秀的Android应用，课程专题不仅仅介绍了Android系统中有关性能问题的底层工作原理，同时也介绍了如何通过工具来找出性能问题以及提升性能的建议，地址是：</p>
+<p><a target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE">https://www.youtube.com/playlist?list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE</a>。</p>
+<p>Android设备作为一种移动设备，不管是内存还是CPU的性能都受到了一定的限制，无法做到像PC设备那样具有超大的内存和高性能的CPU。鉴于这一点，这也意味着Android程序不可能无限制地使用内存和CPU资源，过多地使用内存会导致程序内存溢出，即OOM。而过多地使用CPU资源，一般是指做大量的耗时任务，会导致手机变得卡顿甚至出现程序无法响应的情况，即ANR。由此来看，Android程序的性能问题就变得异常突出了，这对开发人员也提出了更高的要求。为了提高应用程序的性能，本章第一节介绍了一些有效的性能优化方法，主要内容包括布局优化、绘制优化、内存泄露优化、响应速度优化、ListView优化、Bitmap优化、线程优化以及一些性能优化建议，同时在介绍响应速度优化的同时还介绍了ANR日志的分析方法。</p>
+<p>性能优化中一个很重要的问题就是内存泄露，内存泄露并不会导致程序功能异常，但是它会导致Android程序的内存占用过大，这将提高内存溢出的发生几率。如何避免写出内存泄露的代码，这和开发人员的水平和意识有很大关系，甚至很多情况下内存泄露的原因是很难直接发现的，这个时候就需要借助一些内存泄露分析工具，在本章的第二节将介绍内存泄露分析工具MAT的使用，通过MAT就可以发现一些开发过程中难以发现的内存泄露问题。</p>
+<p>在做程序设计时，除了要完成功能开发、提高程序的性能以外，还有一个问题也是不容忽视的，那就是代码的可维护性和可扩展性。如果一个程序的可维护性和可扩展性很差，那就意味着后续的代码维护代价是相当高的，比如需要对一个功能做一些调整，这可能会出现牵一发而动全身的局面。另外添加新功能时也觉得无从下手，整个代码看起来可读性很差，这的确是一份很糟糕的代码。关于代码的可维护性和可扩展性，看起来是一个很抽象的问题，其实它并不抽象，它是可以通过一些合理的设计原则去完成的，比如良好的代码风格、清晰的代码层级、代码的可扩展性和合理的设计模式，在本章的第三节对这些设计原则做了介绍，这将在一定程度上提高程序的可维护性和可扩展性。</p>
+<h2 id="15-1-Android的性能优化方法"><a href="#15-1-Android的性能优化方法" class="headerlink" title="15.1　Android的性能优化方法"></a>15.1　Android的性能优化方法</h2><p>本节介绍了一些有效的性能优化方法，主要内容包括布局优化、绘制优化、内存泄露优化、响应速度优化、ListView优化、Bitmap优化、线程优化以及一些性能优化建议，在介绍响应速度优化的同时还介绍了ANR日志的分析方法。</p>
+<h3 id="15-1-1-布局优化"><a href="#15-1-1-布局优化" class="headerlink" title="15.1.1　布局优化"></a>15.1.1　布局优化</h3><p>布局优化的思想很简单，就是尽量减少布局文件的层级，这个道理是很浅显的，布局中的层级少了，这就意味着Android绘制时的工作量少了，那么程序的性能自然就高了。</p>
+<p>如何进行布局优化呢？首先删除布局中无用的控件和层级，其次有选择地使用性能较低的ViewGroup，比如RelativeLayout。如果布局中既可以使用LinearLayout也可以使用RelativeLayout，那么就采用LinearLayout，这是因为RelativeLayout的功能比较复杂，它的布局过程需要花费更多的CPU时间。FrameLayout和LinearLayout一样都是一种简单高效的ViewGroup，因此可以考虑使用它们，但是很多时候单纯通过一个LinearLayout或者FrameLayout无法实现产品效果，需要通过嵌套的方式来完成。这种情况下还是建议采用RelativeLayout，因为ViewGroup的嵌套就相当于增加了布局的层级，同样会降低程序的性能。</p>
+<p>布局优化的另外一种手段是采用<include>标签、<merge>标签和ViewStub。<include>标签主要用于布局重用，<merge>标签一般和<include>配合使用，它可以降低减少布局的层级，而ViewStub则提供了按需加载的功能，当需要时才会将ViewStub中的布局加载到内存，这提高了程序的初始化效率，下面分别介绍它们的使用方法。</p>
+<p><include>标签</p>
+<p><include>标签可以将一个指定的布局文件加载到当前的布局文件中，如下所示。</p>
+<p>&lt;LinearLayout xmlns:android&#x3D;”<a target="_blank" rel="noopener" href="http://schemas.android.com/apk/res/android">http://schemas.android.com/apk/res/android</a>“</p>
+<p>         android:orientation&#x3D;”vertical”</p>
+<p>         android:layout_width&#x3D;”match_parent”</p>
+<p>         android:layout_height&#x3D;”match_parent”</p>
+<p>         android:background&#x3D;”@color&#x2F;app_bg”</p>
+<p>         android:gravity&#x3D;”center_horizontal”&gt;</p>
+<p>         <include layout="@layout/titlebar"/></p>
+<p>         &lt;TextView android:layout_width&#x3D;”match_parent”</p>
+<p>                   android:layout_height&#x3D;”wrap_content”</p>
+<p>                   android:text&#x3D;”@string&#x2F;text”</p>
+<p>                   android:padding&#x3D;”5dp” &#x2F;&gt;</p>
+<p>…</p>
+<p>    </LinearLayout></p>
+<p>上面的代码中，@layout&#x2F;titlebar指定了另外一个布局文件，通过这种方式就不用把titlebar这个布局文件的内容再重复写一遍了，这就是<include>的好处。<include>标签只支持以android:layout_开头的属性，比如android:layout_width、android:layout_height，其他属性是不支持的，比如android:background。当然，android:id这个属性是个特例，如果<include>指定了这个id属性，同时被包含的布局文件的根元素也指定了id属性，那么以<include>指定的id属性为准。需要注意的是，如果<include>标签指定了android:layout_*这种属性，那么要求android:layout_width和android:layout_height必须存在，否则其他android:layout_*形式的属性无法生效，下面是一个指定了android:layout_*属性的示例。</p>
+<p>&lt;include android:id&#x3D;”@+id&#x2F;new_title”</p>
+<p>              android:layout_width&#x3D;”match_parent”</p>
+<p>              android:layout_height&#x3D;”match_parent”</p>
+<p>              layout&#x3D;”@layout&#x2F;title”&#x2F;&gt;</p>
+<p><merge>标签</p>
+<p><merge>标签一般和<include>标签一起使用从而减少布局的层级。在上面的示例中，由于当前布局是一个竖直方向的LinearLayout，</p>
+<p>这个时候如果被包含的布局文件中也采用了竖直方向的LinearLayout，那么显然被包含的布局文件中的LinearLayout是多余的，通过<merge>标签就可以去掉多余的那一层LinearLayout，如下所示。</p>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+<p>         &lt;Button</p>
+<p>             android:layout_width&#x3D;”wrap_content”</p>
+<p>             android:layout_height&#x3D;”wrap_content”</p>
+<p>             android:text&#x3D;”@string&#x2F;one”&#x2F;&gt;</p>
+<p>         &lt;Button</p>
+<p>             android:layout_width&#x3D;”wrap_content”</p>
+<p>             android:layout_height&#x3D;”wrap_content”</p>
+<p>             android:text&#x3D;”@string&#x2F;two”&#x2F;&gt;</p>
+<p>    </merge></p>
+<p>ViewStub</p>
+<p>ViewStub继承了View，它非常轻量级且宽&#x2F;高都是0，因此它本身不参与任何的布局和绘制过程。ViewStub的意义在于按需加载所需的布局文件，在实际开发中，有很多布局文件在正常情况下不会显示，比如网络异常时的界面，这个时候就没有必要在整个界面初始化的时候将其加载进来，通过ViewStub就可以做到在使用的时候再加载，提高了程序初始化时的性能。下面是一个ViewStub的示例：</p>
+<p>&lt;ViewStub</p>
+<p>         android:id&#x3D;”@+id&#x2F;stub_import”</p>
+<p>         android:inflatedId&#x3D;”@+id&#x2F;panel_import”</p>
+<p>         android:layout&#x3D;”@layout&#x2F;layout_network_error”</p>
+<p>         android:layout_width&#x3D;”match_parent”</p>
+<p>         android:layout_height&#x3D;”wrap_content”</p>
+<p>         android:layout_gravity&#x3D;”bottom” &#x2F;&gt;</p>
+<p>其中stub_import是ViewStub的id，而panel_import是layout&#x2F;layout_network_error这个布局的根元素的id。如何做到按需加载呢？在需要加载ViewStub中的布局时，可以按照如下两种方式进行：</p>
+<p>((ViewStub) findViewById(R.id.stub_import)).setVisibility(View.VISIBLE);</p>
+<p>或者</p>
+<p>View importPanel &#x3D; ((ViewStub) findViewById(R.id.stub_import)).inflate();</p>
+<p>当ViewStub通过setVisibility或者inflate方法加载后，ViewStub就会被它内部的布局替换掉，这个时候ViewStub就不再是整个布局结构中的一部分了。另外，目前ViewStub还不支持<merge>标签。</p>
+<h3 id="15-1-2-绘制优化"><a href="#15-1-2-绘制优化" class="headerlink" title="15.1.2　绘制优化"></a>15.1.2　绘制优化</h3><p>绘制优化是指View的onDraw方法要避免执行大量的操作，这主要体现在两个方面。</p>
+<p>首先，onDraw中不要创建新的局部对象，这是因为onDraw方法可能会被频繁调用，这样就会在一瞬间产生大量的临时对象，这不仅占用了过多的内存而且还会导致系统更加频繁gc，降低了程序的执行效率。另外一方面，onDraw方法中不要做耗时的任务，也不能执行成千上万次的循环操作，尽管每次循环都很轻量级，但是大量的循环仍然十分抢占CPU的时间片，这会造成View的绘制过程不流畅。按照Google官方给出的性能优化典范中的标准，View的绘制帧率保证60fps是最佳的，这就要求每帧的绘制时间不超过16ms（16ms &#x3D; 1000 &#x2F; 60），虽然程序很难保证16ms这个时间，但是尽量降低onDraw方法的复杂度总是切实有效的。</p>
+<h3 id="15-1-3-内存泄露优化"><a href="#15-1-3-内存泄露优化" class="headerlink" title="15.1.3　内存泄露优化"></a>15.1.3　内存泄露优化</h3><p>内存泄露在开发过程中是一个需要重视的问题，但是由于内存泄露问题对开发人员的经验和开发意识有较高的要求，因此这也是开发人员最容易犯的错误之一。内存泄露的优化分为两个方面，一方面是在开发过程中避免写出有内存泄露的代码，另一方面是通过一些分析工具比如MAT来找出潜在的内存泄露继而解决。本节主要介绍一些常见的内存泄露的例子，通过这些例子读者可以很好地理解内存泄露的发生场景并积累规避内存泄露的经验。关于如何通过工具分析内存泄露将在15.2节中专门介绍。</p>
+<p>场景1：静态变量导致的内存泄露</p>
+<p>下面这种情形是一种最简单的内存泄露，相信读者都不会这么干，下面的代码将导致Activity无法正常销毁，因此静态变量sContext引用了它。</p>
+<p>public class MainActivity extends Activity {</p>
+<p>         private static final String TAG &#x3D; “MainActivity”;</p>
+<p>         private static Context sContext;</p>
+<p>         @Override</p>
+<p>         protected void onCreate(Bundle savedInstanceState) {</p>
+<p>             super.onCreate(savedInstanceState);</p>
+<p>             setContentView(R.layout.activity_main);</p>
+<p>             sContext &#x3D; this;</p>
+<p>         }</p>
+<p>    }</p>
+<p>上面的代码也可以改造一下，如下所示。sView是一个静态变量，它内部持有了当前Activity，所以Activity仍然无法释放，估计读者也都明白。</p>
+<p>public class MainActivity extends Activity {</p>
+<p>         private static final String TAG &#x3D; “MainActivity”;</p>
+<p>         private static View sView;</p>
+<p>         @Override</p>
+<p>         protected void onCreate(Bundle savedInstanceState) {</p>
+<p>             super.onCreate(savedInstanceState);</p>
+<p>             setContentView(R.layout.activity_main);</p>
+<p>             sView &#x3D; new View(this);</p>
+<p>         }</p>
+<p>    }</p>
+<p>场景2：单例模式导致的内存泄露</p>
+<p>静态变量导致的内存泄露都太过于明显，相信读者都不会犯这种错误，而单例模式所带来的内存泄露是我们容易忽视的，如下所示。首先提供一个单例模式的TestManager，TestManager可以接收外部的注册并将外部的监听器存储起来。</p>
+<p>public class TestManager {</p>
+<p>         private List<OnDataArrivedListener> mOnDataArrivedListeners &#x3D; new</p>
+<p>         ArrayList<OnDataArrivedListener>();</p>
+<p>         private static class SingletonHolder {</p>
+<p>             public static final TestManager INSTANCE &#x3D; new TestManager();</p>
+<p>         }</p>
+<p>         private TestManager() {</p>
+<p>         }</p>
+<p>         public static TestManager getInstance() {</p>
+<p>             return SingletonHolder.INSTANCE;</p>
+<p>         }</p>
+<p>         public synchronized void registerListener(OnDataArrivedListener</p>
+<p>         listener) {</p>
+<p>             if (!mOnDataArrivedListeners.contains(listener)) {</p>
+<p>                 mOnDataArrivedListeners.add(listener);</p>
+<p>             }</p>
+<p>         }</p>
+<p>         public synchronized void unregisterListener(OnDataArrivedListener</p>
+<p>         listener) {</p>
+<p>             mOnDataArrivedListeners.remove(listener);</p>
+<p>         }</p>
+<p>  </p>
+<p>public interface OnDataArrivedListener {</p>
+<p>             public void onDataArrived(Object data);</p>
+<p>         }</p>
+<p>    }</p>
+<p>接着再让Activity实现OnDataArrivedListener接口并向TestManager注册监听，如下所示。下面的代码由于缺少解注册的操作所以会引起内存泄露，泄露的原因是Activity的对象被单例模式的TestManager所持有，而单例模式的特点是其生命周期和Application保持一致，因此Activity对象无法被及时释放。</p>
+<p>protected void onCreate(Bundle savedInstanceState) {</p>
+<p>        super.onCreate(savedInstanceState);</p>
+<p>        setContentView(R.layout.activity_main);</p>
+<p>        TestManager.getInstance().registerListener(this);</p>
+<p>    }</p>
+<p>场景3：属性动画导致的内存泄露</p>
+<p>从Android 3.0开始，Google提供了属性动画，属性动画中有一类无限循环的动画，如果在Activity中播放此类动画且没有在onDestroy中去停止动画，那么动画会一直播放下去，尽管已经无法在界面上看到动画效果了，并且这个时候Activity的View会被动画持有，而View又持有了Activity，最终Activity无法释放。下面的动画是无限动画，会泄露当前Activity，解决方法是在Activity的onDestroy中调用animator.cancel()来停止动画。</p>
+<p>protected void onCreate(Bundle savedInstanceState) {</p>
+<p>        super.onCreate(savedInstanceState);</p>
+<p>        setContentView(R.layout.activity_main);</p>
+<p>        mButton &#x3D; (Button) findViewById(R.id.button1);</p>
+<p>        ObjectAnimator animator &#x3D; ObjectAnimator.ofFloat(mButton,”rotation”,</p>
+<p>                        0,360).setDuration(2000);</p>
+<p>        animator.setRepeatCount(ValueAnimator.INFINITE);</p>
+<p>        animator.start();</p>
+<p>        &#x2F;&#x2F;animator.cancel();</p>
+<p>    }</p>
+<h3 id="15-1-4-响应速度优化和ANR日志分析"><a href="#15-1-4-响应速度优化和ANR日志分析" class="headerlink" title="15.1.4　响应速度优化和ANR日志分析"></a>15.1.4　响应速度优化和ANR日志分析</h3><p>响应速度优化的核心思想是避免在主线程中做耗时操作，但是有时候的确有很多耗时操作，怎么办呢？可以将这些耗时操作放在线程中去执行，即采用异步的方式执行耗时操作。响应速度过慢更多地体现在Activity的启动速度上面，如果在主线程中做太多事情，会导致Activity启动时出现黑屏现象，甚至出现ANR。Android规定，Activity如果5秒钟之内无法响应屏幕触摸事件或者键盘输入事件就会出现ANR，而BroadcastReceiver如果10秒钟之内还未执行完操作也会出现ANR。在实际开发中，ANR是很难从代码上发现的，如果在开发过程中遇到了ANR，那么怎么定位问题呢？其实当一个进程发生ANR了以后，系统会在&#x2F;data&#x2F;anr目录</p>
+<p>下创建一个文件traces.txt，通过分析这个文件就能定位出ANR的原因，下面模拟一个ANR的场景。下面的代码在Activity的onCreate中休眠30s，程序运行后持续点击屏幕，应用一定会出现ANR：</p>
+<p>protected void onCreate(Bundle savedInstanceState) {</p>
+<p>        super.onCreate(savedInstanceState);</p>
+<p>        setContentView(R.layout.activity_main);</p>
+<p>        SystemClock.sleep(30 * 1000);</p>
+<p>    }</p>
+<p>这里先假定我们无法从代码中看出ANR，为了分析ANR的原因，可以到处traces文件，如下所示，其中.表示当前目录：</p>
+<p>adb pull &#x2F;data&#x2F;anr&#x2F;traces.txt .</p>
+<p>traces文件一般是非常长的，下面是traces文件的部分内容：</p>
+<p>—–pid 29395 at 2015-05-31 16:14:36 —–</p>
+<p>    Cmd line: com.ryg.chapter_15</p>
+<p>    DALVIK THREADS:</p>
+<p>     (mutexes: tll&#x3D;0 tsl&#x3D;0 tscl&#x3D;0 ghl&#x3D;0)</p>
+<p>     “main” prio&#x3D;5 tid&#x3D;1 TIMED_WAIT</p>
+<p>       | group&#x3D;”main” sCount&#x3D;1 dsCount&#x3D;0 obj&#x3D;0x4185b700 self&#x3D;0x4012d0b0</p>
+<p>       | sysTid&#x3D;29395 nice&#x3D;0 sched&#x3D;0&#x2F;0 cgrp&#x3D;apps handle&#x3D;1073954608</p>
+<p>       | schedstat&#x3D;( 0 0 0 ) utm&#x3D;3 stm&#x3D;2 core&#x3D;2</p>
+<p>       at java.lang.VMThread.sleep(Native Method)</p>
+<p>       at java.lang.Thread.sleep(Thread.java:1031)</p>
+<p>       at java.lang.Thread.sleep(Thread.java:1013)</p>
+<p>       at android.os.SystemClock.sleep(SystemClock.java:114)</p>
+<p>       at com.ryg.chapter_15.MainActivity.onCreate(MainActivity.java:42)</p>
+<p>       at android.app.Activity.performCreate(Activity.java:5086)</p>
+<p>       at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1079)</p>
+<p>       at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2056)</p>
+<p>       at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2117)</p>
+<p>       at android.app.ActivityThread.access$600(ActivityThread.java:140)</p>
+<p>       at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1213)</p>
+<p>       at android.os.Handler.dispatchMessage(Handler.java:99)</p>
+<p>       at android.os.Looper.loop(Looper.java:137)</p>
+<p>       at android.app.ActivityThread.main(ActivityThread.java:4914)</p>
+<p>       at java.lang.reflect.Method.invokeNative(Native Method)</p>
+<p>       at java.lang.reflect.Method.invoke(Method.java:511)</p>
+<p>       at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:808)</p>
+<p>       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:575)</p>
+<p>  </p>
+<p>at dalvik.system.NativeStart.main(Native Method)</p>
+<p>     “Binder_2” prio&#x3D;5 tid&#x3D;10 NATIVE</p>
+<p>       | group&#x3D;”main” sCount&#x3D;1 dsCount&#x3D;0 obj&#x3D;0x42296d80 self&#x3D;0x69068848</p>
+<p>       | sysTid&#x3D;29407 nice&#x3D;0 sched&#x3D;0&#x2F;0 cgrp&#x3D;apps handle&#x3D;1750664088</p>
+<p>       | schedstat&#x3D;( 0 0 0 ) utm&#x3D;0 stm&#x3D;0 core&#x3D;1</p>
+<p>       #00  pc 0000cc50  &#x2F;system&#x2F;lib&#x2F;libc.so (__ioctl+8)</p>
+<p>       #01  pc 0002816d  &#x2F;system&#x2F;lib&#x2F;libc.so (ioctl+16)</p>
+<p>       #02  pc 00016f9d  &#x2F;system&#x2F;lib&#x2F;libbinder.so (android::IPCThreadState::talkWithDriver(bool)+124)</p>
+<p>       #03  pc 0001768f  &#x2F;system&#x2F;lib&#x2F;libbinder.so (android::IPCThreadState::joinThreadPool(bool)+154)</p>
+<p>       #04  pc 0001b4e9  &#x2F;system&#x2F;lib&#x2F;libbinder.so</p>
+<p>       #05  pc 00010f7f  &#x2F;system&#x2F;lib&#x2F;libutils.so (android::Thread::_threadLoop(void*)+114)</p>
+<p>       #06  pc 00048ba5  &#x2F;system&#x2F;lib&#x2F;libandroid_runtime.so (android::Android-Runtime::javaThreadShell(void*)+44)</p>
+<p>       #07  pc 00010ae5  &#x2F;system&#x2F;lib&#x2F;libutils.so</p>
+<p>       #08  pc 00012ff0  &#x2F;system&#x2F;lib&#x2F;libc.so (__thread_entry+48)</p>
+<p>       #09  pc 00012748  &#x2F;system&#x2F;lib&#x2F;libc.so (pthread_create+172)</p>
+<p>       at dalvik.system.NativeStart.run(Native Method)</p>
+<p>从traces的内容可以看出，主线程直接sleep了，而原因就是MainActivity的42行。第42行刚好就是SystemClock.sleep(30 * 1000)，这样一来就可以定位问题了。当然这个例子太直接了，下面再模拟一个稍微复杂点的ANR的例子。</p>
+<p>下面的代码也会导致ANR，原因是这样的，在Activity的onCreate中开启了一个线程，在线程中执行testANR()，而testANR()和initView()都被加了同一个锁，为了百分之百让testANR()先获得锁，特意在执行initView()之前让主线程休眠了10ms，这样一来initView()肯定会因为等待testANR()所持有的锁而被同步住，这样就产生了一个稍微复杂些的ANR。这个ANR是很参考意义的，这样的代码很容易在实际开发中出现，尤其是当调用关系比较复杂时，这个时候分析ANR日志就显得异常重要了。下面的代码中虽然已经将耗时操作放在线程中了，按道理就不会出现ANR了，但是仍然要注意子线程和主线程抢占同步锁的情况。</p>
+<p>protected void onCreate(Bundle savedInstanceState) {</p>
+<p>        super.onCreate(savedInstanceState);</p>
+<p>        setContentView(R.layout.activity_main);</p>
+<p>        new Thread(new Runnable() {</p>
+<p>                @Override</p>
+<p>                public void run() {</p>
+<p>                        testANR();</p>
+<p>                }</p>
+<p>        }).start();</p>
+<p>        SystemClock.sleep(10);</p>
+<p>        initView();</p>
+<p>    }</p>
+<p>    pri</p>
+<p>vate synchronized void testANR() {</p>
+<p>        SystemClock.sleep(30 * 1000);</p>
+<p>    }</p>
+<p>    private synchronized void initView() {</p>
+<p>    }</p>
+<p>为了分析问题，需要从traces文件着手，如下所示。</p>
+<p>—–pid 32662 at 2015-05-31 16:40:21 —–</p>
+<p>    Cmd line: com.ryg.chapter_15</p>
+<p>    DALVIK THREADS:</p>
+<p>     (mutexes: tll&#x3D;0 tsl&#x3D;0 tscl&#x3D;0 ghl&#x3D;0)</p>
+<p>     “main” prio&#x3D;5 tid&#x3D;1 MONITOR</p>
+<p>       | group&#x3D;”main” sCount&#x3D;1 dsCount&#x3D;0 obj&#x3D;0x4185b700 self&#x3D;0x4012d0b0</p>
+<p>       | sysTid&#x3D;32662 nice&#x3D;0 sched&#x3D;0&#x2F;0 cgrp&#x3D;apps handle&#x3D;1073954608</p>
+<p>       | schedstat&#x3D;( 0 0 0 ) utm&#x3D;0 stm&#x3D;4 core&#x3D;0</p>
+<p>       at com.ryg.chapter_15.MainActivity.initView(MainActivity.java:~62)</p>
+<p>       -waiting to lock &lt;0x422a0120&gt; (a com.ryg.chapter_15.MainActivity) held</p>
+<p>       by tid&#x3D;11 (Thread-13248)</p>
+<p>       at com.ryg.chapter_15.MainActivity.onCreate(MainActivity.java:53)</p>
+<p>       at android.app.Activity.performCreate(Activity.java:5086)</p>
+<p>       at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1079)</p>
+<p>       at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2056)</p>
+<p>       at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2117)</p>
+<p>       at android.app.ActivityThread.access$600(ActivityThread.java:140)</p>
+<p>       at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1213)</p>
+<p>       at android.os.Handler.dispatchMessage(Handler.java:99)</p>
+<p>       at android.os.Looper.loop(Looper.java:137)</p>
+<p>       at android.app.ActivityThread.main(ActivityThread.java:4914)</p>
+<p>       at java.lang.reflect.Method.invokeNative(Native Method)</p>
+<p>       at java.lang.reflect.Method.invoke(Method.java:511)</p>
+<p>       at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:808)</p>
+<p>       at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:575)</p>
+<p>       at dalvik.system.NativeStart.main(Native Method)</p>
+<p>     “Thread-13248” prio&#x3D;5 tid&#x3D;11 TIMED_WAIT</p>
+<p>       | group&#x3D;”main” sCount&#x3D;1 dsCount&#x3D;0 obj&#x3D;0x422b0ed8 self&#x3D;0x683d20c0</p>
+<p>       | sysTid&#x3D;32687 nice&#x3D;0 sched&#x3D;0&#x2F;0 cgrp&#x3D;apps handle&#x3D;1751804288</p>
+<p>       | schedstat&#x3D;( 0 0 0 ) utm&#x3D;0 stm&#x3D;0 core&#x3D;0</p>
+<p>       at java.lang.VMThread.sleep(Native Method)</p>
+<p>       at java.lang.Thread.sleep(Thread.java:1031)</p>
+<p>       at java.lang.Thread.sleep(Thread.java:1013)</p>
+<p>       at android.os.SystemClock.sleep(SystemClock.java:114)</p>
+<p>       at com.ryg.chapter_15.MainActivity.testANR(MainActivity.java:57)</p>
+<p>       at com.ryg.chapter_15.MainActivity.access$0(MainActivity.java:56)</p>
+<p>       at com.ryg.chapter_15.MainActivity$1.run(MainActivity.java:49)</p>
+<p>       at java.lang.Thread.run(Thread.java:856)</p>
+<p>上面的情况稍微复杂一些，需要逐步分析。首先看主线程，如下所示。可以看得出主线程在initView方法中正在等待一个锁&lt;0x422a0120&gt;，这个锁的类型是一个MainActivity对象，并且这个锁已经被线程id为11（即tid&#x3D;11）的线程持有了，因此需要再看一下线程11的情况。</p>
+<p>at com.ryg.chapter_15.MainActivity.initView(MainActivity.java:~62)</p>
+<p>       -waiting to lock &lt;0x422a0120&gt; (a com.ryg.chapter_15.MainActivity) held</p>
+<p>       by tid&#x3D;11 (Thread-13248)</p>
+<p>tid是11的线程就是“Thread-13248”，就是它持有了主线程所需的锁，可以看出“Thread-13248”正在sleep，sleep的原因是MainActivity的57行，即testANR方法。这个时候可以发现testANR方法和主线程的initView方法都加了synchronized关键字，表明它们在竞争同一个锁，即当前Activity的对象锁，这样一来ANR的原因就明确了，接着就可以修改代码了。</p>
+<p>上面分析了两个ANR的实例，尤其是第二个ANR在实际开发中很容易出现，我们首先要有意识地避免出现ANR，其次出现ANR了也不要着急，通过分析traces文件即可定位问题。</p>
+<h3 id="15-1-5-ListView和Bitmap优化"><a href="#15-1-5-ListView和Bitmap优化" class="headerlink" title="15.1.5　ListView和Bitmap优化"></a>15.1.5　ListView和Bitmap优化</h3><p>ListView的优化在第12章已经做了介绍，这里再简单回顾一下。主要分为三个方面：首先要采用ViewHolder并避免在getView中执行耗时操作；其次要根据列表的滑动状态来控制任务的执行频率，比如当列表快速滑动时显然是不太适合开启大量的异步任务的；最后可以尝试开启硬件加速来使Listview的滑动更加流畅。注意Listview的优化策略完全适用于GridView。</p>
+<p>Bitmap的优化同样在第12章已经做了详细的介绍，主要是通过BitmapFactory.Options来根据需要对图片进行采样，采样过程中主要用到了BitmapFactory.Options的inSampleSize参数，详情这里就不再重复了，请参考第12章的有关内容。</p>
+<h3 id="15-1-6-线程优化"><a href="#15-1-6-线程优化" class="headerlink" title="15.1.6　线程优化"></a>15.1.6　线程优化</h3><p>线程优化的思想是采用线程池，避免程序中存在大量的Thread。线程池可以重用内部的线程，从而避免了线程的创建和销毁所带来的性能开销，同时线程池还能有效地控制线程池的最大并发数，避免大量的线程因互相抢占系</p>
+<p>统资源从而导致阻塞现象的发生。因此在实际开发中，我们要尽量采用线程池，而不是每次都要创建一个Thread对象，关于线程池的详细介绍请参考第11章的内容。</p>
+<h3 id="15-1-7-一些性能优化建议"><a href="#15-1-7-一些性能优化建议" class="headerlink" title="15.1.7　一些性能优化建议"></a>15.1.7　一些性能优化建议</h3><p>本节介绍的是一些性能优化的小建议，通过它们可以在一定程度上提高性能。</p>
+<p>避免创建过多的对象；</p>
+<p>不要过多使用枚举，枚举占用的内存空间要比整型大；</p>
+<p>常量请使用static final来修饰；</p>
+<p>使用一些Android特有的数据结构，比如SparseArray和Pair等，它们都具有更好的性能；</p>
+<p>适当使用软引用和软引用；</p>
+<p>采用内存缓存和磁盘缓存；</p>
+<p>尽量采用静态内部类，这样可以避免潜在的由于内部类而导致的内存泄露。</p>
+<h2 id="15-2-内存泄露分析之MAT工具"><a href="#15-2-内存泄露分析之MAT工具" class="headerlink" title="15.2　内存泄露分析之MAT工具"></a>15.2　内存泄露分析之MAT工具</h2><p>MAT的全称是Eclipse Memory Analyzer，它是一款强大的内存泄露分析工具，MAT不需要安装，下载后解压即可使用，下载地址为<a target="_blank" rel="noopener" href="http://www.eclipse.org/mat/downloads.php">http://www.eclipse.org/mat/downloads.php</a>。对于Eclipse来说，MAT也有插件版，但是不建议使用插件版，因为独立版使用起来更加方便，即使不安装Eclipse也可以正常使用，当然前提是有内存分析后的hprof文件。</p>
+<p>为了采用MAT来分析内存泄露，下面模拟一种简单的内存泄露情况，下面的代码肯定会造成内存泄露：</p>
+<p>public class MainActivity extends Activity {</p>
+<p>         private static final String TAG &#x3D; “MainActivity”;</p>
+<p>         private static Context sContext;</p>
+<p>         @Override</p>
+<p>         protected void onCreate(Bundle savedInstanceState) {</p>
+<p>             super.onCreate(savedInstanceState);</p>
+<p>             setContentView(R.layout.activity_main);</p>
+<p>             sContext &#x3D; this;</p>
+<p>        }</p>
+<p>    }</p>
+<p>编译安装，然后打开DDMS界面，其中AndroidStudio的DDMS位于Monitor中。接着用鼠标选中要分析的进程，然后使用待分析应用的一些功能，这样做是为了将尽量多的内存泄露暴露出来，然后单击Dump HPROF file这个按钮（对应图15-1中底部有黑线的按钮），等待一小段时间即可导出一个hprof后缀的文件，如图15-1所示。</p>
+<p>图15-1　DDMS视图</p>
+<p>导出hprof文件后并不能使用它来进行分析，因为它不能被MAT直接识别，需要通过hprof-conv命令转换一下。hprof-conv命令是Android SDK提供的工具，它位于Android SDK的platform-tools目录下：</p>
+<p>hprof-conv com.ryg.chapter_15.hprof com.ryg.chapter_15-conv.hprof</p>
+<p>当然如果使用的是Eclipse插件版的MAT的话，就可以不进行格式转换了，可以直接用MAT插件打开。</p>
+<p>经过了上面的步骤，接下来就可以直接通过MAT来进行内存分析了。打开MAT，通过菜单打开刚才转换后的com.ryg.chapter_15-conv.hprof这个文件，打开后的界面如图15-2所示。</p>
+<p>图15-2　MAT的内存分析主界面</p>
+<p>如图15-2所示，MAT提供了很多功能，但是最常用的只有Histogram和Dominator Tree，通过Histogram可以直观地看出内存中不同类型的buffer的数量和占用的内存大小，而Dominator Tree则把内存中的对象按照从大到小的顺序进行排序，并且可以分析对象之间的引用关系，内存泄露分析就是通过Dominator Tree来完成的。图15-3和图15-4分别是MAT中Histogram和Dominator Tree的界面。</p>
+<p>图15-3　MAT中Histogram的界面</p>
+<p>图15-4　MAT中Ddominator Tree的界面</p>
+<p>为了分析内存泄露，我们需要分析Dominator Tree里面的内存信息，在Dominator Tree中内存泄露的原因一般不会直接显示出来，这个时候需要按照从大到小的顺序去排查一遍。一般来说Bitmap泄露往往都是由于程序的某个地方发生了内存泄露都引起的，在图15-4中的第2个结果就是一个Bitmap泄露，选中它然后单击鼠标右键-&gt;Path To GC Roots-&gt; exclude wake&#x2F;soft references，如图15-5所示。可以看到sContext引用了Bitmap最终导致了Bitmap无法释放，但其实根本原因是sContext无法释放所导致的，这样我们就找出了内存泄露的地方。Path To GC Roots过程中之所以选择排除弱引用和软引用，是因为二者都有较大几率被gc回收掉，它们并不能造成内存泄露。</p>
+<p>图15-5　Path To GC Roots后的结果</p>
+<p>在Dominator Tree界面中是可以使用搜索功能的，比如我们尝试搜索MainActivity，因为这里我们已经知道MainActivity存在内存泄露了，搜索后的结果如图15-6所示。我们发现里面有6个MainActivity的对象，这是因为每次按back键退出再重新进入MainActivity，系统都会重新创建一个新的MainActivity，但是由于老的MainActivity无法被回收，所以就出现了多个MainActivity对象的情形。另外MAT还有很多其他功能，这里就不再一一介绍了，请读者自己体验吧。</p>
+<p>图15-6　Dominator Tree的搜索功能</p>
+<p>15.3　提高程序的可维护性</p>
+<p>本节所讲述的内容是Android的程序设计思想，主旨是如何提高代码的可维护性和可扩展性，而程序的可维护性本质上也包含可扩展性。本节的切入点为：代码风格、代码的层次性和单一职责原则、面向扩展编程以及设计模式，下面围绕着它们分别展开。</p>
+<p>可读性是代码可维护性的前提，一段别人很难读懂的代码的可维护性显然是极差的。而良好的代码风格在一定程度上可以提高程序的可读性。代码风格包含很多方面，比如命名规范、代码的排版以及是否写注释等。到底什么样的代码风格是良好的？这是个仁者见仁的问题，下面是笔者的一些看法。</p>
+<p>（1）命名要规范，要能正确地传达出变量或者方法的含义，少用缩写，关于变量的前缀可以参考Android源码的命名方式，比如私有成员以m开头，静态成员以s开头，常量则全部用大写字母表示，等等。</p>
+<p>（2）代码的排版上需要留出合理的空白来区分不同的代码块，其中同类变量的声明要放在一组，两类变量之间要留出一行空白作为区分。</p>
+<p>（3）仅为非常关键的代码添加注释，其他地方不写注释，这就对变量和方法的命名风格</p>
+<p>提出了很高的要求，一个合理的命令风格可以让读者阅读源码就像在阅读注释一样，因此根本不需要为代码额外写注释。</p>
+<p>代码的层次性是指代码要有分层的概念，对于一段业务逻辑，不要试图在一个方法或者一个类中去全部实现，而要将它分成几个子逻辑，然后每个子逻辑做自己的事情，这样既显得代码层次分明，又可以分解任务从而实现简化逻辑的效果。单一职责是和层次性相关联的，代码分层以后，每一层仅仅关注少量的逻辑，这样就做到了单一职责。代码的层次性和单一职责原则可以以公司的组织结构为例来说明，比如现在有一个复杂的需求来到了部门经理面前，如果部门经理需要给每个员工来安排具体的任务，那显然他会显得很累，因为他必须要了解每个员工的工作并最终收集每个员工的完成情况，这个时候整个工作过程就缺少了层次性，并且也违背了单一职责的原则，毕竟经理的主要工作是管理团队而不是给员工安排任务。如果采用分层的思想要怎么做呢？首先经理可以将复杂的任务分成若干份，每一份交给一个主管处理，然后剩下的事情经理就不用管了，他只需要管理主管即可。对于主管来说，分配给他的任务相对于整个任务就简单了不少，这个时候他再拆解任务给组员，这个时候真正到达组员手里的任务其实就没有那么复杂了，这其实类似于分治策略。这样一来整个工作过程就具有了三层的结构，并且每一层有不同</p>
+<p>的职责，一旦出现了错误也可以很方便地定位到具体的地方。</p>
+<p>程序的扩展性标志着开发人员是否有足够的经验，很多时候在开发过程中我们无法保证已经做好的需求不在后面的版本发生变更，因此在写程序的过程中要时刻考虑到扩展，考虑着如果这个逻辑后面发生了改变那么需要做哪些修改，以及怎么样才能降低修改的工作量，面向扩展编程会使程序具有很好的扩展性。</p>
+<p>恰当地使用设计模式可以提高代码的可维护性和可扩展性，但是Android程序容易有性能瓶颈，因此要控制设计的度，设计不能太牵强，否则就是过度设计了。常见的设计模式有很多，比如单例模式、工厂模式以及观察者模式等，由于本书不是专门介绍设计模式的书，因此这里就不对设计模式进行详细的介绍了，读者可以参看《大话设计模式》和《Android源码设计模式解析与实战》这两本书，另外设计模式需要理解后灵活运用才能发挥更好的效果。</p>
+</article><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/android/">android</a></div><div class="post_share"><div class="social-share" data-image="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/01/14/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC14%E7%AB%A0%20JNI%E5%92%8CNDK%E7%BC%96%E7%A8%8B/" title="第十四章 JNI和NDK编程"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">第十四章 JNI和NDK编程</div></div></a></div><div class="next-post pull-right"><a href="/2024/02/10/gallery/" title="图库"><div class="cover" style="background: var(--default-bg-color)"></div><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">图库</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2021/01/01/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC1%E7%AB%A0%20Activity%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E5%92%8C%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F/" title="第一章 Activity的生命周期和启动模式"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-01</div><div class="title">第一章 Activity的生命周期和启动模式</div></div></a></div><div><a href="/2021/01/03/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC3%E7%AB%A0%20View%E7%9A%84%E4%BA%8B%E4%BB%B6%E4%BD%93%E7%B3%BB/" title="第三章　View的事件体系"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-03</div><div class="title">第三章　View的事件体系</div></div></a></div><div><a href="/2021/01/04/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC4%E7%AB%A0%20View%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" title="第四章　View的工作原理"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-04</div><div class="title">第四章　View的工作原理</div></div></a></div><div><a href="/2021/01/05/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC5%E7%AB%A0%20%E7%90%86%E8%A7%A3RemoteViews/" title="第五章　理解RemoteViews"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-05</div><div class="title">第五章　理解RemoteViews</div></div></a></div><div><a href="/2021/01/06/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC6%E7%AB%A0%20Android%E7%9A%84Drawable/" title="第六章　Android的Drawable"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-06</div><div class="title">第六章　Android的Drawable</div></div></a></div><div><a href="/2021/01/07/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC7%E7%AB%A0%20Android%E5%8A%A8%E7%94%BB%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90/" title="第七章　Android动画深入分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2021-01-07</div><div class="title">第七章　Android动画深入分析</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fsafe-img.xhscdn.com%2Fbw1%2Fd5f80e1a-f4c1-4f5c-aad2-fe213ae89f64%3FimageView2%2F2%2Fw%2F1080%2Fformat%2Fjpg&amp;refer=http%3A%2F%2Fsafe-img.xhscdn.com&amp;app=2002&amp;size=f9999,10000&amp;q=a80&amp;n=0&amp;g=0n&amp;fmt=auto?sec=1710160772&amp;t=4038984b7822fc46c9a8d50e0c5106b4" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Junyong Tu</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">46</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" href="https://github.com/juncaixingchi1993"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#15-1-Android%E7%9A%84%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">15.1　Android的性能优化方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#15-1-1-%E5%B8%83%E5%B1%80%E4%BC%98%E5%8C%96"><span class="toc-number">1.1.</span> <span class="toc-text">15.1.1　布局优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#15-1-2-%E7%BB%98%E5%88%B6%E4%BC%98%E5%8C%96"><span class="toc-number">1.2.</span> <span class="toc-text">15.1.2　绘制优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#15-1-3-%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E4%BC%98%E5%8C%96"><span class="toc-number">1.3.</span> <span class="toc-text">15.1.3　内存泄露优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#15-1-4-%E5%93%8D%E5%BA%94%E9%80%9F%E5%BA%A6%E4%BC%98%E5%8C%96%E5%92%8CANR%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90"><span class="toc-number">1.4.</span> <span class="toc-text">15.1.4　响应速度优化和ANR日志分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#15-1-5-ListView%E5%92%8CBitmap%E4%BC%98%E5%8C%96"><span class="toc-number">1.5.</span> <span class="toc-text">15.1.5　ListView和Bitmap优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#15-1-6-%E7%BA%BF%E7%A8%8B%E4%BC%98%E5%8C%96"><span class="toc-number">1.6.</span> <span class="toc-text">15.1.6　线程优化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#15-1-7-%E4%B8%80%E4%BA%9B%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E5%BB%BA%E8%AE%AE"><span class="toc-number">1.7.</span> <span class="toc-text">15.1.7　一些性能优化建议</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#15-2-%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2%E5%88%86%E6%9E%90%E4%B9%8BMAT%E5%B7%A5%E5%85%B7"><span class="toc-number">2.</span> <span class="toc-text">15.2　内存泄露分析之MAT工具</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/26_service/" title="无题">无题</a><time datetime="2024-02-14T11:37:45.559Z" title="发表于 2024-02-14 19:37:45">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/14/Android%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E9%9B%86%E9%94%A6/25_intent%E5%92%8CPendingIntent/" title="无题">无题</a><time datetime="2024-02-14T11:37:40.152Z" title="发表于 2024-02-14 19:37:40">2024-02-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/02/10/gallery/" title="图库">图库</a><time datetime="2024-02-10T15:25:25.435Z" title="发表于 2024-02-10 23:25:25">2024-02-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/15/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC15%E7%AB%A0%20Android%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" title="第十五章 Android性能优化">第十五章 Android性能优化</a><time datetime="2021-01-15T14:07:08.000Z" title="发表于 2021-01-15 22:07:08">2021-01-15</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2021/01/14/Android%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2/%E7%AC%AC14%E7%AB%A0%20JNI%E5%92%8CNDK%E7%BC%96%E7%A8%8B/" title="第十四章 JNI和NDK编程">第十四章 JNI和NDK编程</a><time datetime="2021-01-14T14:07:08.000Z" title="发表于 2021-01-14 22:07:08">2021-01-14</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By Junyong Tu</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.12.0"></script><script src="/js/main.js?v=4.12.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script defer="defer" id="fluttering_ribbon" mobile="true" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/dist/canvas-fluttering-ribbon.min.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
